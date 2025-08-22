@@ -5,6 +5,8 @@ import { fetchDashboardOverview, fetchAccountBalances, fetchMonthlyTrends } from
 import OverviewCards from './OverviewCards';
 import AccountsChart from './AccountsChart';
 import MonthlyTrendsChart from './MonthlyTrendsChart';
+import LoadingSpinner from './LoadingSpinner';
+import ErrorState from './ErrorState';
 import { mockOverview, mockAccountBalances, mockMonthlyTrends } from '../data/mockData';
 import '../styles/Dashboard.css';
 
@@ -20,6 +22,12 @@ const Dashboard: React.FC = () => {
     dispatch(fetchMonthlyTrends());
   }, [dispatch]);
 
+  const handleRetry = () => {
+    dispatch(fetchDashboardOverview());
+    dispatch(fetchAccountBalances());
+    dispatch(fetchMonthlyTrends());
+  };
+
   // Use mock data for development when API is not available
   const useMockData = error && error.includes('Network Error');
   const displayOverview = useMockData ? mockOverview : overview;
@@ -28,16 +36,24 @@ const Dashboard: React.FC = () => {
 
   if (loading && !useMockData) {
     return (
-      <div className="dashboard loading">
-        <div className="loading-spinner">Loading dashboard...</div>
+      <div className="dashboard">
+        <header className="dashboard-header">
+          <h1>Personal Budget Dashboard</h1>
+          <p>Track your finances with modern insights</p>
+        </header>
+        <LoadingSpinner message="Loading your financial data..." />
       </div>
     );
   }
 
   if (error && !useMockData) {
     return (
-      <div className="dashboard error">
-        <div className="error-message">Error: {error}</div>
+      <div className="dashboard">
+        <header className="dashboard-header">
+          <h1>Personal Budget Dashboard</h1>
+          <p>Track your finances with modern insights</p>
+        </header>
+        <ErrorState message={error} onRetry={handleRetry} />
       </div>
     );
   }
