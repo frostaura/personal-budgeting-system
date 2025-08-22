@@ -33,7 +33,7 @@ const OverviewCards: React.FC<OverviewCardsProps> = ({ overview }) => {
         </div>
         <div className="card-content">
           <h3>Net Worth</h3>
-          <p className="card-value">{formatCurrency(overview.netWorth)}</p>
+          <p className="card-value positive">{formatCurrency(overview.netWorth)}</p>
         </div>
       </div>
 
@@ -43,7 +43,7 @@ const OverviewCards: React.FC<OverviewCardsProps> = ({ overview }) => {
         </div>
         <div className="card-content">
           <h3>Monthly Income</h3>
-          <p className="card-value">{formatCurrency(overview.monthlyIncome)}</p>
+          <p className="card-value positive">{formatCurrency(overview.monthlyIncome)}</p>
         </div>
       </div>
 
@@ -53,7 +53,7 @@ const OverviewCards: React.FC<OverviewCardsProps> = ({ overview }) => {
         </div>
         <div className="card-content">
           <h3>Monthly Expenses</h3>
-          <p className="card-value">{formatCurrency(overview.monthlyExpenses)}</p>
+          <p className="card-value negative">{formatCurrency(overview.monthlyExpenses)}</p>
         </div>
       </div>
 
@@ -63,7 +63,7 @@ const OverviewCards: React.FC<OverviewCardsProps> = ({ overview }) => {
         </div>
         <div className="card-content">
           <h3>Monthly Investments</h3>
-          <p className="card-value">{formatCurrency(overview.monthlyInvestments)}</p>
+          <p className="card-value positive">{formatCurrency(overview.monthlyInvestments)}</p>
         </div>
       </div>
 
@@ -73,7 +73,9 @@ const OverviewCards: React.FC<OverviewCardsProps> = ({ overview }) => {
         </div>
         <div className="card-content">
           <h3>Savings Rate</h3>
-          <p className="card-value">{formatPercentage(overview.savingsRate)}</p>
+          <p className={`card-value ${overview.savingsRate > 20 ? 'positive' : overview.savingsRate > 10 ? '' : 'negative'}`}>
+            {formatPercentage(overview.savingsRate)}
+          </p>
         </div>
       </div>
 
