@@ -1,4 +1,12 @@
 import React from 'react';
+import { 
+  Wallet, 
+  TrendingUp, 
+  PieChart, 
+  Gem, 
+  Target, 
+  Building2 
+} from 'lucide-react';
 import { DashboardOverview } from '../types';
 
 interface OverviewCardsProps {
@@ -20,47 +28,61 @@ const OverviewCards: React.FC<OverviewCardsProps> = ({ overview }) => {
   return (
     <div className="overview-cards">
       <div className="card glass-card net-worth">
-        <div className="card-icon">💰</div>
+        <div className="card-icon">
+          <Wallet size={32} />
+        </div>
         <div className="card-content">
           <h3>Net Worth</h3>
-          <p className="card-value">{formatCurrency(overview.netWorth)}</p>
+          <p className="card-value positive">{formatCurrency(overview.netWorth)}</p>
         </div>
       </div>
 
       <div className="card glass-card income">
-        <div className="card-icon">📈</div>
+        <div className="card-icon">
+          <TrendingUp size={32} />
+        </div>
         <div className="card-content">
           <h3>Monthly Income</h3>
-          <p className="card-value">{formatCurrency(overview.monthlyIncome)}</p>
+          <p className="card-value positive">{formatCurrency(overview.monthlyIncome)}</p>
         </div>
       </div>
 
       <div className="card glass-card expenses">
-        <div className="card-icon">📊</div>
+        <div className="card-icon">
+          <PieChart size={32} />
+        </div>
         <div className="card-content">
           <h3>Monthly Expenses</h3>
-          <p className="card-value">{formatCurrency(overview.monthlyExpenses)}</p>
+          <p className="card-value negative">{formatCurrency(overview.monthlyExpenses)}</p>
         </div>
       </div>
 
       <div className="card glass-card investments">
-        <div className="card-icon">💎</div>
+        <div className="card-icon">
+          <Gem size={32} />
+        </div>
         <div className="card-content">
           <h3>Monthly Investments</h3>
-          <p className="card-value">{formatCurrency(overview.monthlyInvestments)}</p>
+          <p className="card-value positive">{formatCurrency(overview.monthlyInvestments)}</p>
         </div>
       </div>
 
       <div className="card glass-card savings-rate">
-        <div className="card-icon">🎯</div>
+        <div className="card-icon">
+          <Target size={32} />
+        </div>
         <div className="card-content">
           <h3>Savings Rate</h3>
-          <p className="card-value">{formatPercentage(overview.savingsRate)}</p>
+          <p className={`card-value ${overview.savingsRate > 20 ? 'positive' : overview.savingsRate > 10 ? '' : 'negative'}`}>
+            {formatPercentage(overview.savingsRate)}
+          </p>
         </div>
       </div>
 
       <div className="card glass-card accounts-count">
-        <div className="card-icon">🏦</div>
+        <div className="card-icon">
+          <Building2 size={32} />
+        </div>
         <div className="card-content">
           <h3>Active Accounts</h3>
           <p className="card-value">{overview.accountsCount}</p>
