@@ -2,6 +2,8 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../store';
 import { fetchDashboardOverview, fetchAccountBalances, fetchMonthlyTrends } from '../store/slices/dashboardSlice';
+import { useOnboarding } from '../contexts/OnboardingContext';
+import { dashboardOnboardingSteps } from '../config/onboardingSteps';
 import OverviewCards from './OverviewCards';
 import AccountsChart from './AccountsChart';
 import MonthlyTrendsChart from './MonthlyTrendsChart';
@@ -15,12 +17,25 @@ const Dashboard: React.FC = () => {
   const { overview, accountBalances, monthlyTrends, loading, error } = useSelector(
     (state: RootState) => state.dashboard
   );
+  const { state: onboardingState, startOnboarding } = useOnboarding();
 
   useEffect(() => {
     dispatch(fetchDashboardOverview());
     dispatch(fetchAccountBalances());
     dispatch(fetchMonthlyTrends());
   }, [dispatch]);
+
+  // Auto-start onboarding for new users
+  useEffect(() => {
+    if (!onboardingState.isCompleted && !onboardingState.isActive && overview) {
+      // Add a small delay to ensure components are mounted
+      const timer = setTimeout(() => {
+        startOnboarding(dashboardOnboardingSteps);
+      }, 1000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [onboardingState.isCompleted, onboardingState.isActive, overview, startOnboarding]);
 
   const handleRetry = () => {
     dispatch(fetchDashboardOverview());
