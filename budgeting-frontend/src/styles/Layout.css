@@ -2,7 +2,6 @@
 .layout {
   display: flex;
   min-height: 100vh;
-  background: #f8fafc;
 }
 
 /* Sidebar */
@@ -156,7 +155,7 @@
 /* Desktop Styles */
 @media (min-width: 1024px) {
   .sidebar {
-    position: static;
+    position: fixed;
     transform: translateX(0);
     box-shadow: none;
   }
@@ -174,15 +173,15 @@
   }
   
   .main-content {
-    margin-left: 0;
+    margin-left: 280px;
   }
   
   .main-header {
-    padding: 1rem 2rem 1rem 0;
+    padding: 1rem 2rem 1rem 2rem;
   }
   
   .page-content {
-    padding: 2rem 2rem 2rem 0;
+    padding: 2rem;
   }
 }
 
