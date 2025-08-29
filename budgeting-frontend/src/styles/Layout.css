@@ -156,9 +156,9 @@
 /* Desktop Styles */
 @media (min-width: 1024px) {
   .sidebar {
-    position: static;
+    position: fixed;
     transform: translateX(0);
-    box-shadow: none;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
   }
   
   .sidebar-overlay {
@@ -174,7 +174,7 @@
   }
   
   .main-content {
-    margin-left: 0;
+    margin-left: 280px;
   }
   
   .main-header {
