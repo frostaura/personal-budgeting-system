@@ -3,6 +3,8 @@ BudgetingApi/bin/
 BudgetingApi/obj/
 budgeting-frontend/build/
 budgeting-frontend/node_modules/
+src/frontend/dist/
+src/frontend/node_modules/
 
 # Database Files
 BudgetingApi/*.db
@@ -29,6 +31,7 @@ pids
 
 # Coverage directory used by tools like istanbul
 coverage/
+src/frontend/coverage/
 
 # nyc test coverage
 .nyc_output
@@ -92,3 +95,8 @@ typings/
 
 # DynamoDB Local files
 .dynamodb/
+
+# Testing
+src/frontend/test-results/
+src/frontend/playwright-report/
+src/frontend/playwright/.cache/

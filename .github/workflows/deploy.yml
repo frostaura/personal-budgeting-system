@@ -1,0 +1,105 @@
+name: Deploy Frontend to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: 'src/frontend/package-lock.json'
+        
+    - name: Install dependencies
+      run: |
+        cd src/frontend
+        npm ci
+        
+    - name: Type check
+      run: |
+        cd src/frontend
+        npm run type-check
+        
+    - name: Lint
+      run: |
+        cd src/frontend
+        npm run lint
+        
+    - name: Format check
+      run: |
+        cd src/frontend
+        npm run format:check
+        
+    - name: Run tests
+      run: |
+        cd src/frontend
+        npm run test -- --coverage
+        
+    - name: Upload coverage to Codecov (optional)
+      uses: codecov/codecov-action@v3
+      if: success()
+      with:
+        directory: src/frontend/coverage
+        fail_ci_if_error: false
+
+  build-and-deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+      
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: 'src/frontend/package-lock.json'
+        
+    - name: Install dependencies
+      run: |
+        cd src/frontend
+        npm ci
+        
+    - name: Build
+      run: |
+        cd src/frontend
+        npm run build
+        
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+      
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v2
+      with:
+        path: 'src/frontend/dist'
+        
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v3
