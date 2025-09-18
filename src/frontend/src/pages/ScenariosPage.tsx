@@ -30,6 +30,7 @@ import {
   Tabs,
   Tab,
   LinearProgress,
+  Divider,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -209,6 +210,102 @@ const ScenariosPage: React.FC = () => {
       </DialogTitle>
       <DialogContent>
         <Grid container spacing={3} sx={{ mt: 1 }}>
+          {/* Quick Start Templates */}
+          {scenarios.length === 1 && !editingScenario && (
+            <Grid item xs={12}>
+              <Typography variant="h6" gutterBottom>
+                Quick Start Templates
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                Choose a template to get started quickly, or create your own custom scenario below.
+              </Typography>
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6} md={4}>
+                  <Card 
+                    sx={{ 
+                      cursor: 'pointer', 
+                      border: '1px solid',
+                      borderColor: 'divider',
+                      '&:hover': { borderColor: 'primary.main', backgroundColor: 'action.hover' }
+                    }}
+                    onClick={() => setFormData({
+                      name: 'Reduced Spending',
+                      spendAdjustmentPct: -0.2,
+                      scope: 'discretionary',
+                      inflationPct: 0.06,
+                      salaryGrowthPct: 0.05,
+                    })}
+                  >
+                    <CardContent sx={{ textAlign: 'center', p: 2 }}>
+                      <Typography variant="subtitle2" color="primary">
+                        Reduced Spending
+                      </Typography>
+                      <Typography variant="caption" display="block">
+                        -20% discretionary spending
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+                <Grid item xs={12} sm={6} md={4}>
+                  <Card 
+                    sx={{ 
+                      cursor: 'pointer', 
+                      border: '1px solid',
+                      borderColor: 'divider',
+                      '&:hover': { borderColor: 'primary.main', backgroundColor: 'action.hover' }
+                    }}
+                    onClick={() => setFormData({
+                      name: 'High Inflation',
+                      spendAdjustmentPct: 0,
+                      scope: 'discretionary',
+                      inflationPct: 0.10,
+                      salaryGrowthPct: 0.05,
+                    })}
+                  >
+                    <CardContent sx={{ textAlign: 'center', p: 2 }}>
+                      <Typography variant="subtitle2" color="warning.main">
+                        High Inflation
+                      </Typography>
+                      <Typography variant="caption" display="block">
+                        10% annual inflation
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+                <Grid item xs={12} sm={6} md={4}>
+                  <Card 
+                    sx={{ 
+                      cursor: 'pointer', 
+                      border: '1px solid',
+                      borderColor: 'divider',
+                      '&:hover': { borderColor: 'primary.main', backgroundColor: 'action.hover' }
+                    }}
+                    onClick={() => setFormData({
+                      name: 'Career Growth',
+                      spendAdjustmentPct: 0,
+                      scope: 'discretionary',
+                      inflationPct: 0.06,
+                      salaryGrowthPct: 0.12,
+                    })}
+                  >
+                    <CardContent sx={{ textAlign: 'center', p: 2 }}>
+                      <Typography variant="subtitle2" color="success.main">
+                        Career Growth
+                      </Typography>
+                      <Typography variant="caption" display="block">
+                        12% annual salary growth
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              </Grid>
+              <Divider sx={{ my: 3 }} />
+              <Typography variant="h6" gutterBottom>
+                Custom Scenario
+              </Typography>
+            </Grid>
+          )}
+
           <Grid item xs={12}>
             <TextField
               fullWidth
@@ -325,13 +422,28 @@ const ScenariosPage: React.FC = () => {
         Create and compare different what-if scenarios for your financial future
       </Typography>
 
-      {!canRunComparison && (
-        <Alert severity="info" sx={{ mb: 4 }}>
+      {accounts.length === 0 || cashflows.length === 0 ? (
+        <Alert severity="warning" sx={{ mb: 4 }}>
+          <Typography variant="body2" sx={{ fontWeight: 500, mb: 1 }}>
+            Setup Required
+          </Typography>
           <Typography variant="body2">
-            Scenario comparison requires both accounts and cash flows. Please add some financial data first.
+            To create meaningful scenarios, you need both accounts and cash flows configured. 
+            {accounts.length === 0 && ' Please add some accounts first.'}
+            {cashflows.length === 0 && ' Please add some cash flows first.'}
           </Typography>
         </Alert>
-      )}
+      ) : scenarios.length < 2 ? (
+        <Alert severity="info" sx={{ mb: 4 }}>
+          <Typography variant="body2" sx={{ fontWeight: 500, mb: 1 }}>
+            Getting Started with Scenarios
+          </Typography>
+          <Typography variant="body2">
+            Create your first custom scenario to compare different financial situations! 
+            Start with something simple like "Reduced Spending" or "Higher Savings" to see how small changes can impact your future.
+          </Typography>
+        </Alert>
+      ) : null}
 
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
         <Tabs value={selectedTab} onChange={(_, newValue) => setSelectedTab(newValue)}>
@@ -354,6 +466,41 @@ const ScenariosPage: React.FC = () => {
             Create Scenario
           </Button>
         </Box>
+
+        {/* First-time user guidance */}
+        {scenarios.length === 1 && (
+          <Card sx={{ mb: 3, border: '2px solid', borderColor: 'primary.main', backgroundColor: 'primary.50' }}>
+            <CardContent>
+              <Typography variant="h6" color="primary" gutterBottom>
+                💡 Start Building Your Financial Future
+              </Typography>
+              <Typography variant="body2" sx={{ mb: 2 }}>
+                Create scenarios to explore "what-if" situations and make informed financial decisions:
+              </Typography>
+              <Grid container spacing={2} sx={{ mb: 2 }}>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="body2" sx={{ fontWeight: 500 }}>Quick Start Ideas:</Typography>
+                  <ul style={{ margin: '8px 0', paddingLeft: '20px' }}>
+                    <li>Reduce discretionary spending by 20%</li>
+                    <li>Increase savings rate by 10%</li>
+                    <li>Plan for higher inflation (8-10%)</li>
+                  </ul>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="body2" sx={{ fontWeight: 500 }}>Advanced Scenarios:</Typography>
+                  <ul style={{ margin: '8px 0', paddingLeft: '20px' }}>
+                    <li>Early retirement planning</li>
+                    <li>Economic downturn impact</li>
+                    <li>Career change with salary reduction</li>
+                  </ul>
+                </Grid>
+              </Grid>
+              <Typography variant="body2" color="text.secondary">
+                💡 Tip: Create 2-3 scenarios to see how different choices affect your 5-year financial outlook.
+              </Typography>
+            </CardContent>
+          </Card>
+        )}
 
         <Grid container spacing={3}>
           {scenarios.map((scenario) => (
@@ -601,19 +748,35 @@ const ScenariosPage: React.FC = () => {
             <CardContent sx={{ textAlign: 'center', py: 6 }}>
               <AssessmentIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
               <Typography variant="h6" gutterBottom>
-                No Comparison Data
+                {scenarios.length < 2 ? 'Create More Scenarios to Compare' : 'Ready to Compare Scenarios'}
               </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                Run a comparison to see how different scenarios affect your financial future
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 3, maxWidth: 600, mx: 'auto' }}>
+                {scenarios.length < 2 
+                  ? 'You need at least 2 scenarios to run a comparison. Create additional scenarios in the "Scenario Management" tab to see how different financial decisions impact your future.'
+                  : 'Run a comparison to see detailed projections and rankings of your scenarios over a 5-year period. This will help you understand which financial strategies work best for your goals.'
+                }
               </Typography>
-              <Button
-                variant="contained"
-                startIcon={<PlayIcon />}
-                onClick={handleRunComparison}
-                disabled={!canRunComparison}
-              >
-                Run Your First Comparison
-              </Button>
+              {scenarios.length < 2 ? (
+                <Button
+                  variant="outlined"
+                  startIcon={<AddIcon />}
+                  onClick={() => {
+                    setSelectedTab(0);
+                    setTimeout(() => setIsCreateDialogOpen(true), 100);
+                  }}
+                >
+                  Create Your First Scenario
+                </Button>
+              ) : (
+                <Button
+                  variant="contained"
+                  startIcon={<PlayIcon />}
+                  onClick={handleRunComparison}
+                  disabled={!canRunComparison}
+                >
+                  Run Your First Comparison
+                </Button>
+              )}
             </CardContent>
           </Card>
         )}
