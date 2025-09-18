@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Typography, Grid, Card, CardContent, Box, Alert } from '@mui/material';
 import {
   TrendingUpOutlined,
@@ -6,18 +6,52 @@ import {
   SavingsOutlined,
   PieChartOutlined,
 } from '@mui/icons-material';
-import { formatCurrency } from '@/utils/currency';
+import { formatCurrency, sumCents } from '@/utils/currency';
+import { useAppSelector } from '@/store/hooks';
 
 const DashboardPage: React.FC = () => {
-  // Mock data for now - will be replaced with real data from Redux store
-  const mockData = {
-    netWorth: 125000000, // R1,250,000 in cents
-    totalAssets: 180000000, // R1,800,000
-    totalLiabilities: 55000000, // R550,000
-    monthlyIncome: 4500000, // R45,000
-    monthlyExpenses: 3200000, // R32,000
-    savingsRate: 0.289, // 28.9%
-  };
+  const { accounts } = useAppSelector(state => state.accounts);
+  const { cashflows } = useAppSelector(state => state.cashflows);
+
+  // Calculate real financial metrics
+  const financialMetrics = useMemo(() => {
+    // Calculate total assets and liabilities
+    const assets = accounts
+      .filter(acc => ['income', 'investment'].includes(acc.kind) && acc.openingBalanceCents)
+      .reduce((sum, acc) => sum + (acc.openingBalanceCents || 0), 0);
+
+    const liabilities = accounts
+      .filter(acc => acc.kind === 'liability' && acc.openingBalanceCents)
+      .reduce((sum, acc) => sum + Math.abs(acc.openingBalanceCents || 0), 0);
+
+    const netWorth = assets - liabilities;
+
+    // Calculate monthly income and expenses from cash flows
+    const monthlyIncomeFlows = cashflows.filter(cf => {
+      const account = accounts.find(acc => acc.id === cf.accountId);
+      return account?.kind === 'income' && cf.recurrence.frequency === 'monthly';
+    });
+
+    const monthlyExpenseFlows = cashflows.filter(cf => {
+      const account = accounts.find(acc => acc.id === cf.accountId);
+      return account && account.kind !== 'income' && cf.recurrence.frequency === 'monthly';
+    });
+
+    const monthlyIncome = sumCents(monthlyIncomeFlows.map(cf => cf.amountCents));
+    const monthlyExpenses = sumCents(monthlyExpenseFlows.map(cf => cf.amountCents));
+    const monthlySavings = monthlyIncome - monthlyExpenses;
+    const savingsRate = monthlyIncome > 0 ? monthlySavings / monthlyIncome : 0;
+
+    return {
+      netWorth,
+      totalAssets: assets,
+      totalLiabilities: liabilities,
+      monthlyIncome,
+      monthlyExpenses,
+      monthlySavings,
+      savingsRate,
+    };
+  }, [accounts, cashflows]);
 
   const StatCard: React.FC<{
     title: string;
@@ -96,7 +130,7 @@ const DashboardPage: React.FC = () => {
         <Grid item xs={12} sm={6} lg={3}>
           <StatCard
             title="Net Worth"
-            value={formatCurrency(mockData.netWorth)}
+            value={formatCurrency(financialMetrics.netWorth)}
             icon={<TrendingUpOutlined color="primary" />}
             trend={0.047}
             color="primary"
@@ -106,7 +140,7 @@ const DashboardPage: React.FC = () => {
         <Grid item xs={12} sm={6} lg={3}>
           <StatCard
             title="Total Assets"
-            value={formatCurrency(mockData.totalAssets)}
+            value={formatCurrency(financialMetrics.totalAssets)}
             icon={<AccountBalanceOutlined color="success" />}
             trend={0.023}
             color="success"
@@ -116,9 +150,7 @@ const DashboardPage: React.FC = () => {
         <Grid item xs={12} sm={6} lg={3}>
           <StatCard
             title="Monthly Savings"
-            value={formatCurrency(
-              mockData.monthlyIncome - mockData.monthlyExpenses
-            )}
+            value={formatCurrency(financialMetrics.monthlySavings)}
             icon={<SavingsOutlined color="info" />}
             trend={0.089}
             color="warning"
@@ -128,7 +160,7 @@ const DashboardPage: React.FC = () => {
         <Grid item xs={12} sm={6} lg={3}>
           <StatCard
             title="Savings Rate"
-            value={`${(mockData.savingsRate * 100).toFixed(1)}%`}
+            value={`${(financialMetrics.savingsRate * 100).toFixed(1)}%`}
             icon={<PieChartOutlined color="warning" />}
             trend={0.034}
             color="warning"
@@ -141,11 +173,39 @@ const DashboardPage: React.FC = () => {
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
-                Recent Activity
+                Account Summary
               </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Charts and activity feed will be implemented here with Recharts
-              </Typography>
+              <Box>
+                {accounts.length === 0 ? (
+                  <Typography variant="body2" color="text.secondary">
+                    No accounts found. Add some accounts to see your portfolio.
+                  </Typography>
+                ) : (
+                  <Box>
+                    <Grid container spacing={2}>
+                      <Grid item xs={6}>
+                        <Typography variant="body2" color="text.secondary">
+                          Total Assets
+                        </Typography>
+                        <Typography variant="h6" color="success.main">
+                          {formatCurrency(financialMetrics.totalAssets)}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Typography variant="body2" color="text.secondary">
+                          Total Liabilities
+                        </Typography>
+                        <Typography variant="h6" color="error.main">
+                          {formatCurrency(financialMetrics.totalLiabilities)}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+                      Based on {accounts.length} account{accounts.length !== 1 ? 's' : ''}
+                    </Typography>
+                  </Box>
+                )}
+              </Box>
             </CardContent>
           </Card>
         </Grid>
@@ -154,11 +214,50 @@ const DashboardPage: React.FC = () => {
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
-                Quick Actions
+                Cash Flow Summary
               </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Quick action buttons and forms will be implemented here
-              </Typography>
+              <Box>
+                {cashflows.length === 0 ? (
+                  <Typography variant="body2" color="text.secondary">
+                    No cash flows found. Add income and expense flows to see your monthly budget.
+                  </Typography>
+                ) : (
+                  <Box>
+                    <Grid container spacing={2}>
+                      <Grid item xs={6}>
+                        <Typography variant="body2" color="text.secondary">
+                          Monthly Income
+                        </Typography>
+                        <Typography variant="h6" color="success.main">
+                          {formatCurrency(financialMetrics.monthlyIncome)}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Typography variant="body2" color="text.secondary">
+                          Monthly Expenses
+                        </Typography>
+                        <Typography variant="h6" color="error.main">
+                          {formatCurrency(financialMetrics.monthlyExpenses)}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                    <Box sx={{ mt: 2, p: 2, backgroundColor: 'action.hover', borderRadius: 1 }}>
+                      <Typography variant="body2" color="text.secondary">
+                        Net Cash Flow
+                      </Typography>
+                      <Typography 
+                        variant="h6" 
+                        color={financialMetrics.monthlySavings >= 0 ? 'success.main' : 'error.main'}
+                      >
+                        {formatCurrency(financialMetrics.monthlySavings)}
+                      </Typography>
+                    </Box>
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+                      Based on {cashflows.length} cash flow{cashflows.length !== 1 ? 's' : ''}
+                    </Typography>
+                  </Box>
+                )}
+              </Box>
             </CardContent>
           </Card>
         </Grid>

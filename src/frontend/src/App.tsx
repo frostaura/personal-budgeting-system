@@ -11,6 +11,7 @@ import { AppRouter } from '@/components/routing/AppRouter';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { LoadingScreen } from '@/components/common/LoadingScreen';
 import { DisclaimerDialog } from '@/components/common/DisclaimerDialog';
+import { AppInitializer } from '@/components/common/AppInitializer';
 
 function App() {
   return (
@@ -20,20 +21,22 @@ function App() {
           <ThemeProvider theme={theme}>
             <CssBaseline />
             <HashRouter>
-              <AppRouter />
-              <DisclaimerDialog />
-              <ToastContainer
-                position="top-right"
-                autoClose={5000}
-                hideProgressBar={false}
-                newestOnTop
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-                theme="colored"
-              />
+              <AppInitializer>
+                <AppRouter />
+                <DisclaimerDialog />
+                <ToastContainer
+                  position="top-right"
+                  autoClose={5000}
+                  hideProgressBar={false}
+                  newestOnTop
+                  closeOnClick
+                  rtl={false}
+                  pauseOnFocusLoss
+                  draggable
+                  pauseOnHover
+                  theme="colored"
+                />
+              </AppInitializer>
             </HashRouter>
           </ThemeProvider>
         </PersistGate>
