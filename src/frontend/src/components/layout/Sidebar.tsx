@@ -16,7 +16,7 @@ import {
 import {
   DashboardOutlined,
   AccountBalanceOutlined,
-  TrendingUpOutlined,
+  AttachMoneyOutlined,
   TimelineOutlined,
   ScienceOutlined,
   SettingsOutlined,
@@ -45,7 +45,7 @@ const navigationItems = [
   {
     path: '/cashflows',
     label: 'Cash Flows',
-    icon: TrendingUpOutlined,
+    icon: AttachMoneyOutlined,
     description: 'Income and expenses',
   },
   {

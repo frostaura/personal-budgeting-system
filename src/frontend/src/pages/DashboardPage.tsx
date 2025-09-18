@@ -194,8 +194,9 @@ const DashboardPage: React.FC = () => {
               width: 48,
               height: 48,
               borderRadius: 2,
-              backgroundColor: `${color}.light`,
+              backgroundColor: `${color}.main`,
               mr: 2,
+              color: 'white',
             }}
           >
             {icon}
@@ -318,7 +319,7 @@ const DashboardPage: React.FC = () => {
               <StatCard
                 title="Net Worth"
                 value={formatCurrency(financialMetrics.netWorth)}
-                icon={<TrendingUpOutlined color="primary" />}
+                icon={<TrendingUpOutlined sx={{ color: 'inherit' }} />}
                 trend={0.047}
                 color="primary"
               />
@@ -329,7 +330,7 @@ const DashboardPage: React.FC = () => {
             <StatCard
               title="Total Assets"
               value={formatCurrency(financialMetrics.totalAssets)}
-              icon={<AccountBalanceOutlined color="success" />}
+              icon={<AccountBalanceOutlined sx={{ color: 'inherit' }} />}
               trend={0.023}
               color="success"
             />
@@ -339,7 +340,7 @@ const DashboardPage: React.FC = () => {
             <StatCard
               title="Monthly Savings"
               value={formatCurrency(financialMetrics.monthlySavings)}
-              icon={<SavingsOutlined color="info" />}
+              icon={<SavingsOutlined sx={{ color: 'inherit' }} />}
               trend={0.089}
               color="warning"
             />
@@ -350,7 +351,7 @@ const DashboardPage: React.FC = () => {
               <StatCard
                 title="Savings Rate"
                 value={`${(financialMetrics.savingsRate * 100).toFixed(1)}%`}
-                icon={<PieChartOutlined color="warning" />}
+                icon={<PieChartOutlined sx={{ color: 'inherit' }} />}
                 trend={0.034}
                 color="warning"
               />

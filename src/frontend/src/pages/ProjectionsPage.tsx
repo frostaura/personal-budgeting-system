@@ -97,15 +97,14 @@ const ProjectionsPage: React.FC = () => {
   }, [projectionResults, monthsToProject]);
 
   return (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <Box sx={{ p: 3, flexGrow: 1 }}>
-        <Typography variant="h4" gutterBottom sx={{ fontWeight: 600 }}>
-          Financial Projections
-        </Typography>
+    <Box sx={{ p: 3, minHeight: '100%' }}>
+      <Typography variant="h4" gutterBottom sx={{ fontWeight: 600 }}>
+        Financial Projections
+      </Typography>
 
-        <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-          Deterministic projections based on current balances, interest rates, and compound growth
-        </Typography>
+      <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+        Deterministic projections based on current balances, interest rates, and compound growth
+      </Typography>
 
       {(accounts.length === 0 || cashflows.length === 0) && (
         <Alert severity="warning" sx={{ mb: 4 }}>
@@ -369,7 +368,6 @@ const ProjectionsPage: React.FC = () => {
         </>
       )}
       </Box>
-    </Box>
   );
 };
 
