@@ -1,11 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import {
   Typography,
   Box,
   Card,
   CardContent,
   Grid,
-  TextField,
   Button,
   Select,
   MenuItem,
@@ -24,15 +23,14 @@ import {
   FormHelperText,
 } from '@mui/material';
 import {
-  TrendingUp as TrendingUpIcon,
   Calculate as CalculateIcon,
   Timeline as TimelineIcon,
   AccountBalance as AccountBalanceIcon,
 } from '@mui/icons-material';
 import { useAppSelector } from '@/store/hooks';
 import { projectionEngine } from '@/services/projectionEngine';
-import { formatCurrency, formatPercentage } from '@/utils/currency';
-import { Scenario } from '@/types/money';
+import { formatCurrency } from '@/utils/currency';
+import { Scenario, ProjectionResult } from '@/types/money';
 
 const ProjectionsPage: React.FC = () => {
   const { accounts } = useAppSelector(state => state.accounts);
@@ -40,7 +38,7 @@ const ProjectionsPage: React.FC = () => {
   
   const [monthsToProject, setMonthsToProject] = useState(60); // 5 years default
   const [selectedScenario, setSelectedScenario] = useState<string>('');
-  const [projectionResults, setProjectionResults] = useState<any>(null);
+  const [projectionResults, setProjectionResults] = useState<ProjectionResult | null>(null);
   const [isCalculating, setIsCalculating] = useState(false);
 
   // Sample scenarios (in a real app, these would come from Redux store)
@@ -82,7 +80,7 @@ const ProjectionsPage: React.FC = () => {
   const selectedScenarioObj = scenarios.find(s => s.id === selectedScenario);
 
   // Calculate real-time projections
-  const handleCalculateProjections = async () => {
+  const handleCalculateProjections = useCallback(async () => {
     if (accounts.length === 0 || cashflows.length === 0) {
       return;
     }
@@ -106,21 +104,18 @@ const ProjectionsPage: React.FC = () => {
     } finally {
       setIsCalculating(false);
     }
-  };
+  }, [accounts, cashflows, monthsToProject, selectedScenarioObj]);
 
   // Auto-calculate when inputs change
   React.useEffect(() => {
-    if (accounts.length > 0 && cashflows.length > 0) {
-      handleCalculateProjections();
-    }
-  }, [monthsToProject, selectedScenario, accounts, cashflows]);
+    handleCalculateProjections();
+  }, [handleCalculateProjections]);
 
   // Memoized metrics for performance
   const projectionMetrics = useMemo(() => {
     if (!projectionResults) return null;
 
     const { months, summary } = projectionResults;
-    const finalMonth = months[months.length - 1];
     const midpointMonth = months[Math.floor(months.length / 2)];
     
     // Calculate compound annual growth rate (CAGR)
@@ -324,7 +319,7 @@ const ProjectionsPage: React.FC = () => {
                   </TableHead>
                   <TableBody>
                     {projectionResults.months
-                      .filter((_, index) => index % 3 === 0) // Show every 3rd month for readability
+                      .filter((_month, index) => index % 3 === 0) // Show every 3rd month for readability
                       .map((month, index) => {
                         const previousMonth = index > 0 ? projectionResults.months[(index * 3) - 3] : null;
                         const monthlyGrowth = previousMonth ? 

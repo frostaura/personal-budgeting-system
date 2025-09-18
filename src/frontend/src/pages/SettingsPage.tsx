@@ -43,7 +43,7 @@ const SettingsPage: React.FC = () => {
   const [exportMessage, setExportMessage] = useState<string | null>(null);
   const [importMessage, setImportMessage] = useState<string | null>(null);
 
-  const handleThemeChange = (key: string, value: any) => {
+  const handleThemeChange = (key: string, value: string) => {
     dispatch(updateTheme({ [key]: value }));
   };
 
@@ -51,7 +51,7 @@ const SettingsPage: React.FC = () => {
     dispatch(updateAccessibility({ [key]: value }));
   };
 
-  const handleNotificationChange = (key: string, value: any) => {
+  const handleNotificationChange = (key: string, value: boolean) => {
     if (key === 'enabled') {
       dispatch(updateNotifications({ enabled: value }));
     } else {
