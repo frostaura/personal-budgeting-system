@@ -94,7 +94,7 @@ export const MainLayout: React.FC = () => {
             }),
         }}
       >
-        <Box sx={{ p: 3 }}>
+        <Box sx={{ height: '100%' }}>
           <Outlet />
         </Box>
       </Box>

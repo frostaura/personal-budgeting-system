@@ -16,7 +16,7 @@ import {
 import {
   DashboardOutlined,
   AccountBalanceOutlined,
-  TrendingUpOutlined,
+  AttachMoneyOutlined,
   TimelineOutlined,
   ScienceOutlined,
   SettingsOutlined,
@@ -45,7 +45,7 @@ const navigationItems = [
   {
     path: '/cashflows',
     label: 'Cash Flows',
-    icon: TrendingUpOutlined,
+    icon: AttachMoneyOutlined,
     description: 'Income and expenses',
   },
   {
@@ -131,6 +131,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 }}
                 aria-label={`Navigate to ${item.label}`}
                 role="menuitem"
+                {...(item.path === '/accounts' && {
+                  'data-onboarding': 'sidebar-accounts',
+                })}
               >
                 <ListItemIcon
                   sx={{
@@ -149,7 +152,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   }}
                   secondaryTypographyProps={{
                     variant: 'caption',
-                    sx: { mt: 0.5 },
+                    sx: {
+                      mt: 0.5,
+                      color: isActive ? 'inherit' : 'text.secondary',
+                    },
                   }}
                 />
               </ListItemButton>

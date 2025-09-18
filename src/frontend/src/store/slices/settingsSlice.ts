@@ -11,6 +11,9 @@ interface SettingsState {
   theme: {
     mode: 'light' | 'dark' | 'system';
     primaryColor: string;
+    successColor: string;
+    warningColor: string;
+    errorColor: string;
     contrastMode: 'normal' | 'high'; // For WCAG AA compliance
   };
   accessibility: {
@@ -62,6 +65,9 @@ const initialState: SettingsState = {
   theme: {
     mode: 'system',
     primaryColor: '#1976d2',
+    successColor: '#2e7d32',
+    warningColor: '#ed6c02',
+    errorColor: '#d32f2f',
     contrastMode: 'normal',
   },
   accessibility: {

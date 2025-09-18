@@ -73,6 +73,7 @@ const CashflowsPage: React.FC = () => {
   const [formData, setFormData] = useState({
     accountId: '',
     description: '',
+    icon: '💰', // default icon
     amount: '',
     frequency: 'monthly' as Frequency,
     startDate: new Date().toISOString().split('T')[0],
@@ -93,6 +94,7 @@ const CashflowsPage: React.FC = () => {
       setFormData({
         accountId: cashflow.accountId,
         description: cashflow.description || '',
+        icon: cashflow.icon || '💰',
         amount: centsToMajor(cashflow.amountCents).toString(),
         frequency: cashflow.recurrence.frequency,
         startDate: cashflow.recurrence.startDate,
@@ -108,6 +110,7 @@ const CashflowsPage: React.FC = () => {
       setFormData({
         accountId: '',
         description: '',
+        icon: '💰',
         amount: '',
         frequency: 'monthly',
         startDate: new Date().toISOString().split('T')[0],
@@ -132,7 +135,10 @@ const CashflowsPage: React.FC = () => {
         return;
       }
 
-      const recurrenceData: Partial<Recurrence> & { frequency: Frequency; startDate: string } = {
+      const recurrenceData: Partial<Recurrence> & {
+        frequency: Frequency;
+        startDate: string;
+      } = {
         frequency: formData.frequency,
         startDate: formData.startDate,
       };
@@ -144,7 +150,8 @@ const CashflowsPage: React.FC = () => {
         recurrenceData.endDate = formData.endDate;
       }
       if (formData.annualIndexation) {
-        recurrenceData.annualIndexationPct = parseFloat(formData.annualIndexation) / 100;
+        recurrenceData.annualIndexationPct =
+          parseFloat(formData.annualIndexation) / 100;
       }
 
       const cashflow: Cashflow = {
@@ -152,6 +159,7 @@ const CashflowsPage: React.FC = () => {
         accountId: formData.accountId,
         amountCents: majorToCents(parseFloat(formData.amount)),
         description: formData.description,
+        icon: formData.icon,
         recurrence: recurrenceData as Recurrence,
       };
 
@@ -201,160 +209,225 @@ const CashflowsPage: React.FC = () => {
   };
 
   const getFrequencyDisplayText = (frequency: Frequency) => {
-    return FREQUENCY_OPTIONS.find(opt => opt.value === frequency)?.label || frequency;
+    return (
+      FREQUENCY_OPTIONS.find(opt => opt.value === frequency)?.label || frequency
+    );
   };
 
-  const groupedCashflows = cashflows.reduce((groups, cashflow) => {
-    const direction = getCashflowDirection(cashflow);
-    if (!groups[direction]) {
-      groups[direction] = [];
+  const getCashflowDescription = (direction: string): string => {
+    switch (direction) {
+      case 'income':
+        return 'Regular income sources like salary, dividends, and other earnings';
+      case 'expense':
+        return 'Regular expenses like rent, utilities, and recurring payments';
+      default:
+        return 'Financial cash flows and transactions';
     }
-    groups[direction].push(cashflow);
-    return groups;
-  }, {} as Record<string, Cashflow[]>);
+  };
+
+  const groupedCashflows = cashflows.reduce(
+    (groups, cashflow) => {
+      const direction = getCashflowDirection(cashflow);
+      if (!groups[direction]) {
+        groups[direction] = [];
+      }
+      groups[direction].push(cashflow);
+      return groups;
+    },
+    {} as Record<string, Cashflow[]>
+  );
 
   if (loading === 'loading') {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="400px"
+      >
         <Typography>Loading cash flows...</Typography>
       </Box>
     );
   }
 
   return (
-    <Box>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <div>
-          <Typography variant="h4" gutterBottom sx={{ fontWeight: 600 }}>
-            Cash Flows
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            Track your recurring income and expenses
-          </Typography>
-        </div>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => handleOpenDialog()}
-          size="large"
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <Box sx={{ p: 3, flexGrow: 1 }}>
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          mb={3}
         >
-          Add Cash Flow
-        </Button>
+          <div>
+            <Typography variant="h4" gutterBottom sx={{ fontWeight: 600 }}>
+              Cash Flows
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              Track your recurring income and expenses
+            </Typography>
+          </div>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => handleOpenDialog()}
+            size="large"
+          >
+            Add Cash Flow
+          </Button>
+        </Box>
+
+        {error && (
+          <Alert severity="error" sx={{ mb: 3 }}>
+            {error}
+          </Alert>
+        )}
+
+        <Grid container spacing={3}>
+          {Object.entries(groupedCashflows).map(
+            ([direction, directionCashflows]) => (
+              <Grid item xs={12} md={6} key={direction}>
+                <Card>
+                  <CardContent>
+                    <Box display="flex" alignItems="center" mb={1}>
+                      {getCashflowIcon(direction)}
+                      <Typography
+                        variant="h6"
+                        sx={{ ml: 1, textTransform: 'capitalize' }}
+                      >
+                        {direction} Flows
+                      </Typography>
+                      <Chip
+                        label={directionCashflows.length}
+                        color={direction === 'income' ? 'success' : 'error'}
+                        size="small"
+                        sx={{ ml: 'auto' }}
+                      />
+                    </Box>
+
+                    {/* Add subtitle/description */}
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ mb: 2, fontSize: '0.875rem' }}
+                    >
+                      {getCashflowDescription(direction)}
+                    </Typography>
+
+                    <List dense>
+                      {directionCashflows.map(cashflow => (
+                        <ListItem
+                          key={cashflow.id}
+                          sx={{
+                            cursor: 'pointer',
+                            borderRadius: 1,
+                            '&:hover': { backgroundColor: 'action.hover' },
+                            backgroundColor:
+                              selectedCashflowId === cashflow.id
+                                ? 'action.selected'
+                                : 'transparent',
+                          }}
+                          onClick={() => dispatch(selectCashflow(cashflow.id))}
+                        >
+                          <ListItemAvatar>
+                            <Avatar
+                              sx={{
+                                backgroundColor: getCashflowColor(direction),
+                                fontSize: '1.2rem',
+                              }}
+                            >
+                              {cashflow.icon ||
+                                (direction === 'income' ? '💰' : '💸')}
+                            </Avatar>
+                          </ListItemAvatar>
+                          <ListItemText
+                            primary={
+                              cashflow.description || 'Unnamed Cash Flow'
+                            }
+                            secondary={
+                              <Box>
+                                <Typography
+                                  variant="body2"
+                                  color="text.secondary"
+                                >
+                                  {getAccountName(cashflow.accountId)}
+                                </Typography>
+                                <Box display="flex" alignItems="center" gap={1}>
+                                  <Typography
+                                    variant="body2"
+                                    sx={{ fontWeight: 600 }}
+                                  >
+                                    {formatCurrency(cashflow.amountCents)}
+                                  </Typography>
+                                  <Chip
+                                    label={getFrequencyDisplayText(
+                                      cashflow.recurrence.frequency
+                                    )}
+                                    size="small"
+                                    variant="outlined"
+                                    icon={<RepeatIcon />}
+                                  />
+                                </Box>
+                              </Box>
+                            }
+                          />
+                          <ListItemSecondaryAction>
+                            <Tooltip title="Edit Cash Flow">
+                              <IconButton
+                                edge="end"
+                                onClick={e => {
+                                  e.stopPropagation();
+                                  handleOpenDialog(cashflow);
+                                }}
+                                size="small"
+                              >
+                                <EditIcon />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Delete Cash Flow">
+                              <IconButton
+                                edge="end"
+                                onClick={e => {
+                                  e.stopPropagation();
+                                  setCashflowToDelete(cashflow.id);
+                                  setDeleteDialogOpen(true);
+                                }}
+                                size="small"
+                                color="error"
+                              >
+                                <DeleteIcon />
+                              </IconButton>
+                            </Tooltip>
+                          </ListItemSecondaryAction>
+                        </ListItem>
+                      ))}
+                    </List>
+
+                    {directionCashflows.length === 0 && (
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        textAlign="center"
+                        py={2}
+                      >
+                        No {direction} cash flows yet
+                      </Typography>
+                    )}
+                  </CardContent>
+                </Card>
+              </Grid>
+            )
+          )}
+        </Grid>
       </Box>
 
-      {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
-          {error}
-        </Alert>
-      )}
-
-      <Grid container spacing={3}>
-        {Object.entries(groupedCashflows).map(([direction, directionCashflows]) => (
-          <Grid item xs={12} md={6} key={direction}>
-            <Card>
-              <CardContent>
-                <Box display="flex" alignItems="center" mb={2}>
-                  {getCashflowIcon(direction)}
-                  <Typography variant="h6" sx={{ ml: 1, textTransform: 'capitalize' }}>
-                    {direction} Flows
-                  </Typography>
-                  <Chip
-                    label={directionCashflows.length}
-                    color={direction === 'income' ? 'success' : 'error'}
-                    size="small"
-                    sx={{ ml: 'auto' }}
-                  />
-                </Box>
-
-                <List dense>
-                  {directionCashflows.map(cashflow => (
-                    <ListItem
-                      key={cashflow.id}
-                      sx={{
-                        cursor: 'pointer',
-                        borderRadius: 1,
-                        '&:hover': { backgroundColor: 'action.hover' },
-                        backgroundColor:
-                          selectedCashflowId === cashflow.id ? 'action.selected' : 'transparent',
-                      }}
-                      onClick={() => dispatch(selectCashflow(cashflow.id))}
-                    >
-                      <ListItemAvatar>
-                        <Avatar
-                          sx={{
-                            backgroundColor: getCashflowColor(direction),
-                            fontSize: '1.2rem',
-                          }}
-                        >
-                          {direction === 'income' ? '💰' : '💸'}
-                        </Avatar>
-                      </ListItemAvatar>
-                      <ListItemText
-                        primary={cashflow.description || 'Unnamed Cash Flow'}
-                        secondary={
-                          <Box>
-                            <Typography variant="body2" color="text.secondary">
-                              {getAccountName(cashflow.accountId)}
-                            </Typography>
-                            <Box display="flex" alignItems="center" gap={1}>
-                              <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                                {formatCurrency(cashflow.amountCents)}
-                              </Typography>
-                              <Chip
-                                label={getFrequencyDisplayText(cashflow.recurrence.frequency)}
-                                size="small"
-                                variant="outlined"
-                                icon={<RepeatIcon />}
-                              />
-                            </Box>
-                          </Box>
-                        }
-                      />
-                      <ListItemSecondaryAction>
-                        <Tooltip title="Edit Cash Flow">
-                          <IconButton
-                            edge="end"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleOpenDialog(cashflow);
-                            }}
-                            size="small"
-                          >
-                            <EditIcon />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Delete Cash Flow">
-                          <IconButton
-                            edge="end"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setCashflowToDelete(cashflow.id);
-                              setDeleteDialogOpen(true);
-                            }}
-                            size="small"
-                            color="error"
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        </Tooltip>
-                      </ListItemSecondaryAction>
-                    </ListItem>
-                  ))}
-                </List>
-
-                {directionCashflows.length === 0 && (
-                  <Typography variant="body2" color="text.secondary" textAlign="center" py={2}>
-                    No {direction} cash flows yet
-                  </Typography>
-                )}
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
-
       {/* Add/Edit Cashflow Dialog */}
-      <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="md" fullWidth>
+      <Dialog
+        open={dialogOpen}
+        onClose={handleCloseDialog}
+        maxWidth="md"
+        fullWidth
+      >
         <DialogTitle>
           {editingCashflow ? 'Edit Cash Flow' : 'Add New Cash Flow'}
         </DialogTitle>
@@ -365,7 +438,9 @@ const CashflowsPage: React.FC = () => {
                 <InputLabel>Account</InputLabel>
                 <Select
                   value={formData.accountId}
-                  onChange={(e) => setFormData({ ...formData, accountId: e.target.value })}
+                  onChange={e =>
+                    setFormData({ ...formData, accountId: e.target.value })
+                  }
                   label="Account"
                 >
                   {accounts.map(account => (
@@ -381,9 +456,39 @@ const CashflowsPage: React.FC = () => {
                 fullWidth
                 label="Description"
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={e =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
                 required
               />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth>
+                <InputLabel>Icon</InputLabel>
+                <Select
+                  value={formData.icon}
+                  onChange={e =>
+                    setFormData({ ...formData, icon: e.target.value })
+                  }
+                  label="Icon"
+                >
+                  <MenuItem value="💰">💰 Money</MenuItem>
+                  <MenuItem value="💸">💸 Expenses</MenuItem>
+                  <MenuItem value="🏠">🏠 Home</MenuItem>
+                  <MenuItem value="🚗">🚗 Car</MenuItem>
+                  <MenuItem value="🍕">🍕 Food</MenuItem>
+                  <MenuItem value="⚡">⚡ Utilities</MenuItem>
+                  <MenuItem value="🎯">🎯 Savings</MenuItem>
+                  <MenuItem value="📱">📱 Technology</MenuItem>
+                  <MenuItem value="👕">👕 Clothing</MenuItem>
+                  <MenuItem value="🎉">🎉 Entertainment</MenuItem>
+                  <MenuItem value="🏥">🏥 Healthcare</MenuItem>
+                  <MenuItem value="📚">📚 Education</MenuItem>
+                  <MenuItem value="🛒">🛒 Shopping</MenuItem>
+                  <MenuItem value="🎪">🎪 Subscriptions</MenuItem>
+                  <MenuItem value="🏦">🏦 Banking</MenuItem>
+                </Select>
+              </FormControl>
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
@@ -391,7 +496,9 @@ const CashflowsPage: React.FC = () => {
                 label="Amount"
                 type="number"
                 value={formData.amount}
-                onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                onChange={e =>
+                  setFormData({ ...formData, amount: e.target.value })
+                }
                 required
                 helperText="Enter positive amount (direction determined by account type)"
               />
@@ -401,8 +508,11 @@ const CashflowsPage: React.FC = () => {
                 <InputLabel>Frequency</InputLabel>
                 <Select
                   value={formData.frequency}
-                  onChange={(e) =>
-                    setFormData({ ...formData, frequency: e.target.value as Frequency })
+                  onChange={e =>
+                    setFormData({
+                      ...formData,
+                      frequency: e.target.value as Frequency,
+                    })
                   }
                   label="Frequency"
                 >
@@ -420,7 +530,9 @@ const CashflowsPage: React.FC = () => {
                 label="Start Date"
                 type="date"
                 value={formData.startDate}
-                onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                onChange={e =>
+                  setFormData({ ...formData, startDate: e.target.value })
+                }
                 InputLabelProps={{ shrink: true }}
                 required
               />
@@ -432,8 +544,11 @@ const CashflowsPage: React.FC = () => {
                   label="Day of Month"
                   type="number"
                   value={formData.dayOfMonth}
-                  onChange={(e) =>
-                    setFormData({ ...formData, dayOfMonth: parseInt(e.target.value) || 1 })
+                  onChange={e =>
+                    setFormData({
+                      ...formData,
+                      dayOfMonth: parseInt(e.target.value) || 1,
+                    })
                   }
                   inputProps={{ min: 1, max: 31 }}
                   helperText="Day of month for recurring payments"
@@ -445,7 +560,9 @@ const CashflowsPage: React.FC = () => {
                 control={
                   <Switch
                     checked={formData.hasEndDate}
-                    onChange={(e) => setFormData({ ...formData, hasEndDate: e.target.checked })}
+                    onChange={e =>
+                      setFormData({ ...formData, hasEndDate: e.target.checked })
+                    }
                   />
                 }
                 label="Set End Date"
@@ -458,7 +575,9 @@ const CashflowsPage: React.FC = () => {
                   label="End Date"
                   type="date"
                   value={formData.endDate}
-                  onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                  onChange={e =>
+                    setFormData({ ...formData, endDate: e.target.value })
+                  }
                   InputLabelProps={{ shrink: true }}
                 />
               </Grid>
@@ -466,12 +585,14 @@ const CashflowsPage: React.FC = () => {
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
-                label="Annual Indexation (%)"
+                label="Annual Interest Rate (%)"
                 type="number"
                 value={formData.annualIndexation}
-                onChange={(e) => setFormData({ ...formData, annualIndexation: e.target.value })}
+                onChange={e =>
+                  setFormData({ ...formData, annualIndexation: e.target.value })
+                }
                 inputProps={{ step: 0.1 }}
-                helperText="Annual increase rate (e.g., inflation adjustment)"
+                helperText="Annual growth/increase rate (e.g., inflation adjustment)"
               />
             </Grid>
           </Grid>
@@ -481,7 +602,11 @@ const CashflowsPage: React.FC = () => {
           <Button
             onClick={handleSaveCashflow}
             variant="contained"
-            disabled={!formData.accountId || !formData.description.trim() || !formData.amount}
+            disabled={
+              !formData.accountId ||
+              !formData.description.trim() ||
+              !formData.amount
+            }
           >
             {editingCashflow ? 'Update' : 'Create'}
           </Button>
@@ -489,16 +614,24 @@ const CashflowsPage: React.FC = () => {
       </Dialog>
 
       {/* Delete Confirmation Dialog */}
-      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+      >
         <DialogTitle>Delete Cash Flow</DialogTitle>
         <DialogContent>
           <Typography>
-            Are you sure you want to delete this cash flow? This action cannot be undone.
+            Are you sure you want to delete this cash flow? This action cannot
+            be undone.
           </Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
-          <Button onClick={handleDeleteCashflow} color="error" variant="contained">
+          <Button
+            onClick={handleDeleteCashflow}
+            color="error"
+            variant="contained"
+          >
             Delete
           </Button>
         </DialogActions>

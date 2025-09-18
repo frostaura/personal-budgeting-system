@@ -318,13 +318,17 @@ export async function initializeSampleData(): Promise<void> {
     const existingScenarios = await dataService.getScenarios();
 
     // Only seed data if none exists
-    if (existingAccounts.length === 0 && existingCashflows.length === 0 && existingScenarios.length === 0) {
+    if (
+      existingAccounts.length === 0 &&
+      existingCashflows.length === 0 &&
+      existingScenarios.length === 0
+    ) {
       console.log('Initializing application with sample data...');
-      
+
       await dataService.saveAccounts(SAMPLE_ACCOUNTS);
       await dataService.saveCashflows(SAMPLE_CASHFLOWS);
       await dataService.saveScenarios(SAMPLE_SCENARIOS);
-      
+
       console.log('Sample data initialized successfully');
     } else {
       console.log('Existing data found, skipping sample data initialization');

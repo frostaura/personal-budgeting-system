@@ -73,6 +73,7 @@ export type Cashflow = {
   accountId: string;
   amountCents: Cents; // positive magnitude; direction inferred from account kind
   description?: string;
+  icon?: string; // emoji or icon name for display
   recurrence: Recurrence;
   effectiveFrom?: string; // future-dated changes
 };
