@@ -299,16 +299,26 @@ const ProjectionsPage: React.FC = () => {
                 Monthly Projection Breakdown
               </Typography>
 
-              <TableContainer component={Paper} sx={{ mt: 2, maxHeight: 600 }}>
+              <TableContainer 
+                component={Paper} 
+                sx={{ 
+                  mt: 2, 
+                  maxHeight: 600,
+                  overflowX: 'auto',
+                  '& .MuiTable-root': {
+                    minWidth: { xs: 'auto', sm: 650 }
+                  }
+                }}
+              >
                 <Table stickyHeader size="small">
                   <TableHead>
                     <TableRow>
-                      <TableCell>Month</TableCell>
-                      <TableCell align="right">Net Worth</TableCell>
-                      <TableCell align="right">Monthly Income</TableCell>
-                      <TableCell align="right">Monthly Expenses</TableCell>
-                      <TableCell align="right">Savings Rate</TableCell>
-                      <TableCell align="right">Growth</TableCell>
+                      <TableCell sx={{ minWidth: { xs: 80, sm: 100 } }}>Month</TableCell>
+                      <TableCell align="right" sx={{ minWidth: { xs: 120, sm: 140 } }}>Net Worth</TableCell>
+                      <TableCell align="right" sx={{ minWidth: { xs: 100, sm: 120 }, display: { xs: 'none', sm: 'table-cell' } }}>Monthly Income</TableCell>
+                      <TableCell align="right" sx={{ minWidth: { xs: 100, sm: 120 } }}>Monthly Expenses</TableCell>
+                      <TableCell align="right" sx={{ minWidth: { xs: 80, sm: 100 } }}>Savings Rate</TableCell>
+                      <TableCell align="right" sx={{ minWidth: { xs: 80, sm: 100 }, display: { xs: 'none', md: 'table-cell' } }}>Growth</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -325,7 +335,7 @@ const ProjectionsPage: React.FC = () => {
 
                         return (
                           <TableRow key={month.month}>
-                            <TableCell>
+                            <TableCell sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
                               {new Date(month.month + '-01').toLocaleDateString(
                                 'en-ZA',
                                 {
@@ -335,19 +345,32 @@ const ProjectionsPage: React.FC = () => {
                               )}
                             </TableCell>
                             <TableCell align="right">
-                              <strong>
+                              <Typography
+                                sx={{
+                                  fontWeight: 'bold',
+                                  fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                                  color: month.totalNetWorth >= 0 ? 'success.main' : 'error.main',
+                                }}
+                              >
                                 {formatCurrency(month.totalNetWorth)}
-                              </strong>
+                              </Typography>
                             </TableCell>
                             <TableCell
                               align="right"
-                              sx={{ color: 'success.main' }}
+                              sx={{ 
+                                color: 'success.main',
+                                fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                                display: { xs: 'none', sm: 'table-cell' }
+                              }}
                             >
                               {formatCurrency(month.totalIncome)}
                             </TableCell>
                             <TableCell
                               align="right"
-                              sx={{ color: 'error.main' }}
+                              sx={{ 
+                                color: 'error.main',
+                                fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                              }}
                             >
                               {formatCurrency(month.totalExpenses)}
                             </TableCell>
@@ -362,17 +385,20 @@ const ProjectionsPage: React.FC = () => {
                                       : 'error'
                                 }
                                 size="small"
+                                sx={{ 
+                                  fontSize: { xs: '0.65rem', sm: '0.75rem' },
+                                  height: { xs: 20, sm: 24 }
+                                }}
                               />
                             </TableCell>
-                            <TableCell align="right">
+                            <TableCell align="right" sx={{ display: { xs: 'none', md: 'table-cell' } }}>
                               {previousMonth && (
                                 <Typography
                                   variant="body2"
-                                  color={
-                                    monthlyGrowth >= 0
-                                      ? 'success.main'
-                                      : 'error.main'
-                                  }
+                                  sx={{
+                                    fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                                    color: monthlyGrowth >= 0 ? 'success.main' : 'error.main',
+                                  }}
                                 >
                                   {monthlyGrowth >= 0 ? '+' : ''}
                                   {formatCurrency(monthlyGrowth)}
