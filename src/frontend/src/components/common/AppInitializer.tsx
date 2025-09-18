@@ -16,7 +16,7 @@ export const AppInitializer: React.FC<AppInitializerProps> = ({ children }) => {
       try {
         // Initialize sample data if needed
         await initializeSampleData();
-        
+
         // Load data into Redux store
         dispatch(fetchAccounts());
         dispatch(fetchCashflows());

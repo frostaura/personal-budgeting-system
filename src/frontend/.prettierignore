@@ -5,6 +5,10 @@ node_modules/
 dist/
 coverage/
 
+# Test outputs
+playwright-report/
+test-results/
+
 # Logs
 *.log
 

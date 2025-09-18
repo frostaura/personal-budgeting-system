@@ -17,7 +17,10 @@ const DashboardPage: React.FC = () => {
   const financialMetrics = useMemo(() => {
     // Calculate total assets and liabilities
     const assets = accounts
-      .filter(acc => ['income', 'investment'].includes(acc.kind) && acc.openingBalanceCents)
+      .filter(
+        acc =>
+          ['income', 'investment'].includes(acc.kind) && acc.openingBalanceCents
+      )
       .reduce((sum, acc) => sum + (acc.openingBalanceCents || 0), 0);
 
     const liabilities = accounts
@@ -29,16 +32,26 @@ const DashboardPage: React.FC = () => {
     // Calculate monthly income and expenses from cash flows
     const monthlyIncomeFlows = cashflows.filter(cf => {
       const account = accounts.find(acc => acc.id === cf.accountId);
-      return account?.kind === 'income' && cf.recurrence.frequency === 'monthly';
+      return (
+        account?.kind === 'income' && cf.recurrence.frequency === 'monthly'
+      );
     });
 
     const monthlyExpenseFlows = cashflows.filter(cf => {
       const account = accounts.find(acc => acc.id === cf.accountId);
-      return account && account.kind !== 'income' && cf.recurrence.frequency === 'monthly';
+      return (
+        account &&
+        account.kind !== 'income' &&
+        cf.recurrence.frequency === 'monthly'
+      );
     });
 
-    const monthlyIncome = sumCents(monthlyIncomeFlows.map(cf => cf.amountCents));
-    const monthlyExpenses = sumCents(monthlyExpenseFlows.map(cf => cf.amountCents));
+    const monthlyIncome = sumCents(
+      monthlyIncomeFlows.map(cf => cf.amountCents)
+    );
+    const monthlyExpenses = sumCents(
+      monthlyExpenseFlows.map(cf => cf.amountCents)
+    );
     const monthlySavings = monthlyIncome - monthlyExpenses;
     const savingsRate = monthlyIncome > 0 ? monthlySavings / monthlyIncome : 0;
 
@@ -200,8 +213,13 @@ const DashboardPage: React.FC = () => {
                         </Typography>
                       </Grid>
                     </Grid>
-                    <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-                      Based on {accounts.length} account{accounts.length !== 1 ? 's' : ''}
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ mt: 2 }}
+                    >
+                      Based on {accounts.length} account
+                      {accounts.length !== 1 ? 's' : ''}
                     </Typography>
                   </Box>
                 )}
@@ -219,7 +237,8 @@ const DashboardPage: React.FC = () => {
               <Box>
                 {cashflows.length === 0 ? (
                   <Typography variant="body2" color="text.secondary">
-                    No cash flows found. Add income and expense flows to see your monthly budget.
+                    No cash flows found. Add income and expense flows to see
+                    your monthly budget.
                   </Typography>
                 ) : (
                   <Box>
@@ -241,19 +260,35 @@ const DashboardPage: React.FC = () => {
                         </Typography>
                       </Grid>
                     </Grid>
-                    <Box sx={{ mt: 2, p: 2, backgroundColor: 'action.hover', borderRadius: 1 }}>
+                    <Box
+                      sx={{
+                        mt: 2,
+                        p: 2,
+                        backgroundColor: 'action.hover',
+                        borderRadius: 1,
+                      }}
+                    >
                       <Typography variant="body2" color="text.secondary">
                         Net Cash Flow
                       </Typography>
-                      <Typography 
-                        variant="h6" 
-                        color={financialMetrics.monthlySavings >= 0 ? 'success.main' : 'error.main'}
+                      <Typography
+                        variant="h6"
+                        color={
+                          financialMetrics.monthlySavings >= 0
+                            ? 'success.main'
+                            : 'error.main'
+                        }
                       >
                         {formatCurrency(financialMetrics.monthlySavings)}
                       </Typography>
                     </Box>
-                    <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-                      Based on {cashflows.length} cash flow{cashflows.length !== 1 ? 's' : ''}
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ mt: 2 }}
+                    >
+                      Based on {cashflows.length} cash flow
+                      {cashflows.length !== 1 ? 's' : ''}
                     </Typography>
                   </Box>
                 )}

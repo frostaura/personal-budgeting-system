@@ -16,6 +16,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "type-check": "tsc --noEmit",
+    "regression-pack": "node scripts/regression-pack.js",
+    "regression-pack:prod": "node scripts/regression-pack-prod.js",
     "prepare": "cd ../.. && husky install src/frontend/.husky"
   },
   "dependencies": {

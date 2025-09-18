@@ -85,10 +85,10 @@ const cashflowsSlice = createSlice({
       state.filters = {};
     },
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     builder
       // Fetch cashflows
-      .addCase(fetchCashflows.pending, (state) => {
+      .addCase(fetchCashflows.pending, state => {
         state.loading = 'loading';
         state.error = null;
       })
@@ -101,7 +101,7 @@ const cashflowsSlice = createSlice({
         state.error = action.error.message || 'Failed to fetch cashflows';
       })
       // Create cashflow
-      .addCase(createCashflow.pending, (state) => {
+      .addCase(createCashflow.pending, state => {
         state.loading = 'loading';
       })
       .addCase(createCashflow.fulfilled, (state, action) => {
@@ -113,12 +113,14 @@ const cashflowsSlice = createSlice({
         state.error = action.error.message || 'Failed to create cashflow';
       })
       // Update cashflow
-      .addCase(updateCashflowThunk.pending, (state) => {
+      .addCase(updateCashflowThunk.pending, state => {
         state.loading = 'loading';
       })
       .addCase(updateCashflowThunk.fulfilled, (state, action) => {
         state.loading = 'succeeded';
-        const index = state.cashflows.findIndex(cf => cf.id === action.payload.id);
+        const index = state.cashflows.findIndex(
+          cf => cf.id === action.payload.id
+        );
         if (index !== -1) {
           state.cashflows[index] = action.payload;
         }
@@ -128,12 +130,14 @@ const cashflowsSlice = createSlice({
         state.error = action.error.message || 'Failed to update cashflow';
       })
       // Delete cashflow
-      .addCase(deleteCashflowThunk.pending, (state) => {
+      .addCase(deleteCashflowThunk.pending, state => {
         state.loading = 'loading';
       })
       .addCase(deleteCashflowThunk.fulfilled, (state, action) => {
         state.loading = 'succeeded';
-        state.cashflows = state.cashflows.filter(cf => cf.id !== action.payload);
+        state.cashflows = state.cashflows.filter(
+          cf => cf.id !== action.payload
+        );
         if (state.selectedCashflowId === action.payload) {
           state.selectedCashflowId = null;
         }

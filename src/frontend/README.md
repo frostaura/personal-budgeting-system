@@ -95,8 +95,30 @@ src/
 - `npm run format` - Format code with Prettier
 - `npm run format:check` - Check code formatting
 - `npm run type-check` - Run TypeScript type checking
+- `npm run regression-pack` - Run comprehensive regression testing
+- `npm run regression-pack:prod` - Run production regression testing (no E2E)
 
 ## 🧪 Testing
+
+### Comprehensive Regression Testing
+
+The application includes a comprehensive regression testing pack that runs all quality checks:
+
+```bash
+npm run regression-pack        # Full regression pack (includes E2E tests)
+npm run regression-pack:prod   # Production pack (excludes E2E tests)
+```
+
+The regression pack includes:
+
+- ✅ Code formatting checks (Prettier)
+- ✅ Linting (ESLint)
+- ✅ Type checking (TypeScript)
+- ✅ Unit tests with coverage (Vitest)
+- ✅ Production build verification (Vite)
+- ✅ End-to-end tests (Playwright)
+
+For detailed information, see [REGRESSION_TESTING.md](./REGRESSION_TESTING.md).
 
 ### Unit Tests
 

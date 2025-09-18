@@ -33,7 +33,13 @@ export default defineConfig({
         '**/*.d.ts',
         '**/*.config.*',
         'dist/',
+        'playwright-report/',
+        'test-results/',
+        'scripts/',
       ],
+      reportsDirectory: './coverage',
+      all: true,
+      include: ['src/**/*.{ts,tsx}'],
     },
   },
 });
