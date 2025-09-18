@@ -35,7 +35,18 @@ import { useOnboarding } from '@/hooks/useOnboarding';
 const DashboardPage: React.FC = () => {
   const { accounts } = useAppSelector(state => state.accounts);
   const { cashflows } = useAppSelector(state => state.cashflows);
-  const [projectionYears, setProjectionYears] = useState(5);
+  
+  // Load projection years from localStorage or default to 5 years
+  const [projectionYears, setProjectionYears] = useState(() => {
+    const saved = localStorage.getItem('dashboardProjectionYears');
+    return saved ? parseInt(saved, 10) : 5;
+  });
+
+  // Save projection years to localStorage when it changes
+  const handleProjectionYearsChange = (value: number) => {
+    setProjectionYears(value);
+    localStorage.setItem('dashboardProjectionYears', value.toString());
+  };
 
   // Onboarding setup
   const { isOnboardingOpen, completeOnboarding, skipOnboarding } =
@@ -323,15 +334,18 @@ const DashboardPage: React.FC = () => {
                 </Typography>
                 <Slider
                   value={projectionYears}
-                  onChange={(_, value) => setProjectionYears(value as number)}
+                  onChange={(_, value) => handleProjectionYearsChange(value as number)}
                   min={1}
-                  max={15}
+                  max={50}
                   step={1}
                   marks={[
                     { value: 1, label: '1y' },
                     { value: 5, label: '5y' },
                     { value: 10, label: '10y' },
-                    { value: 15, label: '15y' },
+                    { value: 20, label: '20y' },
+                    { value: 30, label: '30y' },
+                    { value: 40, label: '40y' },
+                    { value: 50, label: '50y' },
                   ]}
                   valueLabelDisplay="auto"
                   sx={{ width: 180 }}

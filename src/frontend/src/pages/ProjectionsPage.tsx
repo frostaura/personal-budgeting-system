@@ -36,11 +36,22 @@ const ProjectionsPage: React.FC = () => {
   const { cashflows } = useAppSelector(state => state.cashflows);
   const { scenarios } = useAppSelector(state => state.scenarios);
 
-  const [monthsToProject, setMonthsToProject] = useState(60); // 5 years default
+  // Load projection period from localStorage or default to 60 months (5 years)
+  const [monthsToProject, setMonthsToProject] = useState(() => {
+    const saved = localStorage.getItem('projectionPeriodMonths');
+    return saved ? parseInt(saved, 10) : 60;
+  });
+
   const [selectedScenario, setSelectedScenario] = useState<string>('');
   const [projectionResults, setProjectionResults] =
     useState<ProjectionResult | null>(null);
   const [isCalculating, setIsCalculating] = useState(false);
+
+  // Save projection period to localStorage when it changes
+  const handleProjectionPeriodChange = (value: number) => {
+    setMonthsToProject(value);
+    localStorage.setItem('projectionPeriodMonths', value.toString());
+  };
 
   const selectedScenarioObj = scenarios.find(s => s.id === selectedScenario);
 
@@ -140,9 +151,9 @@ const ProjectionsPage: React.FC = () => {
               </Typography>
               <Slider
                 value={monthsToProject}
-                onChange={(_, value) => setMonthsToProject(value as number)}
+                onChange={(_, value) => handleProjectionPeriodChange(value as number)}
                 min={12}
-                max={360} // 30 years max
+                max={600} // 50 years max
                 step={12}
                 marks={[
                   { value: 12, label: '1yr' },
@@ -150,6 +161,8 @@ const ProjectionsPage: React.FC = () => {
                   { value: 120, label: '10yr' },
                   { value: 240, label: '20yr' },
                   { value: 360, label: '30yr' },
+                  { value: 480, label: '40yr' },
+                  { value: 600, label: '50yr' },
                 ]}
                 sx={{ mt: 2 }}
               />
