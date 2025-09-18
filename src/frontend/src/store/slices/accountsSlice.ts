@@ -39,7 +39,9 @@ const accountsSlice = createSlice({
       state.accounts.push(action.payload);
     },
     updateAccount: (state, action: PayloadAction<Account>) => {
-      const index = state.accounts.findIndex(acc => acc.id === action.payload.id);
+      const index = state.accounts.findIndex(
+        acc => acc.id === action.payload.id
+      );
       if (index !== -1) {
         state.accounts[index] = action.payload;
       }
@@ -53,7 +55,10 @@ const accountsSlice = createSlice({
     selectAccount: (state, action: PayloadAction<string | null>) => {
       state.selectedAccountId = action.payload;
     },
-    updateAccountBalance: (state, action: PayloadAction<{ id: string; balanceCents: number; asOf: string }>) => {
+    updateAccountBalance: (
+      state,
+      action: PayloadAction<{ id: string; balanceCents: number; asOf: string }>
+    ) => {
       const account = state.accounts.find(acc => acc.id === action.payload.id);
       if (account) {
         account.openingBalanceCents = action.payload.balanceCents;

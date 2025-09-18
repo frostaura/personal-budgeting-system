@@ -2,22 +2,28 @@
 export type Cents = number; // integer cents
 
 export type CurrencySettings = {
-  code: string;     // 'ZAR'
-  symbol: string;   // 'R'
-  locale: string;   // 'en-ZA'
+  code: string; // 'ZAR'
+  symbol: string; // 'R'
+  locale: string; // 'en-ZA'
   roundingStepCents: number; // default 50_000 == R500
-  storagePrefix?: string;    // default 'pfp:' (can be '')
+  storagePrefix?: string; // default 'pfp:' (can be '')
 };
 
 export type AccountKind =
-  | 'income' | 'tax' | 'expense' | 'investment' | 'liability' | 'reserve' | 'transfer';
+  | 'income'
+  | 'tax'
+  | 'expense'
+  | 'investment'
+  | 'liability'
+  | 'reserve'
+  | 'transfer';
 
 export interface Account {
   id: string;
   name: string;
   kind: AccountKind;
   category?: string;
-  color?: string; 
+  color?: string;
   icon?: string;
   notes?: string;
 
@@ -26,46 +32,58 @@ export interface Account {
   currentBalanceAsOf?: string; // ISO date
 
   // Financial parameters
-  annualInterestRate?: number;       // 0.08 = 8% APR (assets only, monthly compounding)
-  compoundsPerYear?: number;         // default 12
-  isProperty?: boolean;              // for home value tracking
+  annualInterestRate?: number; // 0.08 = 8% APR (assets only, monthly compounding)
+  compoundsPerYear?: number; // default 12
+  isProperty?: boolean; // for home value tracking
   propertyAppreciationRate?: number; // annual, default 0
 
   // Rounding override (falls back to global)
   roundingStepCents?: Cents;
 }
 
-export type Frequency = 'once' | 'weekly' | 'fortnightly' | 'monthly' | 'quarterly' | 'annually';
+export type Frequency =
+  | 'once'
+  | 'weekly'
+  | 'fortnightly'
+  | 'monthly'
+  | 'quarterly'
+  | 'annually';
 
 export type Recurrence = {
   frequency: Frequency;
-  anchor?: { dayOfMonth?: number; nthWeekday?: { nth: 1|2|3|4|5|-1; weekday: 0|1|2|3|4|5|6 } };
+  anchor?: {
+    dayOfMonth?: number;
+    nthWeekday?: {
+      nth: 1 | 2 | 3 | 4 | 5 | -1;
+      weekday: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+    };
+  };
   businessDayRule?: 'none' | 'previous' | 'next' | 'modifiedFollowing';
   offsetDays?: number; // +/- from anchor
-  startDate: string;   // ISO
-  endDate?: string;    // ISO
+  startDate: string; // ISO
+  endDate?: string; // ISO
   occurrences?: number;
   prorateFirst?: boolean;
   annualIndexationPct?: number; // applied at anniversary
-  rruleText?: string;           // optional RRULE string mirror
+  rruleText?: string; // optional RRULE string mirror
 };
 
 export type Cashflow = {
   id: string;
   accountId: string;
-  amountCents: Cents;       // positive magnitude; direction inferred from account kind
+  amountCents: Cents; // positive magnitude; direction inferred from account kind
   description?: string;
   recurrence: Recurrence;
-  effectiveFrom?: string;   // future-dated changes
+  effectiveFrom?: string; // future-dated changes
 };
 
 export type Scenario = {
   id: string;
   name: string;
-  spendAdjustmentPct: number;     // e.g., -0.10 for -10%
+  spendAdjustmentPct: number; // e.g., -0.10 for -10%
   scope: 'all' | 'discretionary'; // which expenses scale
-  inflationPct?: number;          // applied annually to expenses
-  salaryGrowthPct?: number;       // applied annually to incomes
+  inflationPct?: number; // applied annually to expenses
+  salaryGrowthPct?: number; // applied annually to incomes
 };
 
 export type TaxBracket = {
@@ -74,11 +92,11 @@ export type TaxBracket = {
 };
 
 export type TaxPresetZA = {
-  taxYear: string;  // '2025-26'
+  taxYear: string; // '2025-26'
   brackets: Array<TaxBracket>;
   primaryRebate: Cents;
   secondaryRebate?: Cents; // age 65+
-  tertiaryRebate?: Cents;  // age 75+
+  tertiaryRebate?: Cents; // age 75+
   medicalAidCredits?: {
     member: Cents;
     firstDependent: Cents;
@@ -89,14 +107,17 @@ export type TaxPresetZA = {
 // Projection outputs
 export type MonthlyProjection = {
   month: string; // ISO YYYY-MM
-  accounts: Record<string, {
-    openingBalance: Cents;
-    income: Cents;
-    expenses: Cents;
-    netCashflow: Cents;
-    interestEarned?: Cents;
-    closingBalance: Cents;
-  }>;
+  accounts: Record<
+    string,
+    {
+      openingBalance: Cents;
+      income: Cents;
+      expenses: Cents;
+      netCashflow: Cents;
+      interestEarned?: Cents;
+      closingBalance: Cents;
+    }
+  >;
   totalNetWorth: Cents;
   totalIncome: Cents;
   totalExpenses: Cents;

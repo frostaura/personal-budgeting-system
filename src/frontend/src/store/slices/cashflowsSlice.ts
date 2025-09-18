@@ -48,7 +48,9 @@ const cashflowsSlice = createSlice({
       state.cashflows.push(action.payload);
     },
     updateCashflow: (state, action: PayloadAction<Cashflow>) => {
-      const index = state.cashflows.findIndex(cf => cf.id === action.payload.id);
+      const index = state.cashflows.findIndex(
+        cf => cf.id === action.payload.id
+      );
       if (index !== -1) {
         state.cashflows[index] = action.payload;
       }
@@ -65,7 +67,7 @@ const cashflowsSlice = createSlice({
     setFilters: (state, action: PayloadAction<typeof initialState.filters>) => {
       state.filters = action.payload;
     },
-    clearFilters: (state) => {
+    clearFilters: state => {
       state.filters = {};
     },
   },

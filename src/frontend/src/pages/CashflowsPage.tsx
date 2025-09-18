@@ -7,7 +7,7 @@ const CashflowsPage: React.FC = () => {
       <Typography variant="h4" gutterBottom sx={{ fontWeight: 600 }}>
         Cash Flows
       </Typography>
-      
+
       <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
         Track your recurring income and expenses
       </Typography>

@@ -35,14 +35,10 @@ export function formatCurrency(
     signDisplay?: 'auto' | 'never' | 'always' | 'exceptZero';
   } = {}
 ): string {
-  const {
-    showSymbol = true,
-    showCode = false,
-    signDisplay = 'auto',
-  } = options;
+  const { showSymbol = true, showCode = false, signDisplay = 'auto' } = options;
 
   const major = centsToMajor(cents);
-  
+
   const formatter = new Intl.NumberFormat(settings.locale, {
     style: 'currency',
     currency: settings.code,
@@ -68,9 +64,9 @@ export function parseCurrencyToCents(
     .replace(/[^\d.-]/g, '');
 
   const parsed = parseFloat(cleaned);
-  
+
   if (isNaN(parsed)) return null;
-  
+
   return majorToCents(parsed);
 }
 
@@ -114,7 +110,11 @@ export function calculatePercentageChange(
  * Validate that a number represents valid cents (integer)
  */
 export function isValidCents(value: unknown): value is Cents {
-  return typeof value === 'number' && Number.isInteger(value) && Number.isFinite(value);
+  return (
+    typeof value === 'number' &&
+    Number.isInteger(value) &&
+    Number.isFinite(value)
+  );
 }
 
 /**
@@ -146,7 +146,7 @@ export function formatCompactCurrency(
 ): string {
   const major = centsToMajor(Math.abs(cents));
   const sign = cents < 0 ? '-' : '';
-  
+
   const formatter = new Intl.NumberFormat(settings.locale, {
     notation: 'compact',
     style: 'currency',

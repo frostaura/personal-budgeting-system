@@ -63,13 +63,37 @@ export type PersistedState = {
 };
 
 // Accessibility types
-export type AriaRole = 
-  | 'button' | 'link' | 'textbox' | 'combobox' | 'listbox' | 'option'
-  | 'grid' | 'gridcell' | 'row' | 'columnheader' | 'rowheader'
-  | 'tab' | 'tabpanel' | 'tablist' | 'dialog' | 'alertdialog'
-  | 'alert' | 'status' | 'progressbar' | 'slider'
-  | 'menu' | 'menuitem' | 'menubar' | 'navigation'
-  | 'main' | 'article' | 'section' | 'aside' | 'header' | 'footer';
+export type AriaRole =
+  | 'button'
+  | 'link'
+  | 'textbox'
+  | 'combobox'
+  | 'listbox'
+  | 'option'
+  | 'grid'
+  | 'gridcell'
+  | 'row'
+  | 'columnheader'
+  | 'rowheader'
+  | 'tab'
+  | 'tabpanel'
+  | 'tablist'
+  | 'dialog'
+  | 'alertdialog'
+  | 'alert'
+  | 'status'
+  | 'progressbar'
+  | 'slider'
+  | 'menu'
+  | 'menuitem'
+  | 'menubar'
+  | 'navigation'
+  | 'main'
+  | 'article'
+  | 'section'
+  | 'aside'
+  | 'header'
+  | 'footer';
 
 export type KeyboardShortcut = {
   key: string;

@@ -26,7 +26,9 @@ import { acceptDisclaimer } from '@/store/slices/settingsSlice';
 
 export const DisclaimerDialog: React.FC = () => {
   const dispatch = useAppDispatch();
-  const disclaimerAccepted = useAppSelector(state => state.settings.disclaimerAccepted);
+  const disclaimerAccepted = useAppSelector(
+    state => state.settings.disclaimerAccepted
+  );
   const [acknowledgedRisks, setAcknowledgedRisks] = useState(false);
   const [acknowledgedPrivacy, setAcknowledgedPrivacy] = useState(false);
 
@@ -68,7 +70,7 @@ export const DisclaimerDialog: React.FC = () => {
         <WarningAmberOutlined color="warning" />
         Important Legal Disclaimer
       </DialogTitle>
-      
+
       <DialogContent dividers>
         <Box id="disclaimer-dialog-description">
           <Alert severity="warning" sx={{ mb: 3 }}>
@@ -76,8 +78,8 @@ export const DisclaimerDialog: React.FC = () => {
               This is NOT Financial Advice
             </Typography>
             <Typography variant="body2">
-              This application is for educational and planning purposes only. 
-              All projections, calculations, and recommendations should not be 
+              This application is for educational and planning purposes only.
+              All projections, calculations, and recommendations should not be
               considered as professional financial advice.
             </Typography>
           </Alert>
@@ -96,7 +98,7 @@ export const DisclaimerDialog: React.FC = () => {
                 secondary="All financial projections are based on assumptions and may not reflect actual future performance."
               />
             </ListItem>
-            
+
             <ListItem>
               <ListItemIcon>
                 <WarningAmberOutlined color="warning" />
@@ -106,7 +108,7 @@ export const DisclaimerDialog: React.FC = () => {
                 secondary="All investments carry risk of loss. Past performance does not guarantee future results."
               />
             </ListItem>
-            
+
             <ListItem>
               <ListItemIcon>
                 <SecurityOutlined color="info" />
@@ -116,7 +118,7 @@ export const DisclaimerDialog: React.FC = () => {
                 secondary="Tax rates and regulations may change. Consult a qualified professional for advice specific to your situation."
               />
             </ListItem>
-            
+
             <ListItem>
               <ListItemIcon>
                 <VisibilityOffOutlined color="info" />
@@ -130,8 +132,11 @@ export const DisclaimerDialog: React.FC = () => {
 
           <Alert severity="info" sx={{ mt: 3 }}>
             <Typography variant="body2">
-              <strong>Always consult with qualified financial professionals</strong> before making 
-              important financial decisions. This tool should supplement, not replace, professional advice.
+              <strong>
+                Always consult with qualified financial professionals
+              </strong>{' '}
+              before making important financial decisions. This tool should
+              supplement, not replace, professional advice.
             </Typography>
           </Alert>
 
@@ -140,36 +145,38 @@ export const DisclaimerDialog: React.FC = () => {
               control={
                 <Checkbox
                   checked={acknowledgedRisks}
-                  onChange={(e) => setAcknowledgedRisks(e.target.checked)}
+                  onChange={e => setAcknowledgedRisks(e.target.checked)}
                   color="primary"
                 />
               }
               label={
                 <Typography variant="body2">
-                  I understand that this application provides estimates only and is not financial advice. 
-                  I acknowledge the risks associated with financial planning and investments.
+                  I understand that this application provides estimates only and
+                  is not financial advice. I acknowledge the risks associated
+                  with financial planning and investments.
                 </Typography>
               }
             />
-            
+
             <FormControlLabel
               control={
                 <Checkbox
                   checked={acknowledgedPrivacy}
-                  onChange={(e) => setAcknowledgedPrivacy(e.target.checked)}
+                  onChange={e => setAcknowledgedPrivacy(e.target.checked)}
                   color="primary"
                 />
               }
               label={
                 <Typography variant="body2">
-                  I understand that my data is stored locally and I am responsible for my own data backups.
+                  I understand that my data is stored locally and I am
+                  responsible for my own data backups.
                 </Typography>
               }
             />
           </Box>
         </Box>
       </DialogContent>
-      
+
       <DialogActions sx={{ p: 3 }}>
         <Button
           variant="contained"

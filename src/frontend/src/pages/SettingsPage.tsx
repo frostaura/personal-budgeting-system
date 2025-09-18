@@ -7,7 +7,7 @@ const SettingsPage: React.FC = () => {
       <Typography variant="h4" gutterBottom sx={{ fontWeight: 600 }}>
         Settings
       </Typography>
-      
+
       <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
         Configure your preferences and application settings
       </Typography>

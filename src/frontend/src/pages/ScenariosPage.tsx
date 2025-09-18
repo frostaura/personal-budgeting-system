@@ -7,7 +7,7 @@ const ScenariosPage: React.FC = () => {
       <Typography variant="h4" gutterBottom sx={{ fontWeight: 600 }}>
         Financial Scenarios
       </Typography>
-      
+
       <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
         Compare different what-if scenarios for your financial future
       </Typography>

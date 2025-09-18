@@ -56,7 +56,7 @@ const scenariosSlice = createSlice({
     removeScenario: (state, action: PayloadAction<string>) => {
       // Don't allow removing the baseline scenario
       if (action.payload === 'baseline') return;
-      
+
       state.scenarios = state.scenarios.filter(s => s.id !== action.payload);
       if (state.activeScenarioId === action.payload) {
         state.activeScenarioId = 'baseline';

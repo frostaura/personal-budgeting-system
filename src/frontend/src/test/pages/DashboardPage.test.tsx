@@ -13,9 +13,7 @@ const TestWrapper = ({ children }: { children: ReactNode }) => {
   return (
     <Provider store={store}>
       <ThemeProvider theme={theme}>
-        <BrowserRouter>
-          {children}
-        </BrowserRouter>
+        <BrowserRouter>{children}</BrowserRouter>
       </ThemeProvider>
     </Provider>
   );
@@ -28,7 +26,7 @@ describe('DashboardPage', () => {
         <DashboardPage />
       </TestWrapper>
     );
-    
+
     expect(screen.getByText('Financial Dashboard')).toBeInTheDocument();
   });
 
@@ -38,9 +36,11 @@ describe('DashboardPage', () => {
         <DashboardPage />
       </TestWrapper>
     );
-    
+
     expect(screen.getByText(/Remember:/)).toBeInTheDocument();
-    expect(screen.getByText(/This is not financial advice/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/This is not financial advice/)
+    ).toBeInTheDocument();
   });
 
   it('displays net worth stat card', () => {
@@ -49,7 +49,7 @@ describe('DashboardPage', () => {
         <DashboardPage />
       </TestWrapper>
     );
-    
+
     expect(screen.getByText('Net Worth')).toBeInTheDocument();
   });
 });
