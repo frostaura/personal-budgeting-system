@@ -488,12 +488,12 @@ const CashflowsPage: React.FC = () => {
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
-                label="Annual Indexation (%)"
+                label="Annual Interest Rate (%)"
                 type="number"
                 value={formData.annualIndexation}
                 onChange={(e) => setFormData({ ...formData, annualIndexation: e.target.value })}
                 inputProps={{ step: 0.1 }}
-                helperText="Annual increase rate (e.g., inflation adjustment)"
+                helperText="Annual growth/increase rate (e.g., inflation adjustment)"
               />
             </Grid>
           </Grid>

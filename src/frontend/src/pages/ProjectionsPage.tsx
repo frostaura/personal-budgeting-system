@@ -5,7 +5,6 @@ import {
   Card,
   CardContent,
   Grid,
-  Button,
   Select,
   MenuItem,
   FormControl,
@@ -30,52 +29,17 @@ import {
 import { useAppSelector } from '@/store/hooks';
 import { projectionEngine } from '@/services/projectionEngine';
 import { formatCurrency } from '@/utils/currency';
-import { Scenario, ProjectionResult } from '@/types/money';
+import { ProjectionResult } from '@/types/money';
 
 const ProjectionsPage: React.FC = () => {
   const { accounts } = useAppSelector(state => state.accounts);
   const { cashflows } = useAppSelector(state => state.cashflows);
+  const { scenarios } = useAppSelector(state => state.scenarios);
   
   const [monthsToProject, setMonthsToProject] = useState(60); // 5 years default
   const [selectedScenario, setSelectedScenario] = useState<string>('');
   const [projectionResults, setProjectionResults] = useState<ProjectionResult | null>(null);
   const [isCalculating, setIsCalculating] = useState(false);
-
-  // Sample scenarios (in a real app, these would come from Redux store)
-  const scenarios: Scenario[] = [
-    {
-      id: 'conservative',
-      name: 'Conservative Spending',
-      spendAdjustmentPct: -0.15,
-      scope: 'discretionary',
-      inflationPct: 0.055,
-      salaryGrowthPct: 0.065,
-    },
-    {
-      id: 'aggressive-saving',
-      name: 'Aggressive Savings',
-      spendAdjustmentPct: -0.25,
-      scope: 'all',
-      inflationPct: 0.055,
-      salaryGrowthPct: 0.065,
-    },
-    {
-      id: 'high-inflation',
-      name: 'High Inflation Period',
-      spendAdjustmentPct: 0,
-      scope: 'all',
-      inflationPct: 0.085,
-      salaryGrowthPct: 0.055,
-    },
-    {
-      id: 'salary-increase',
-      name: 'Promotion & Salary Increase',
-      spendAdjustmentPct: 0.1,
-      scope: 'discretionary',
-      inflationPct: 0.055,
-      salaryGrowthPct: 0.12,
-    },
-  ];
 
   const selectedScenarioObj = scenarios.find(s => s.id === selectedScenario);
 
@@ -208,17 +172,14 @@ const ProjectionsPage: React.FC = () => {
             </Grid>
           </Grid>
 
-          <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
-            <Button
-              variant="contained"
-              onClick={handleCalculateProjections}
-              disabled={isCalculating || accounts.length === 0 || cashflows.length === 0}
-              startIcon={<TimelineIcon />}
-              size="large"
-            >
-              {isCalculating ? 'Calculating...' : 'Recalculate Projections'}
-            </Button>
-          </Box>
+          {isCalculating && (
+            <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
+              <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center' }}>
+                <TimelineIcon sx={{ mr: 1, animation: 'pulse 1.5s infinite' }} />
+                Calculating projections...
+              </Typography>
+            </Box>
+          )}
         </CardContent>
       </Card>
 

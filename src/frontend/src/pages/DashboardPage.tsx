@@ -1,11 +1,20 @@
-import React, { useMemo } from 'react';
-import { Typography, Grid, Card, CardContent, Box, Alert } from '@mui/material';
+import React, { useMemo, useState } from 'react';
+import { Typography, Grid, Card, CardContent, Box, Alert, Slider } from '@mui/material';
 import {
   TrendingUpOutlined,
   AccountBalanceOutlined,
   SavingsOutlined,
   PieChartOutlined,
 } from '@mui/icons-material';
+import { 
+  LineChart, 
+  Line, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip as RechartsTooltip, 
+  ResponsiveContainer 
+} from 'recharts';
 import { formatCurrency, sumCents } from '@/utils/currency';
 import { useAppSelector } from '@/store/hooks';
 import { OnboardingTooltip, OnboardingStep } from '@/components/common/OnboardingTooltip';
@@ -14,6 +23,7 @@ import { useOnboarding } from '@/hooks/useOnboarding';
 const DashboardPage: React.FC = () => {
   const { accounts } = useAppSelector(state => state.accounts);
   const { cashflows } = useAppSelector(state => state.cashflows);
+  const [projectionYears, setProjectionYears] = useState(5);
 
   // Onboarding setup
   const {
@@ -32,6 +42,13 @@ const DashboardPage: React.FC = () => {
       target: '[data-onboarding="dashboard-title"]',
       title: 'Welcome to Your Financial Dashboard! 🎉',
       description: 'This is your financial command center. Here you can see a complete overview of your financial health including net worth, savings, and cash flow.',
+      placement: 'bottom',
+    },
+    {
+      id: 'wealth-projection',
+      target: '[data-onboarding="wealth-projection"]',
+      title: 'Wealth Projection Chart',
+      description: 'This chart shows your projected net worth over time based on your current savings rate and growth assumptions. Use the slider to adjust the time horizon.',
       placement: 'bottom',
     },
     {
@@ -117,6 +134,42 @@ const DashboardPage: React.FC = () => {
     };
   }, [accounts, cashflows]);
 
+  // Generate wealth projection data
+  const wealthProjectionData = useMemo(() => {
+    const data = [];
+    const startingNetWorth = financialMetrics.netWorth;
+    const monthlyContribution = financialMetrics.monthlySavings;
+    const annualReturn = 0.07; // 7% annual return assumption
+    const monthlyReturn = annualReturn / 12;
+    
+    for (let year = 0; year <= projectionYears; year++) {
+      const months = year * 12;
+      
+      // Calculate future value with monthly contributions
+      let futureValue = startingNetWorth;
+      if (monthlyReturn > 0) {
+        // Present value growth
+        futureValue = startingNetWorth * Math.pow(1 + monthlyReturn, months);
+        
+        // Future value of annuity (monthly contributions)
+        if (monthlyContribution > 0 && monthlyReturn > 0) {
+          futureValue += monthlyContribution * ((Math.pow(1 + monthlyReturn, months) - 1) / monthlyReturn);
+        }
+      } else {
+        // Simple case if no return
+        futureValue = startingNetWorth + (monthlyContribution * months);
+      }
+      
+      data.push({
+        year: year,
+        netWorth: Math.round(futureValue),
+        netWorthFormatted: formatCurrency(Math.round(futureValue)),
+      });
+    }
+    
+    return data;
+  }, [financialMetrics.netWorth, financialMetrics.monthlySavings, projectionYears]);
+
   const StatCard: React.FC<{
     title: string;
     value: string;
@@ -195,6 +248,69 @@ const DashboardPage: React.FC = () => {
             qualified professionals for important financial decisions.
           </Typography>
         </Alert>
+
+        {/* Wealth Projection Chart */}
+        <Card sx={{ mb: 4 }} data-onboarding="wealth-projection">
+          <CardContent>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+              <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                Wealth Projection
+              </Typography>
+              <Box sx={{ minWidth: 200 }}>
+                <Typography variant="body2" gutterBottom>
+                  Time Horizon: {projectionYears} year{projectionYears !== 1 ? 's' : ''}
+                </Typography>
+                <Slider
+                  value={projectionYears}
+                  onChange={(_, value) => setProjectionYears(value as number)}
+                  min={1}
+                  max={15}
+                  step={1}
+                  marks={[
+                    { value: 1, label: '1y' },
+                    { value: 5, label: '5y' },
+                    { value: 10, label: '10y' },
+                    { value: 15, label: '15y' },
+                  ]}
+                  valueLabelDisplay="auto"
+                  sx={{ width: 180 }}
+                />
+              </Box>
+            </Box>
+            
+            <Box sx={{ height: 300 }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={wealthProjectionData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis 
+                    dataKey="year" 
+                    label={{ value: 'Years', position: 'insideBottom', offset: -10 }}
+                  />
+                  <YAxis 
+                    tickFormatter={(value) => `R ${(value / 1000000).toFixed(1)}M`}
+                    label={{ value: 'Net Worth', angle: -90, position: 'insideLeft' }}
+                  />
+                  <RechartsTooltip 
+                    formatter={(value: number) => [formatCurrency(value), 'Net Worth']}
+                    labelFormatter={(label) => `Year ${label}`}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="netWorth" 
+                    stroke="#1976d2" 
+                    strokeWidth={3}
+                    dot={{ fill: '#1976d2', strokeWidth: 2, r: 4 }}
+                    activeDot={{ r: 6 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </Box>
+            
+            <Typography variant="caption" color="text.secondary" sx={{ mt: 2, display: 'block' }}>
+              Projection assumes 7% annual investment return and current monthly savings rate of {formatCurrency(financialMetrics.monthlySavings)}
+            </Typography>
+          </CardContent>
+        </Card>
 
         <Grid container spacing={3} sx={{ mb: 4 }}>
           <Grid item xs={12} sm={6} lg={3}>
