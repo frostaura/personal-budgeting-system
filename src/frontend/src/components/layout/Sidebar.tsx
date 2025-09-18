@@ -79,10 +79,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const navigate = useNavigate();
 
   const handleNavigation = (path: string) => {
-    navigate(path);
+    // Always close the sidebar on mobile before navigation
     if (variant === 'temporary') {
       onClose();
     }
+    
+    // Navigate after a small delay to ensure state update
+    setTimeout(() => {
+      navigate(path);
+    }, 10);
   };
 
   const handleClose = () => {

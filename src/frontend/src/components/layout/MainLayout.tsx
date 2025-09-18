@@ -14,7 +14,7 @@ import {
   AccountBalanceWalletOutlined,
 } from '@mui/icons-material';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
-import { toggleSidebar } from '@/store/slices/appSlice';
+import { toggleSidebar, setSidebarOpen } from '@/store/slices/appSlice';
 import { Sidebar } from './Sidebar';
 
 export const MainLayout: React.FC = () => {
@@ -25,6 +25,10 @@ export const MainLayout: React.FC = () => {
 
   const handleToggleSidebar = () => {
     dispatch(toggleSidebar());
+  };
+
+  const handleCloseSidebar = () => {
+    dispatch(setSidebarOpen(false));
   };
 
   const drawerWidth = 280;
@@ -70,7 +74,7 @@ export const MainLayout: React.FC = () => {
 
       <Sidebar
         open={sidebarOpen}
-        onClose={handleToggleSidebar}
+        onClose={isMobile ? handleCloseSidebar : handleToggleSidebar}
         width={drawerWidth}
         variant={isMobile ? 'temporary' : 'persistent'}
       />
