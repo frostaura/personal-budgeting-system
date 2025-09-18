@@ -4,12 +4,9 @@ import { LoadingState } from '@/types/common';
 import { dataService } from '@/services/dataService';
 
 // Async thunks for data operations
-const fetchAccounts = createAsyncThunk(
-  'accounts/fetchAccounts',
-  async () => {
-    return await dataService.getAccounts();
-  }
-);
+const fetchAccounts = createAsyncThunk('accounts/fetchAccounts', async () => {
+  return await dataService.getAccounts();
+});
 
 const createAccount = createAsyncThunk(
   'accounts/createAccount',
@@ -80,10 +77,10 @@ const accountsSlice = createSlice({
       }
     },
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     builder
       // Fetch accounts
-      .addCase(fetchAccounts.pending, (state) => {
+      .addCase(fetchAccounts.pending, state => {
         state.loading = 'loading';
         state.error = null;
       })
@@ -96,7 +93,7 @@ const accountsSlice = createSlice({
         state.error = action.error.message || 'Failed to fetch accounts';
       })
       // Create account
-      .addCase(createAccount.pending, (state) => {
+      .addCase(createAccount.pending, state => {
         state.loading = 'loading';
       })
       .addCase(createAccount.fulfilled, (state, action) => {
@@ -108,12 +105,14 @@ const accountsSlice = createSlice({
         state.error = action.error.message || 'Failed to create account';
       })
       // Update account
-      .addCase(updateAccountThunk.pending, (state) => {
+      .addCase(updateAccountThunk.pending, state => {
         state.loading = 'loading';
       })
       .addCase(updateAccountThunk.fulfilled, (state, action) => {
         state.loading = 'succeeded';
-        const index = state.accounts.findIndex(acc => acc.id === action.payload.id);
+        const index = state.accounts.findIndex(
+          acc => acc.id === action.payload.id
+        );
         if (index !== -1) {
           state.accounts[index] = action.payload;
         }
@@ -123,12 +122,14 @@ const accountsSlice = createSlice({
         state.error = action.error.message || 'Failed to update account';
       })
       // Delete account
-      .addCase(deleteAccountThunk.pending, (state) => {
+      .addCase(deleteAccountThunk.pending, state => {
         state.loading = 'loading';
       })
       .addCase(deleteAccountThunk.fulfilled, (state, action) => {
         state.loading = 'succeeded';
-        state.accounts = state.accounts.filter(acc => acc.id !== action.payload);
+        state.accounts = state.accounts.filter(
+          acc => acc.id !== action.payload
+        );
         if (state.selectedAccountId === action.payload) {
           state.selectedAccountId = null;
         }
@@ -148,11 +149,6 @@ export const {
   updateAccountBalance,
 } = accountsSlice.actions;
 
-export {
-  fetchAccounts,
-  createAccount,
-  updateAccountThunk,
-  deleteAccountThunk,
-};
+export { fetchAccounts, createAccount, updateAccountThunk, deleteAccountThunk };
 
 export default accountsSlice.reducer;

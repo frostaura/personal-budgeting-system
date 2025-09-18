@@ -8,7 +8,9 @@ import { DEFAULT_CURRENCY_SETTINGS } from '@/utils/currency';
 export class DataService {
   private readonly storagePrefix: string;
 
-  constructor(storagePrefix: string = DEFAULT_CURRENCY_SETTINGS.storagePrefix || 'pfp:') {
+  constructor(
+    storagePrefix: string = DEFAULT_CURRENCY_SETTINGS.storagePrefix || 'pfp:'
+  ) {
     this.storagePrefix = storagePrefix;
   }
 
@@ -56,13 +58,13 @@ export class DataService {
   async saveAccount(account: Account): Promise<Account> {
     const accounts = await this.getAccounts();
     const existingIndex = accounts.findIndex(a => a.id === account.id);
-    
+
     if (existingIndex >= 0) {
       accounts[existingIndex] = account;
     } else {
       accounts.push(account);
     }
-    
+
     await this.saveAccounts(accounts);
     return account;
   }
@@ -90,13 +92,13 @@ export class DataService {
   async saveCashflow(cashflow: Cashflow): Promise<Cashflow> {
     const cashflows = await this.getCashflows();
     const existingIndex = cashflows.findIndex(cf => cf.id === cashflow.id);
-    
+
     if (existingIndex >= 0) {
       cashflows[existingIndex] = cashflow;
     } else {
       cashflows.push(cashflow);
     }
-    
+
     await this.saveCashflows(cashflows);
     return cashflow;
   }
@@ -124,13 +126,13 @@ export class DataService {
   async saveScenario(scenario: Scenario): Promise<Scenario> {
     const scenarios = await this.getScenarios();
     const existingIndex = scenarios.findIndex(s => s.id === scenario.id);
-    
+
     if (existingIndex >= 0) {
       scenarios[existingIndex] = scenario;
     } else {
       scenarios.push(scenario);
     }
-    
+
     await this.saveScenarios(scenarios);
     return scenario;
   }

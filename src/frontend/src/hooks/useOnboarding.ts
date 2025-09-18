@@ -6,10 +6,10 @@ export interface UseOnboardingOptions {
   delay?: number;
 }
 
-export const useOnboarding = ({ 
-  storageKey, 
+export const useOnboarding = ({
+  storageKey,
   autoStart = true,
-  delay = 1000 
+  delay = 1000,
 }: UseOnboardingOptions) => {
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
@@ -26,6 +26,9 @@ export const useOnboarding = ({
 
       return () => clearTimeout(timer);
     }
+
+    // Return empty cleanup function when no timer is set
+    return () => {};
   }, [storageKey, autoStart, delay]);
 
   const startOnboarding = () => {

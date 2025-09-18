@@ -35,10 +35,11 @@ const ProjectionsPage: React.FC = () => {
   const { accounts } = useAppSelector(state => state.accounts);
   const { cashflows } = useAppSelector(state => state.cashflows);
   const { scenarios } = useAppSelector(state => state.scenarios);
-  
+
   const [monthsToProject, setMonthsToProject] = useState(60); // 5 years default
   const [selectedScenario, setSelectedScenario] = useState<string>('');
-  const [projectionResults, setProjectionResults] = useState<ProjectionResult | null>(null);
+  const [projectionResults, setProjectionResults] =
+    useState<ProjectionResult | null>(null);
   const [isCalculating, setIsCalculating] = useState(false);
 
   const selectedScenarioObj = scenarios.find(s => s.id === selectedScenario);
@@ -50,18 +51,18 @@ const ProjectionsPage: React.FC = () => {
     }
 
     setIsCalculating(true);
-    
+
     try {
       // Small delay to show loading state
       await new Promise(resolve => setTimeout(resolve, 500));
-      
+
       const results = projectionEngine.projectFinances(
         accounts,
         cashflows,
         monthsToProject,
         selectedScenarioObj
       );
-      
+
       setProjectionResults(results);
     } catch (error) {
       console.error('Error calculating projections:', error);
@@ -81,10 +82,13 @@ const ProjectionsPage: React.FC = () => {
 
     const { months, summary } = projectionResults;
     const midpointMonth = months[Math.floor(months.length / 2)];
-    
+
     // Calculate compound annual growth rate (CAGR)
     const years = monthsToProject / 12;
-    const cagr = years > 0 ? Math.pow(summary.endNetWorth / summary.startNetWorth, 1 / years) - 1 : 0;
+    const cagr =
+      years > 0
+        ? Math.pow(summary.endNetWorth / summary.startNetWorth, 1 / years) - 1
+        : 0;
 
     return {
       totalGrowth: summary.totalReturn,
@@ -103,13 +107,15 @@ const ProjectionsPage: React.FC = () => {
       </Typography>
 
       <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-        Deterministic projections based on current balances, interest rates, and compound growth
+        Deterministic projections based on current balances, interest rates, and
+        compound growth
       </Typography>
 
       {(accounts.length === 0 || cashflows.length === 0) && (
         <Alert severity="warning" sx={{ mb: 4 }}>
           <Typography variant="body2">
-            Projections require both accounts and cash flows. Please add some accounts and cash flows first.
+            Projections require both accounts and cash flows. Please add some
+            accounts and cash flows first.
           </Typography>
         </Alert>
       )}
@@ -117,15 +123,20 @@ const ProjectionsPage: React.FC = () => {
       {/* Projection Controls */}
       <Card sx={{ mb: 4 }}>
         <CardContent>
-          <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+          <Typography
+            variant="h6"
+            gutterBottom
+            sx={{ display: 'flex', alignItems: 'center' }}
+          >
             <CalculateIcon sx={{ mr: 1 }} />
             Projection Settings
           </Typography>
-          
+
           <Grid container spacing={3} sx={{ mt: 1 }}>
             <Grid item xs={12} md={6}>
               <Typography variant="body2" gutterBottom>
-                Projection Period: {monthsToProject} months ({(monthsToProject / 12).toFixed(1)} years)
+                Projection Period: {monthsToProject} months (
+                {(monthsToProject / 12).toFixed(1)} years)
               </Typography>
               <Slider
                 value={monthsToProject}
@@ -143,13 +154,13 @@ const ProjectionsPage: React.FC = () => {
                 sx={{ mt: 2 }}
               />
             </Grid>
-            
+
             <Grid item xs={12} md={6}>
               <FormControl fullWidth>
                 <InputLabel>Scenario</InputLabel>
                 <Select
                   value={selectedScenario}
-                  onChange={(e) => setSelectedScenario(e.target.value)}
+                  onChange={e => setSelectedScenario(e.target.value)}
                   label="Scenario"
                 >
                   <MenuItem value="">
@@ -162,10 +173,9 @@ const ProjectionsPage: React.FC = () => {
                   ))}
                 </Select>
                 <FormHelperText>
-                  {selectedScenarioObj ? 
-                    `${selectedScenarioObj.spendAdjustmentPct >= 0 ? '+' : ''}${(selectedScenarioObj.spendAdjustmentPct * 100).toFixed(1)}% spending adjustment` : 
-                    'Standard projection with current parameters'
-                  }
+                  {selectedScenarioObj
+                    ? `${selectedScenarioObj.spendAdjustmentPct >= 0 ? '+' : ''}${(selectedScenarioObj.spendAdjustmentPct * 100).toFixed(1)}% spending adjustment`
+                    : 'Standard projection with current parameters'}
                 </FormHelperText>
               </FormControl>
             </Grid>
@@ -173,8 +183,14 @@ const ProjectionsPage: React.FC = () => {
 
           {isCalculating && (
             <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
-              <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center' }}>
-                <TimelineIcon sx={{ mr: 1, animation: 'pulse 1.5s infinite' }} />
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ display: 'flex', alignItems: 'center' }}
+              >
+                <TimelineIcon
+                  sx={{ mr: 1, animation: 'pulse 1.5s infinite' }}
+                />
                 Calculating projections...
               </Typography>
             </Box>
@@ -196,7 +212,7 @@ const ProjectionsPage: React.FC = () => {
                   <Typography variant="body2" color="text.secondary">
                     Projected Net Worth
                   </Typography>
-                  <Chip 
+                  <Chip
                     label={`+${projectionMetrics.percentageGrowth.toFixed(1)}%`}
                     color="success"
                     size="small"
@@ -215,7 +231,7 @@ const ProjectionsPage: React.FC = () => {
                   <Typography variant="body2" color="text.secondary">
                     Total Growth
                   </Typography>
-                  <Chip 
+                  <Chip
                     label={`${projectionMetrics.cagr.toFixed(1)}% CAGR`}
                     color="info"
                     size="small"
@@ -261,11 +277,15 @@ const ProjectionsPage: React.FC = () => {
           {/* Detailed Monthly Breakdown */}
           <Card>
             <CardContent>
-              <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+              <Typography
+                variant="h6"
+                gutterBottom
+                sx={{ display: 'flex', alignItems: 'center' }}
+              >
                 <AccountBalanceIcon sx={{ mr: 1 }} />
                 Monthly Projection Breakdown
               </Typography>
-              
+
               <TableContainer component={Paper} sx={{ mt: 2, maxHeight: 600 }}>
                 <Table stickyHeader size="small">
                   <TableHead>
@@ -282,31 +302,52 @@ const ProjectionsPage: React.FC = () => {
                     {projectionResults.months
                       .filter((_month, index) => index % 3 === 0) // Show every 3rd month for readability
                       .map((month, index) => {
-                        const previousMonth = index > 0 ? projectionResults.months[(index * 3) - 3] : null;
-                        const monthlyGrowth = previousMonth ? 
-                          month.totalNetWorth - previousMonth.totalNetWorth : 0;
-                        
+                        const previousMonth =
+                          index > 0
+                            ? projectionResults.months[index * 3 - 3]
+                            : null;
+                        const monthlyGrowth = previousMonth
+                          ? month.totalNetWorth - previousMonth.totalNetWorth
+                          : 0;
+
                         return (
                           <TableRow key={month.month}>
                             <TableCell>
-                              {new Date(month.month + '-01').toLocaleDateString('en-ZA', {
-                                year: 'numeric',
-                                month: 'short'
-                              })}
+                              {new Date(month.month + '-01').toLocaleDateString(
+                                'en-ZA',
+                                {
+                                  year: 'numeric',
+                                  month: 'short',
+                                }
+                              )}
                             </TableCell>
                             <TableCell align="right">
-                              <strong>{formatCurrency(month.totalNetWorth)}</strong>
+                              <strong>
+                                {formatCurrency(month.totalNetWorth)}
+                              </strong>
                             </TableCell>
-                            <TableCell align="right" sx={{ color: 'success.main' }}>
+                            <TableCell
+                              align="right"
+                              sx={{ color: 'success.main' }}
+                            >
                               {formatCurrency(month.totalIncome)}
                             </TableCell>
-                            <TableCell align="right" sx={{ color: 'error.main' }}>
+                            <TableCell
+                              align="right"
+                              sx={{ color: 'error.main' }}
+                            >
                               {formatCurrency(month.totalExpenses)}
                             </TableCell>
                             <TableCell align="right">
                               <Chip
                                 label={`${(month.savingsRate * 100).toFixed(1)}%`}
-                                color={month.savingsRate >= 0.2 ? 'success' : month.savingsRate >= 0.1 ? 'warning' : 'error'}
+                                color={
+                                  month.savingsRate >= 0.2
+                                    ? 'success'
+                                    : month.savingsRate >= 0.1
+                                      ? 'warning'
+                                      : 'error'
+                                }
                                 size="small"
                               />
                             </TableCell>
@@ -314,23 +355,32 @@ const ProjectionsPage: React.FC = () => {
                               {previousMonth && (
                                 <Typography
                                   variant="body2"
-                                  color={monthlyGrowth >= 0 ? 'success.main' : 'error.main'}
+                                  color={
+                                    monthlyGrowth >= 0
+                                      ? 'success.main'
+                                      : 'error.main'
+                                  }
                                 >
-                                  {monthlyGrowth >= 0 ? '+' : ''}{formatCurrency(monthlyGrowth)}
+                                  {monthlyGrowth >= 0 ? '+' : ''}
+                                  {formatCurrency(monthlyGrowth)}
                                 </Typography>
                               )}
                             </TableCell>
                           </TableRow>
                         );
-                      })
-                    }
+                      })}
                   </TableBody>
                 </Table>
               </TableContainer>
 
-              <Typography variant="caption" color="text.secondary" sx={{ mt: 2, display: 'block' }}>
-                * Showing every 3rd month for readability. Projections include compound interest, 
-                property appreciation, and annual indexation where applicable.
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ mt: 2, display: 'block' }}
+              >
+                * Showing every 3rd month for readability. Projections include
+                compound interest, property appreciation, and annual indexation
+                where applicable.
               </Typography>
             </CardContent>
           </Card>
@@ -347,8 +397,12 @@ const ProjectionsPage: React.FC = () => {
                     <strong>Interest & Growth:</strong>
                   </Typography>
                   <ul style={{ margin: 0, paddingLeft: 20 }}>
-                    <li>Account interest rates applied monthly with compounding</li>
-                    <li>Property appreciation calculated monthly where applicable</li>
+                    <li>
+                      Account interest rates applied monthly with compounding
+                    </li>
+                    <li>
+                      Property appreciation calculated monthly where applicable
+                    </li>
                     <li>Investment returns based on configured annual rates</li>
                   </ul>
                 </Grid>
@@ -367,7 +421,7 @@ const ProjectionsPage: React.FC = () => {
           </Card>
         </>
       )}
-      </Box>
+    </Box>
   );
 };
 

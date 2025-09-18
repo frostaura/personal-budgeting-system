@@ -141,17 +141,20 @@ const AccountsPage: React.FC = () => {
       if (formData.category) additionalProps.category = formData.category;
       if (formData.notes) additionalProps.notes = formData.notes;
       if (formData.openingBalance) {
-        additionalProps.openingBalanceCents = 
-          majorToCents(parseFloat(formData.openingBalance)) * (formData.kind === 'liability' ? -1 : 1);
+        additionalProps.openingBalanceCents =
+          majorToCents(parseFloat(formData.openingBalance)) *
+          (formData.kind === 'liability' ? -1 : 1);
       }
       if (formData.annualInterestRate) {
-        additionalProps.annualInterestRate = parseFloat(formData.annualInterestRate) / 100;
+        additionalProps.annualInterestRate =
+          parseFloat(formData.annualInterestRate) / 100;
       }
       if (formData.isProperty) {
         additionalProps.isProperty = formData.isProperty;
       }
       if (formData.propertyAppreciationRate) {
-        additionalProps.propertyAppreciationRate = parseFloat(formData.propertyAppreciationRate) / 100;
+        additionalProps.propertyAppreciationRate =
+          parseFloat(formData.propertyAppreciationRate) / 100;
       }
 
       const account = Object.assign(baseAccount, additionalProps) as Account;
@@ -215,18 +218,26 @@ const AccountsPage: React.FC = () => {
     }
   };
 
-  const groupedAccounts = accounts.reduce((groups, account) => {
-    const kind = account.kind;
-    if (!groups[kind]) {
-      groups[kind] = [];
-    }
-    groups[kind].push(account);
-    return groups;
-  }, {} as Record<AccountKind, Account[]>);
+  const groupedAccounts = accounts.reduce(
+    (groups, account) => {
+      const kind = account.kind;
+      if (!groups[kind]) {
+        groups[kind] = [];
+      }
+      groups[kind].push(account);
+      return groups;
+    },
+    {} as Record<AccountKind, Account[]>
+  );
 
   if (loading === 'loading') {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="400px"
+      >
         <Typography>Loading accounts...</Typography>
       </Box>
     );
@@ -235,13 +246,19 @@ const AccountsPage: React.FC = () => {
   return (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <Box sx={{ p: 3, flexGrow: 1 }}>
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          mb={3}
+        >
           <div>
             <Typography variant="h4" gutterBottom sx={{ fontWeight: 600 }}>
               Financial Accounts
             </Typography>
             <Typography variant="body1" color="text.secondary">
-              Manage your bank accounts, investments, and other financial accounts
+              Manage your bank accounts, investments, and other financial
+              accounts
             </Typography>
           </div>
           <Button
@@ -267,7 +284,10 @@ const AccountsPage: React.FC = () => {
                 <CardContent>
                   <Box display="flex" alignItems="center" mb={1}>
                     {getAccountIcon(kind as AccountKind)}
-                    <Typography variant="h6" sx={{ ml: 1, textTransform: 'capitalize' }}>
+                    <Typography
+                      variant="h6"
+                      sx={{ ml: 1, textTransform: 'capitalize' }}
+                    >
                       {kind} Accounts
                     </Typography>
                     <Chip
@@ -277,93 +297,105 @@ const AccountsPage: React.FC = () => {
                       sx={{ ml: 'auto' }}
                     />
                   </Box>
-                  
+
                   {/* Add subtitle/description */}
-                  <Typography 
-                    variant="body2" 
-                    color="text.secondary" 
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
                     sx={{ mb: 2, fontSize: '0.875rem' }}
                   >
                     {getAccountKindDescription(kind as AccountKind)}
                   </Typography>
 
                   <List dense>
-                  {kindAccounts.map(account => (
-                    <ListItem
-                      key={account.id}
-                      sx={{
-                        cursor: 'pointer',
-                        borderRadius: 1,
-                        '&:hover': { backgroundColor: 'action.hover' },
-                        backgroundColor:
-                          selectedAccountId === account.id ? 'action.selected' : 'transparent',
-                      }}
-                      onClick={() => dispatch(selectAccount(account.id))}
-                    >
-                      <ListItemAvatar>
-                        <Avatar
-                          sx={{
-                            backgroundColor: account.color,
-                            fontSize: '1.2rem',
-                          }}
-                        >
-                          {account.icon}
-                        </Avatar>
-                      </ListItemAvatar>
-                      <ListItemText
-                        primary={account.name}
-                        secondary={
-                          account.openingBalanceCents
-                            ? formatCurrency(account.openingBalanceCents)
-                            : 'No balance set'
-                        }
-                      />
-                      <ListItemSecondaryAction>
-                        <Tooltip title="Edit Account">
-                          <IconButton
-                            edge="end"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleOpenDialog(account);
+                    {kindAccounts.map(account => (
+                      <ListItem
+                        key={account.id}
+                        sx={{
+                          cursor: 'pointer',
+                          borderRadius: 1,
+                          '&:hover': { backgroundColor: 'action.hover' },
+                          backgroundColor:
+                            selectedAccountId === account.id
+                              ? 'action.selected'
+                              : 'transparent',
+                        }}
+                        onClick={() => dispatch(selectAccount(account.id))}
+                      >
+                        <ListItemAvatar>
+                          <Avatar
+                            sx={{
+                              backgroundColor: account.color,
+                              fontSize: '1.2rem',
                             }}
-                            size="small"
                           >
-                            <EditIcon />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Delete Account">
-                          <IconButton
-                            edge="end"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setAccountToDelete(account.id);
-                              setDeleteDialogOpen(true);
-                            }}
-                            size="small"
-                            color="error"
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        </Tooltip>
-                      </ListItemSecondaryAction>
-                    </ListItem>
-                  ))}
-                </List>
+                            {account.icon}
+                          </Avatar>
+                        </ListItemAvatar>
+                        <ListItemText
+                          primary={account.name}
+                          secondary={
+                            account.openingBalanceCents
+                              ? formatCurrency(account.openingBalanceCents)
+                              : 'No balance set'
+                          }
+                        />
+                        <ListItemSecondaryAction>
+                          <Tooltip title="Edit Account">
+                            <IconButton
+                              edge="end"
+                              onClick={e => {
+                                e.stopPropagation();
+                                handleOpenDialog(account);
+                              }}
+                              size="small"
+                            >
+                              <EditIcon />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Delete Account">
+                            <IconButton
+                              edge="end"
+                              onClick={e => {
+                                e.stopPropagation();
+                                setAccountToDelete(account.id);
+                                setDeleteDialogOpen(true);
+                              }}
+                              size="small"
+                              color="error"
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          </Tooltip>
+                        </ListItemSecondaryAction>
+                      </ListItem>
+                    ))}
+                  </List>
 
-                {kindAccounts.length === 0 && (
-                  <Typography variant="body2" color="text.secondary" textAlign="center" py={2}>
-                    No {kind} accounts yet
-                  </Typography>
-                )}
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
+                  {kindAccounts.length === 0 && (
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      textAlign="center"
+                      py={2}
+                    >
+                      No {kind} accounts yet
+                    </Typography>
+                  )}
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
       </Box>
 
       {/* Add/Edit Account Dialog */}
-      <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="md" fullWidth>
+      <Dialog
+        open={dialogOpen}
+        onClose={handleCloseDialog}
+        maxWidth="md"
+        fullWidth
+      >
         <DialogTitle>
           {editingAccount ? 'Edit Account' : 'Add New Account'}
         </DialogTitle>
@@ -374,7 +406,9 @@ const AccountsPage: React.FC = () => {
                 fullWidth
                 label="Account Name"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={e =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
                 required
               />
             </Grid>
@@ -383,8 +417,11 @@ const AccountsPage: React.FC = () => {
                 <InputLabel>Account Type</InputLabel>
                 <Select
                   value={formData.kind}
-                  onChange={(e) =>
-                    setFormData({ ...formData, kind: e.target.value as AccountKind })
+                  onChange={e =>
+                    setFormData({
+                      ...formData,
+                      kind: e.target.value as AccountKind,
+                    })
                   }
                   label="Account Type"
                 >
@@ -403,7 +440,9 @@ const AccountsPage: React.FC = () => {
                 fullWidth
                 label="Category"
                 value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                onChange={e =>
+                  setFormData({ ...formData, category: e.target.value })
+                }
                 placeholder="e.g., Banking, Investments, Credit Cards"
               />
             </Grid>
@@ -413,7 +452,9 @@ const AccountsPage: React.FC = () => {
                 label="Opening Balance"
                 type="number"
                 value={formData.openingBalance}
-                onChange={(e) => setFormData({ ...formData, openingBalance: e.target.value })}
+                onChange={e =>
+                  setFormData({ ...formData, openingBalance: e.target.value })
+                }
                 helperText="Enter positive amount (liability sign handled automatically)"
               />
             </Grid>
@@ -423,8 +464,11 @@ const AccountsPage: React.FC = () => {
                 label="Annual Interest Rate (%)"
                 type="number"
                 value={formData.annualInterestRate}
-                onChange={(e) =>
-                  setFormData({ ...formData, annualInterestRate: e.target.value })
+                onChange={e =>
+                  setFormData({
+                    ...formData,
+                    annualInterestRate: e.target.value,
+                  })
                 }
                 inputProps={{ step: 0.1 }}
               />
@@ -434,7 +478,9 @@ const AccountsPage: React.FC = () => {
                 fullWidth
                 label="Icon/Emoji"
                 value={formData.icon}
-                onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
+                onChange={e =>
+                  setFormData({ ...formData, icon: e.target.value })
+                }
                 inputProps={{ maxLength: 2 }}
               />
             </Grid>
@@ -445,7 +491,9 @@ const AccountsPage: React.FC = () => {
                 multiline
                 rows={3}
                 value={formData.notes}
-                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                onChange={e =>
+                  setFormData({ ...formData, notes: e.target.value })
+                }
               />
             </Grid>
           </Grid>
@@ -463,16 +511,24 @@ const AccountsPage: React.FC = () => {
       </Dialog>
 
       {/* Delete Confirmation Dialog */}
-      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+      >
         <DialogTitle>Delete Account</DialogTitle>
         <DialogContent>
           <Typography>
-            Are you sure you want to delete this account? This action cannot be undone.
+            Are you sure you want to delete this account? This action cannot be
+            undone.
           </Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
-          <Button onClick={handleDeleteAccount} color="error" variant="contained">
+          <Button
+            onClick={handleDeleteAccount}
+            color="error"
+            variant="contained"
+          >
             Delete
           </Button>
         </DialogActions>

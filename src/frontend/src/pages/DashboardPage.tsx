@@ -1,5 +1,13 @@
 import React, { useMemo, useState } from 'react';
-import { Typography, Grid, Card, CardContent, Box, Alert, Slider } from '@mui/material';
+import {
+  Typography,
+  Grid,
+  Card,
+  CardContent,
+  Box,
+  Alert,
+  Slider,
+} from '@mui/material';
 import {
   TrendingUpOutlined,
   AccountBalanceOutlined,
@@ -7,18 +15,21 @@ import {
   PieChartOutlined,
   PaymentOutlined,
 } from '@mui/icons-material';
-import { 
-  LineChart, 
-  Line, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip as RechartsTooltip, 
-  ResponsiveContainer 
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip as RechartsTooltip,
+  ResponsiveContainer,
 } from 'recharts';
 import { formatCurrency, sumCents } from '@/utils/currency';
 import { useAppSelector } from '@/store/hooks';
-import { OnboardingTooltip, OnboardingStep } from '@/components/common/OnboardingTooltip';
+import {
+  OnboardingTooltip,
+  OnboardingStep,
+} from '@/components/common/OnboardingTooltip';
 import { useOnboarding } from '@/hooks/useOnboarding';
 
 const DashboardPage: React.FC = () => {
@@ -27,64 +38,68 @@ const DashboardPage: React.FC = () => {
   const [projectionYears, setProjectionYears] = useState(5);
 
   // Onboarding setup
-  const {
-    isOnboardingOpen,
-    completeOnboarding,
-    skipOnboarding,
-  } = useOnboarding({
-    storageKey: 'dashboard-onboarding-completed',
-    autoStart: true,
-    delay: 1500,
-  });
+  const { isOnboardingOpen, completeOnboarding, skipOnboarding } =
+    useOnboarding({
+      storageKey: 'dashboard-onboarding-completed',
+      autoStart: true,
+      delay: 1500,
+    });
 
   const onboardingSteps: OnboardingStep[] = [
     {
       id: 'welcome',
       target: '[data-onboarding="dashboard-title"]',
       title: 'Welcome to Your Financial Dashboard! 🎉',
-      description: 'This is your financial command center. Here you can see a complete overview of your financial health including net worth, savings, and cash flow.',
+      description:
+        'This is your financial command center. Here you can see a complete overview of your financial health including net worth, savings, and cash flow.',
       placement: 'bottom',
     },
     {
       id: 'wealth-projection',
       target: '[data-onboarding="wealth-projection"]',
       title: 'Wealth Projection Chart',
-      description: 'This chart shows your projected net worth over time based on your current savings rate and growth assumptions. Use the slider to adjust the time horizon.',
+      description:
+        'This chart shows your projected net worth over time based on your current savings rate and growth assumptions. Use the slider to adjust the time horizon.',
       placement: 'bottom',
     },
     {
       id: 'net-worth',
       target: '[data-onboarding="net-worth-card"]',
       title: 'Your Net Worth',
-      description: 'This shows your total assets minus liabilities. It\'s the most important number for tracking your overall financial progress over time.',
+      description:
+        "This shows your total assets minus liabilities. It's the most important number for tracking your overall financial progress over time.",
       placement: 'bottom',
     },
     {
       id: 'savings-rate',
       target: '[data-onboarding="savings-rate-card"]',
       title: 'Savings Rate',
-      description: 'Your savings rate is the percentage of income you save each month. Aim for 10-20% for good financial health!',
+      description:
+        'Your savings rate is the percentage of income you save each month. Aim for 10-20% for good financial health!',
       placement: 'bottom',
     },
     {
       id: 'account-summary',
       target: '[data-onboarding="account-summary"]',
       title: 'Account Summary',
-      description: 'Track your assets and liabilities here. Add accounts through the "Accounts" page to see your complete financial picture.',
+      description:
+        'Track your assets and liabilities here. Add accounts through the "Accounts" page to see your complete financial picture.',
       placement: 'top',
     },
     {
       id: 'cashflow-summary',
       target: '[data-onboarding="cashflow-summary"]',
       title: 'Cash Flow Analysis',
-      description: 'See your monthly income vs expenses. Positive cash flow means you\'re saving money each month!',
+      description:
+        "See your monthly income vs expenses. Positive cash flow means you're saving money each month!",
       placement: 'top',
     },
     {
       id: 'navigation',
       target: '[data-onboarding="sidebar-accounts"]',
       title: 'Ready to Get Started?',
-      description: 'Click on "Accounts" in the sidebar to add your bank accounts, investments, and loans. Then add your income and expenses in "Cash Flows".',
+      description:
+        'Click on "Accounts" in the sidebar to add your bank accounts, investments, and loans. Then add your income and expenses in "Cash Flows".',
       placement: 'right',
       action: {
         label: 'Go to Accounts',
@@ -99,7 +114,10 @@ const DashboardPage: React.FC = () => {
   const financialMetrics = useMemo(() => {
     // Calculate total assets and liabilities
     const assets = accounts
-      .filter(acc => ['income', 'investment'].includes(acc.kind) && acc.openingBalanceCents)
+      .filter(
+        acc =>
+          ['income', 'investment'].includes(acc.kind) && acc.openingBalanceCents
+      )
       .reduce((sum, acc) => sum + (acc.openingBalanceCents || 0), 0);
 
     const liabilities = accounts
@@ -108,7 +126,12 @@ const DashboardPage: React.FC = () => {
 
     // Calculate monthly interest payments on liability accounts
     const monthlyInterestPayments = accounts
-      .filter(acc => acc.kind === 'liability' && acc.openingBalanceCents && acc.annualInterestRate)
+      .filter(
+        acc =>
+          acc.kind === 'liability' &&
+          acc.openingBalanceCents &&
+          acc.annualInterestRate
+      )
       .reduce((sum, acc) => {
         const balance = Math.abs(acc.openingBalanceCents || 0);
         const annualRate = acc.annualInterestRate || 0;
@@ -122,16 +145,26 @@ const DashboardPage: React.FC = () => {
     // Calculate monthly income and expenses from cash flows
     const monthlyIncomeFlows = cashflows.filter(cf => {
       const account = accounts.find(acc => acc.id === cf.accountId);
-      return account?.kind === 'income' && cf.recurrence.frequency === 'monthly';
+      return (
+        account?.kind === 'income' && cf.recurrence.frequency === 'monthly'
+      );
     });
 
     const monthlyExpenseFlows = cashflows.filter(cf => {
       const account = accounts.find(acc => acc.id === cf.accountId);
-      return account && account.kind !== 'income' && cf.recurrence.frequency === 'monthly';
+      return (
+        account &&
+        account.kind !== 'income' &&
+        cf.recurrence.frequency === 'monthly'
+      );
     });
 
-    const monthlyIncome = sumCents(monthlyIncomeFlows.map(cf => cf.amountCents));
-    const monthlyExpenses = sumCents(monthlyExpenseFlows.map(cf => cf.amountCents));
+    const monthlyIncome = sumCents(
+      monthlyIncomeFlows.map(cf => cf.amountCents)
+    );
+    const monthlyExpenses = sumCents(
+      monthlyExpenseFlows.map(cf => cf.amountCents)
+    );
     const monthlySavings = monthlyIncome - monthlyExpenses;
     const savingsRate = monthlyIncome > 0 ? monthlySavings / monthlyIncome : 0;
 
@@ -154,34 +187,40 @@ const DashboardPage: React.FC = () => {
     const monthlyContribution = financialMetrics.monthlySavings;
     const annualReturn = 0.07; // 7% annual return assumption
     const monthlyReturn = annualReturn / 12;
-    
+
     for (let year = 0; year <= projectionYears; year++) {
       const months = year * 12;
-      
+
       // Calculate future value with monthly contributions
       let futureValue = startingNetWorth;
       if (monthlyReturn > 0) {
         // Present value growth
         futureValue = startingNetWorth * Math.pow(1 + monthlyReturn, months);
-        
+
         // Future value of annuity (monthly contributions)
         if (monthlyContribution > 0 && monthlyReturn > 0) {
-          futureValue += monthlyContribution * ((Math.pow(1 + monthlyReturn, months) - 1) / monthlyReturn);
+          futureValue +=
+            monthlyContribution *
+            ((Math.pow(1 + monthlyReturn, months) - 1) / monthlyReturn);
         }
       } else {
         // Simple case if no return
-        futureValue = startingNetWorth + (monthlyContribution * months);
+        futureValue = startingNetWorth + monthlyContribution * months;
       }
-      
+
       data.push({
         year: year,
         netWorth: Math.round(futureValue),
         netWorthFormatted: formatCurrency(Math.round(futureValue)),
       });
     }
-    
+
     return data;
-  }, [financialMetrics.netWorth, financialMetrics.monthlySavings, projectionYears]);
+  }, [
+    financialMetrics.netWorth,
+    financialMetrics.monthlySavings,
+    projectionYears,
+  ]);
 
   const StatCard: React.FC<{
     title: string;
@@ -242,9 +281,9 @@ const DashboardPage: React.FC = () => {
   return (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <Box sx={{ p: 3, flexGrow: 1 }}>
-        <Typography 
-          variant="h4" 
-          gutterBottom 
+        <Typography
+          variant="h4"
+          gutterBottom
           sx={{ fontWeight: 600 }}
           data-onboarding="dashboard-title"
         >
@@ -266,13 +305,21 @@ const DashboardPage: React.FC = () => {
         {/* Wealth Projection Chart */}
         <Card sx={{ mb: 4 }} data-onboarding="wealth-projection">
           <CardContent>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                mb: 3,
+              }}
+            >
               <Typography variant="h6" sx={{ fontWeight: 600 }}>
                 Wealth Projection
               </Typography>
               <Box sx={{ minWidth: 200 }}>
                 <Typography variant="body2" gutterBottom>
-                  Time Horizon: {projectionYears} year{projectionYears !== 1 ? 's' : ''}
+                  Time Horizon: {projectionYears} year
+                  {projectionYears !== 1 ? 's' : ''}
                 </Typography>
                 <Slider
                   value={projectionYears}
@@ -291,27 +338,40 @@ const DashboardPage: React.FC = () => {
                 />
               </Box>
             </Box>
-            
+
             <Box sx={{ height: 300 }}>
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={wealthProjectionData}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis 
-                    dataKey="year" 
-                    label={{ value: 'Years', position: 'insideBottom', offset: -10 }}
+                  <XAxis
+                    dataKey="year"
+                    label={{
+                      value: 'Years',
+                      position: 'insideBottom',
+                      offset: -10,
+                    }}
                   />
-                  <YAxis 
-                    tickFormatter={(value) => `R ${(value / 1000000).toFixed(1)}M`}
-                    label={{ value: 'Net Worth', angle: -90, position: 'insideLeft' }}
+                  <YAxis
+                    tickFormatter={value =>
+                      `R ${(value / 1000000).toFixed(1)}M`
+                    }
+                    label={{
+                      value: 'Net Worth',
+                      angle: -90,
+                      position: 'insideLeft',
+                    }}
                   />
-                  <RechartsTooltip 
-                    formatter={(value: number) => [formatCurrency(value), 'Net Worth']}
-                    labelFormatter={(label) => `Year ${label}`}
+                  <RechartsTooltip
+                    formatter={(value: number) => [
+                      formatCurrency(value),
+                      'Net Worth',
+                    ]}
+                    labelFormatter={label => `Year ${label}`}
                   />
-                  <Line 
-                    type="monotone" 
-                    dataKey="netWorth" 
-                    stroke="#1976d2" 
+                  <Line
+                    type="monotone"
+                    dataKey="netWorth"
+                    stroke="#1976d2"
                     strokeWidth={3}
                     dot={{ fill: '#1976d2', strokeWidth: 2, r: 4 }}
                     activeDot={{ r: 6 }}
@@ -319,9 +379,14 @@ const DashboardPage: React.FC = () => {
                 </LineChart>
               </ResponsiveContainer>
             </Box>
-            
-            <Typography variant="caption" color="text.secondary" sx={{ mt: 2, display: 'block' }}>
-              Projection assumes 7% annual investment return and current monthly savings rate of {formatCurrency(financialMetrics.monthlySavings)}
+
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ mt: 2, display: 'block' }}
+            >
+              Projection assumes 7% annual investment return and current monthly
+              savings rate of {formatCurrency(financialMetrics.monthlySavings)}
             </Typography>
           </CardContent>
         </Card>
@@ -392,7 +457,8 @@ const DashboardPage: React.FC = () => {
                 <Box>
                   {accounts.length === 0 ? (
                     <Typography variant="body2" color="text.secondary">
-                      No accounts found. Add some accounts to see your portfolio.
+                      No accounts found. Add some accounts to see your
+                      portfolio.
                     </Typography>
                   ) : (
                     <Box>
@@ -414,8 +480,13 @@ const DashboardPage: React.FC = () => {
                           </Typography>
                         </Grid>
                       </Grid>
-                      <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-                        Based on {accounts.length} account{accounts.length !== 1 ? 's' : ''}
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ mt: 2 }}
+                      >
+                        Based on {accounts.length} account
+                        {accounts.length !== 1 ? 's' : ''}
                       </Typography>
                     </Box>
                   )}
@@ -433,7 +504,8 @@ const DashboardPage: React.FC = () => {
                 <Box>
                   {cashflows.length === 0 ? (
                     <Typography variant="body2" color="text.secondary">
-                      No cash flows found. Add income and expense flows to see your monthly budget.
+                      No cash flows found. Add income and expense flows to see
+                      your monthly budget.
                     </Typography>
                   ) : (
                     <Box>
@@ -455,19 +527,35 @@ const DashboardPage: React.FC = () => {
                           </Typography>
                         </Grid>
                       </Grid>
-                      <Box sx={{ mt: 2, p: 2, backgroundColor: 'action.hover', borderRadius: 1 }}>
+                      <Box
+                        sx={{
+                          mt: 2,
+                          p: 2,
+                          backgroundColor: 'action.hover',
+                          borderRadius: 1,
+                        }}
+                      >
                         <Typography variant="body2" color="text.secondary">
                           Net Cash Flow
                         </Typography>
-                        <Typography 
-                          variant="h6" 
-                          color={financialMetrics.monthlySavings >= 0 ? 'success.main' : 'error.main'}
+                        <Typography
+                          variant="h6"
+                          color={
+                            financialMetrics.monthlySavings >= 0
+                              ? 'success.main'
+                              : 'error.main'
+                          }
                         >
                           {formatCurrency(financialMetrics.monthlySavings)}
                         </Typography>
                       </Box>
-                      <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-                        Based on {cashflows.length} cash flow{cashflows.length !== 1 ? 's' : ''}
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ mt: 2 }}
+                      >
+                        Based on {cashflows.length} cash flow
+                        {cashflows.length !== 1 ? 's' : ''}
                       </Typography>
                     </Box>
                   )}

@@ -59,14 +59,14 @@ export const OnboardingTooltip: React.FC<OnboardingTooltipProps> = ({
     const target = document.querySelector(step.target) as HTMLElement;
     if (target) {
       setAnchorEl(target);
-      
+
       // Scroll to element if it's not visible
       target.scrollIntoView({
         behavior: 'smooth',
         block: 'center',
         inline: 'center',
       });
-      
+
       // Add highlight class
       target.classList.add('onboarding-highlight');
       target.style.position = 'relative';
@@ -86,7 +86,7 @@ export const OnboardingTooltip: React.FC<OnboardingTooltipProps> = ({
     if (step?.action) {
       step.action.onClick();
     }
-    
+
     if (isLastStep) {
       handleComplete();
     } else {
@@ -140,7 +140,7 @@ export const OnboardingTooltip: React.FC<OnboardingTooltipProps> = ({
           zIndex: 1300,
           '& .MuiBackdrop-root': {
             backgroundColor: 'rgba(0, 0, 0, 0.7)',
-          }
+          },
         }}
       />
 
@@ -214,7 +214,8 @@ export const OnboardingTooltip: React.FC<OnboardingTooltipProps> = ({
                     width: 8,
                     height: 8,
                     borderRadius: '50%',
-                    backgroundColor: index <= currentStep ? 'primary.main' : 'action.disabled',
+                    backgroundColor:
+                      index <= currentStep ? 'primary.main' : 'action.disabled',
                     transition: 'background-color 0.2s',
                   }}
                 />
@@ -222,7 +223,13 @@ export const OnboardingTooltip: React.FC<OnboardingTooltipProps> = ({
             </Box>
 
             {/* Actions */}
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}
+            >
               <Box>
                 <Button
                   size="small"

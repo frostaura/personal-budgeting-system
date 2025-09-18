@@ -131,7 +131,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 }}
                 aria-label={`Navigate to ${item.label}`}
                 role="menuitem"
-                {...(item.path === '/accounts' && { 'data-onboarding': 'sidebar-accounts' })}
+                {...(item.path === '/accounts' && {
+                  'data-onboarding': 'sidebar-accounts',
+                })}
               >
                 <ListItemIcon
                   sx={{
@@ -150,7 +152,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   }}
                   secondaryTypographyProps={{
                     variant: 'caption',
-                    sx: { 
+                    sx: {
                       mt: 0.5,
                       color: isActive ? 'inherit' : 'text.secondary',
                     },
