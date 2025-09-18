@@ -34,7 +34,15 @@ export const MainLayout: React.FC = () => {
   const drawerWidth = 280;
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+    <Box sx={{ 
+      display: 'flex', 
+      minHeight: '100vh',
+      // Use dynamic viewport height for mobile devices
+      minHeight: ['100vh', '100dvh'], // dvh is dynamic viewport height
+      '@supports (height: 100dvh)': {
+        minHeight: '100dvh',
+      },
+    }}>
       <AppBar
         position="fixed"
         sx={{
@@ -84,6 +92,12 @@ export const MainLayout: React.FC = () => {
         sx={{
           flexGrow: 1,
           pt: `${theme.mixins.toolbar.minHeight}px`,
+          height: '100vh',
+          // Use dynamic viewport height for mobile devices
+          '@supports (height: 100dvh)': {
+            height: '100dvh',
+          },
+          overflow: 'auto',
           transition: theme.transitions.create(['margin'], {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
@@ -98,7 +112,10 @@ export const MainLayout: React.FC = () => {
             }),
         }}
       >
-        <Box sx={{ height: '100%' }}>
+        <Box sx={{ 
+          minHeight: 'calc(100% - 64px)', // Account for app bar height
+          pb: 2, // Add some bottom padding
+        }}>
           <Outlet />
         </Box>
       </Box>

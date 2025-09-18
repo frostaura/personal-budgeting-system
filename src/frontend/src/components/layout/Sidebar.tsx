@@ -184,6 +184,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
           boxSizing: 'border-box',
           backgroundColor: 'background.paper',
           borderRight: `1px solid ${theme.palette.divider}`,
+          height: '100vh',
+          // Use dynamic viewport height for mobile devices
+          '@supports (height: 100dvh)': {
+            height: '100dvh',
+          },
         },
       }}
       ModalProps={{
