@@ -73,6 +73,7 @@ const CashflowsPage: React.FC = () => {
   const [formData, setFormData] = useState({
     accountId: '',
     description: '',
+    icon: '💰', // default icon
     amount: '',
     frequency: 'monthly' as Frequency,
     startDate: new Date().toISOString().split('T')[0],
@@ -93,6 +94,7 @@ const CashflowsPage: React.FC = () => {
       setFormData({
         accountId: cashflow.accountId,
         description: cashflow.description || '',
+        icon: cashflow.icon || '💰',
         amount: centsToMajor(cashflow.amountCents).toString(),
         frequency: cashflow.recurrence.frequency,
         startDate: cashflow.recurrence.startDate,
@@ -108,6 +110,7 @@ const CashflowsPage: React.FC = () => {
       setFormData({
         accountId: '',
         description: '',
+        icon: '💰',
         amount: '',
         frequency: 'monthly',
         startDate: new Date().toISOString().split('T')[0],
@@ -152,6 +155,7 @@ const CashflowsPage: React.FC = () => {
         accountId: formData.accountId,
         amountCents: majorToCents(parseFloat(formData.amount)),
         description: formData.description,
+        icon: formData.icon,
         recurrence: recurrenceData as Recurrence,
       };
 
@@ -307,7 +311,7 @@ const CashflowsPage: React.FC = () => {
                             fontSize: '1.2rem',
                           }}
                         >
-                          {direction === 'income' ? '💰' : '💸'}
+                          {cashflow.icon || (direction === 'income' ? '💰' : '💸')}
                         </Avatar>
                       </ListItemAvatar>
                       <ListItemText
@@ -406,6 +410,32 @@ const CashflowsPage: React.FC = () => {
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 required
               />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth>
+                <InputLabel>Icon</InputLabel>
+                <Select
+                  value={formData.icon}
+                  onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
+                  label="Icon"
+                >
+                  <MenuItem value="💰">💰 Money</MenuItem>
+                  <MenuItem value="💸">💸 Expenses</MenuItem>
+                  <MenuItem value="🏠">🏠 Home</MenuItem>
+                  <MenuItem value="🚗">🚗 Car</MenuItem>
+                  <MenuItem value="🍕">🍕 Food</MenuItem>
+                  <MenuItem value="⚡">⚡ Utilities</MenuItem>
+                  <MenuItem value="🎯">🎯 Savings</MenuItem>
+                  <MenuItem value="📱">📱 Technology</MenuItem>
+                  <MenuItem value="👕">👕 Clothing</MenuItem>
+                  <MenuItem value="🎉">🎉 Entertainment</MenuItem>
+                  <MenuItem value="🏥">🏥 Healthcare</MenuItem>
+                  <MenuItem value="📚">📚 Education</MenuItem>
+                  <MenuItem value="🛒">🛒 Shopping</MenuItem>
+                  <MenuItem value="🎪">🎪 Subscriptions</MenuItem>
+                  <MenuItem value="🏦">🏦 Banking</MenuItem>
+                </Select>
+              </FormControl>
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
