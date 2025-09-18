@@ -9,7 +9,7 @@ interface ProjectionsState {
   auditTrail: AuditEntry[];
   projectionParameters: {
     startDate: string; // ISO date
-    endDate: string;   // ISO date
+    endDate: string; // ISO date
     scenarioId: string;
   };
   lastCalculated: string | null; // ISO timestamp
@@ -22,7 +22,9 @@ const initialState: ProjectionsState = {
   auditTrail: [],
   projectionParameters: {
     startDate: new Date().toISOString().split('T')[0]!, // Today
-    endDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000 * 5).toISOString().split('T')[0]!, // 5 years from now
+    endDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000 * 5)
+      .toISOString()
+      .split('T')[0]!, // 5 years from now
     scenarioId: 'baseline',
   },
   lastCalculated: null,
@@ -48,7 +50,10 @@ const projectionsSlice = createSlice({
       state.error = null;
       state.lastCalculated = new Date().toISOString();
     },
-    setProjectionParameters: (state, action: PayloadAction<Partial<typeof initialState.projectionParameters>>) => {
+    setProjectionParameters: (
+      state,
+      action: PayloadAction<Partial<typeof initialState.projectionParameters>>
+    ) => {
       state.projectionParameters = {
         ...state.projectionParameters,
         ...action.payload,
@@ -61,13 +66,13 @@ const projectionsSlice = createSlice({
         state.auditTrail = state.auditTrail.slice(-100);
       }
     },
-    clearProjection: (state) => {
+    clearProjection: state => {
       state.currentProjection = null;
       state.loading = 'idle';
       state.error = null;
       state.lastCalculated = null;
     },
-    clearAuditTrail: (state) => {
+    clearAuditTrail: state => {
       state.auditTrail = [];
     },
   },

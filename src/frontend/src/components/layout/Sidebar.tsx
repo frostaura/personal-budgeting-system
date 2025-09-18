@@ -94,14 +94,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </Typography>
         </Box>
       </Toolbar>
-      
+
       <Divider />
-      
+
       <List sx={{ pt: 1 }}>
-        {navigationItems.map((item) => {
+        {navigationItems.map(item => {
           const Icon = item.icon;
           const isActive = location.pathname === item.path;
-          
+
           return (
             <ListItem key={item.path} disablePadding>
               <ListItemButton
@@ -136,7 +136,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </ListItemIcon>
                 <ListItemText
                   primary={item.label}
-                  secondary={variant !== 'temporary' ? item.description : undefined}
+                  secondary={
+                    variant !== 'temporary' ? item.description : undefined
+                  }
                   primaryTypographyProps={{
                     fontWeight: isActive ? 600 : 400,
                   }}

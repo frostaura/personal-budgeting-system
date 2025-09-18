@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  Typography,
-  Grid,
-  Card,
-  CardContent,
-  Box,
-  Alert,
-} from '@mui/material';
+import { Typography, Grid, Card, CardContent, Box, Alert } from '@mui/material';
 import {
   TrendingUpOutlined,
   AccountBalanceOutlined,
@@ -73,7 +66,8 @@ const DashboardPage: React.FC = () => {
               fontWeight: 500,
             }}
           >
-            {trend >= 0 ? '+' : ''}{(trend * 100).toFixed(1)}% from last month
+            {trend >= 0 ? '+' : ''}
+            {(trend * 100).toFixed(1)}% from last month
           </Typography>
         )}
       </CardContent>
@@ -85,15 +79,16 @@ const DashboardPage: React.FC = () => {
       <Typography variant="h4" gutterBottom sx={{ fontWeight: 600 }}>
         Financial Dashboard
       </Typography>
-      
+
       <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
         Overview of your current financial position and recent trends
       </Typography>
 
       <Alert severity="info" sx={{ mb: 4 }}>
         <Typography variant="body2">
-          <strong>Remember:</strong> All values shown are projections and estimates only. 
-          This is not financial advice. Please consult with qualified professionals for important financial decisions.
+          <strong>Remember:</strong> All values shown are projections and
+          estimates only. This is not financial advice. Please consult with
+          qualified professionals for important financial decisions.
         </Typography>
       </Alert>
 
@@ -107,7 +102,7 @@ const DashboardPage: React.FC = () => {
             color="primary"
           />
         </Grid>
-        
+
         <Grid item xs={12} sm={6} lg={3}>
           <StatCard
             title="Total Assets"
@@ -117,17 +112,19 @@ const DashboardPage: React.FC = () => {
             color="success"
           />
         </Grid>
-        
+
         <Grid item xs={12} sm={6} lg={3}>
           <StatCard
             title="Monthly Savings"
-            value={formatCurrency(mockData.monthlyIncome - mockData.monthlyExpenses)}
+            value={formatCurrency(
+              mockData.monthlyIncome - mockData.monthlyExpenses
+            )}
             icon={<SavingsOutlined color="info" />}
             trend={0.089}
             color="warning"
           />
         </Grid>
-        
+
         <Grid item xs={12} sm={6} lg={3}>
           <StatCard
             title="Savings Rate"
@@ -152,7 +149,7 @@ const DashboardPage: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        
+
         <Grid item xs={12} md={6}>
           <Card>
             <CardContent>

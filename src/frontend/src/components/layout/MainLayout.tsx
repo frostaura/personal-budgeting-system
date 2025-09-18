@@ -1,7 +1,18 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import { Box, AppBar, Toolbar, Typography, IconButton, useTheme, useMediaQuery } from '@mui/material';
-import { MenuOutlined, AccountBalanceWalletOutlined } from '@mui/icons-material';
+import {
+  Box,
+  AppBar,
+  Toolbar,
+  Typography,
+  IconButton,
+  useTheme,
+  useMediaQuery,
+} from '@mui/material';
+import {
+  MenuOutlined,
+  AccountBalanceWalletOutlined,
+} from '@mui/icons-material';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { toggleSidebar } from '@/store/slices/appSlice';
 import { Sidebar } from './Sidebar';
@@ -39,9 +50,9 @@ export const MainLayout: React.FC = () => {
           >
             <MenuOutlined />
           </IconButton>
-          
+
           <AccountBalanceWalletOutlined sx={{ mr: 2, color: 'primary.main' }} />
-          
+
           <Typography
             variant="h6"
             noWrap
@@ -73,13 +84,14 @@ export const MainLayout: React.FC = () => {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
           }),
-          ...(sidebarOpen && !isMobile && {
-            marginLeft: `${drawerWidth}px`,
-            transition: theme.transitions.create(['margin'], {
-              easing: theme.transitions.easing.easeOut,
-              duration: theme.transitions.duration.enteringScreen,
+          ...(sidebarOpen &&
+            !isMobile && {
+              marginLeft: `${drawerWidth}px`,
+              transition: theme.transitions.create(['margin'], {
+                easing: theme.transitions.easing.easeOut,
+                duration: theme.transitions.duration.enteringScreen,
+              }),
             }),
-          }),
         }}
       >
         <Box sx={{ p: 3 }}>

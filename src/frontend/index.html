@@ -4,35 +4,46 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Personal Finance Planner - A production-grade financial planning application for South African users" />
+    <meta
+      name="description"
+      content="Personal Finance Planner - A production-grade financial planning application for South African users"
+    />
     <meta name="theme-color" content="#1976d2" />
-    
+
     <!-- Accessibility and SEO -->
     <meta name="author" content="Personal Finance Planner" />
     <meta name="robots" content="noindex, nofollow" />
-    
+
     <!-- Preload critical fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
     <title>Personal Finance Planner</title>
-    
+
     <style>
       /* Critical CSS for loading screen */
       body {
         margin: 0;
-        font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        font-family:
+          'Roboto',
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          sans-serif;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         background-color: #fafafa;
       }
-      
+
       /* Loading screen styles */
       #root {
         min-height: 100vh;
       }
-      
+
       .loading-fallback {
         display: flex;
         flex-direction: column;
@@ -41,13 +52,13 @@
         min-height: 100vh;
         background-color: #fafafa;
       }
-      
+
       .loading-fallback h1 {
         color: #1976d2;
         margin-bottom: 1rem;
         font-weight: 600;
       }
-      
+
       .loading-spinner {
         width: 40px;
         height: 40px;
@@ -56,12 +67,16 @@
         border-radius: 50%;
         animation: spin 1s linear infinite;
       }
-      
+
       @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
       }
-      
+
       /* High contrast mode support */
       @media (prefers-contrast: high) {
         .loading-fallback {
@@ -69,7 +84,7 @@
           border: 2px solid #000000;
         }
       }
-      
+
       /* Reduced motion support */
       @media (prefers-reduced-motion: reduce) {
         .loading-spinner {
@@ -83,12 +98,16 @@
       <!-- Fallback loading screen for users with JavaScript disabled or slow connections -->
       <div class="loading-fallback">
         <h1>Personal Finance Planner</h1>
-        <div class="loading-spinner" role="status" aria-label="Loading application"></div>
+        <div
+          class="loading-spinner"
+          role="status"
+          aria-label="Loading application"
+        ></div>
         <p>Loading your financial planning tools...</p>
         <noscript>
-          <p style="color: #d32f2f; font-weight: 500;">
-            This application requires JavaScript to function properly. 
-            Please enable JavaScript in your browser settings.
+          <p style="color: #d32f2f; font-weight: 500">
+            This application requires JavaScript to function properly. Please
+            enable JavaScript in your browser settings.
           </p>
         </noscript>
       </div>

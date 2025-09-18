@@ -7,7 +7,7 @@ const ProjectionsPage: React.FC = () => {
       <Typography variant="h4" gutterBottom sx={{ fontWeight: 600 }}>
         Financial Projections
       </Typography>
-      
+
       <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
         Deterministic projections of your financial future
       </Typography>

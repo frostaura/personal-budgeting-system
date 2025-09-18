@@ -7,7 +7,7 @@ const AccountsPage: React.FC = () => {
       <Typography variant="h4" gutterBottom sx={{ fontWeight: 600 }}>
         Financial Accounts
       </Typography>
-      
+
       <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
         Manage your bank accounts, investments, and other financial accounts
       </Typography>
@@ -18,7 +18,8 @@ const AccountsPage: React.FC = () => {
             Accounts Management
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Account management interface will be implemented here with Material UI Data Grid
+            Account management interface will be implemented here with Material
+            UI Data Grid
           </Typography>
         </CardContent>
       </Card>

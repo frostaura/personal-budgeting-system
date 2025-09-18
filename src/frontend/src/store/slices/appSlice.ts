@@ -28,7 +28,7 @@ const appSlice = createSlice({
     setTheme: (state, action: PayloadAction<ThemeMode>) => {
       state.theme = action.payload;
     },
-    toggleSidebar: (state) => {
+    toggleSidebar: state => {
       state.sidebarOpen = !state.sidebarOpen;
     },
     setSidebarOpen: (state, action: PayloadAction<boolean>) => {
@@ -44,7 +44,7 @@ const appSlice = createSlice({
     removeToast: (state, action: PayloadAction<string>) => {
       state.toasts = state.toasts.filter(toast => toast.id !== action.payload);
     },
-    clearAllToasts: (state) => {
+    clearAllToasts: state => {
       state.toasts = [];
     },
     setGlobalLoading: (state, action: PayloadAction<LoadingState>) => {
@@ -56,10 +56,10 @@ const appSlice = createSlice({
     removeError: (state, action: PayloadAction<number>) => {
       state.errors.splice(action.payload, 1);
     },
-    clearErrors: (state) => {
+    clearErrors: state => {
       state.errors = [];
     },
-    updateLastActivity: (state) => {
+    updateLastActivity: state => {
       state.lastActivity = new Date().toISOString();
     },
     setOnlineStatus: (state, action: PayloadAction<boolean>) => {

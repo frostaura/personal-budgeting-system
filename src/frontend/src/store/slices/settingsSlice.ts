@@ -89,31 +89,49 @@ const settingsSlice = createSlice({
   name: 'settings',
   initialState,
   reducers: {
-    updateCurrencySettings: (state, action: PayloadAction<Partial<CurrencySettings>>) => {
+    updateCurrencySettings: (
+      state,
+      action: PayloadAction<Partial<CurrencySettings>>
+    ) => {
       state.currency = { ...state.currency, ...action.payload };
     },
     updateTaxSettings: (state, action: PayloadAction<TaxPresetZA>) => {
       state.taxSettings = action.payload;
     },
-    acceptDisclaimer: (state) => {
+    acceptDisclaimer: state => {
       state.disclaimerAccepted = true;
     },
-    updateAutoSave: (state, action: PayloadAction<{ enabled: boolean; interval?: number }>) => {
+    updateAutoSave: (
+      state,
+      action: PayloadAction<{ enabled: boolean; interval?: number }>
+    ) => {
       state.autoSave = action.payload.enabled;
       if (action.payload.interval !== undefined) {
         state.saveInterval = action.payload.interval;
       }
     },
-    updateTheme: (state, action: PayloadAction<Partial<typeof initialState.theme>>) => {
+    updateTheme: (
+      state,
+      action: PayloadAction<Partial<typeof initialState.theme>>
+    ) => {
       state.theme = { ...state.theme, ...action.payload };
     },
-    updateAccessibility: (state, action: PayloadAction<Partial<typeof initialState.accessibility>>) => {
+    updateAccessibility: (
+      state,
+      action: PayloadAction<Partial<typeof initialState.accessibility>>
+    ) => {
       state.accessibility = { ...state.accessibility, ...action.payload };
     },
-    updateNotifications: (state, action: PayloadAction<Partial<typeof initialState.notifications>>) => {
+    updateNotifications: (
+      state,
+      action: PayloadAction<Partial<typeof initialState.notifications>>
+    ) => {
       state.notifications = { ...state.notifications, ...action.payload };
     },
-    updatePrivacy: (state, action: PayloadAction<Partial<typeof initialState.privacy>>) => {
+    updatePrivacy: (
+      state,
+      action: PayloadAction<Partial<typeof initialState.privacy>>
+    ) => {
       state.privacy = { ...state.privacy, ...action.payload };
     },
     resetSettings: () => initialState,

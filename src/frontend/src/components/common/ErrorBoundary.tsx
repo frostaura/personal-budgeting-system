@@ -32,10 +32,10 @@ export class ErrorBoundary extends Component<Props, State> {
   };
 
   private handleReset = () => {
-    this.setState({ 
-      hasError: false, 
-      error: undefined, 
-      errorInfo: undefined 
+    this.setState({
+      hasError: false,
+      error: undefined,
+      errorInfo: undefined,
     });
   };
 
@@ -73,13 +73,14 @@ export class ErrorBoundary extends Component<Props, State> {
                 mb: 2,
               }}
             />
-            
+
             <Typography variant="h4" gutterBottom>
               Oops! Something went wrong
             </Typography>
-            
+
             <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-              We're sorry, but an unexpected error has occurred. This could be a temporary issue.
+              We're sorry, but an unexpected error has occurred. This could be a
+              temporary issue.
             </Typography>
 
             {process.env.NODE_ENV === 'development' && this.state.error && (
@@ -87,7 +88,11 @@ export class ErrorBoundary extends Component<Props, State> {
                 <Typography variant="h6" gutterBottom>
                   Error Details:
                 </Typography>
-                <Typography variant="body2" component="pre" sx={{ fontSize: '0.75rem' }}>
+                <Typography
+                  variant="body2"
+                  component="pre"
+                  sx={{ fontSize: '0.75rem' }}
+                >
                   {this.state.error.toString()}
                   {this.state.errorInfo?.componentStack}
                 </Typography>
@@ -102,10 +107,7 @@ export class ErrorBoundary extends Component<Props, State> {
               >
                 Reload Page
               </Button>
-              <Button
-                variant="outlined"
-                onClick={this.handleReset}
-              >
+              <Button variant="outlined" onClick={this.handleReset}>
                 Try Again
               </Button>
             </Box>

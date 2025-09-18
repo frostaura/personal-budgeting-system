@@ -1,5 +1,10 @@
 import React from 'react';
-import { Box, CircularProgress, Typography, LinearProgress } from '@mui/material';
+import {
+  Box,
+  CircularProgress,
+  Typography,
+  LinearProgress,
+} from '@mui/material';
 import { AccountBalanceWalletOutlined } from '@mui/icons-material';
 
 interface LoadingScreenProps {
