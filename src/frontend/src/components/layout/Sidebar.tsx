@@ -85,6 +85,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }
   };
 
+  const handleClose = () => {
+    // Always call onClose to ensure proper cleanup
+    onClose();
+  };
+
   const drawerContent = (
     <>
       <Toolbar>
@@ -159,7 +164,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     <Drawer
       variant={variant}
       open={open}
-      onClose={onClose}
+      onClose={handleClose}
       sx={{
         width: open ? width : 0,
         flexShrink: 0,
@@ -172,6 +177,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
       }}
       ModalProps={{
         keepMounted: true, // Better open performance on mobile
+        disableAutoFocus: true,
+        disableEnforceFocus: true,
+        ...(variant === 'temporary' && {
+          BackdropProps: {
+            sx: {
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              transition: theme.transitions.create('opacity', {
+                easing: theme.transitions.easing.sharp,
+                duration: theme.transitions.duration.leavingScreen,
+              }),
+            },
+          },
+        }),
       }}
       role="navigation"
       aria-label="Main navigation menu"
