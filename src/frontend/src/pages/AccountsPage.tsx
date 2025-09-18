@@ -133,8 +133,9 @@ const AccountsPage: React.FC = () => {
       };
 
       // Build additional properties object
-      const additionalProps: Record<string, any> = {
-        currentBalanceAsOf: new Date().toISOString().split('T')[0],
+      const currentDate = new Date().toISOString().split('T')[0] as string;
+      const additionalProps: Record<string, string | number | boolean> = {
+        currentBalanceAsOf: currentDate,
       };
 
       if (formData.category) additionalProps.category = formData.category;

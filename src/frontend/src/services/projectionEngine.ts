@@ -5,9 +5,7 @@ import {
   MonthlyProjection,
   ProjectionResult,
   Cents,
-  Frequency,
 } from '@/types/money';
-import { sumCents } from '@/utils/currency';
 
 /**
  * Deterministic financial projection engine
@@ -77,7 +75,7 @@ export class ProjectionEngine {
   private shouldCashflowOccur(
     cashflow: Cashflow,
     targetMonth: Date,
-    startDate: Date
+    _startDate: Date
   ): boolean {
     const cfStartDate = new Date(cashflow.recurrence.startDate);
     const monthsSinceStart = this.getMonthsDifference(cfStartDate, targetMonth);
@@ -216,7 +214,14 @@ export class ProjectionEngine {
       const projectionDate = new Date(startDate);
       projectionDate.setMonth(projectionDate.getMonth() + monthIndex);
       
-      const monthlyAccountData: Record<string, any> = {};
+      const monthlyAccountData: Record<string, {
+        openingBalance: Cents;
+        income: Cents;
+        expenses: Cents;
+        netCashflow: Cents;
+        interestEarned: Cents;
+        closingBalance: Cents;
+      }> = {};
       let totalIncome = 0;
       let totalExpenses = 0;
 

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import {
   Typography,
   Box,
@@ -37,15 +37,13 @@ import {
   Delete as DeleteIcon,
   CompareArrows as CompareIcon,
   Assessment as AssessmentIcon,
-  TrendingUp as TrendingUpIcon,
   PlayArrow as PlayIcon,
-  Visibility as VisibilityIcon,
 } from '@mui/icons-material';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { addScenario, updateScenario, removeScenario, setActiveScenario } from '@/store/slices/scenariosSlice';
 import { projectionEngine } from '@/services/projectionEngine';
-import { formatCurrency, formatPercentage } from '@/utils/currency';
-import { Scenario } from '@/types/money';
+import { formatCurrency } from '@/utils/currency';
+import { Scenario, ProjectionResult } from '@/types/money';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -77,9 +75,18 @@ const ScenariosPage: React.FC = () => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingScenario, setEditingScenario] = useState<Scenario | null>(null);
   const [selectedTab, setSelectedTab] = useState(0);
-  const [compareScenarios, setCompareScenarios] = useState<string[]>([]);
+  const [compareScenarios] = useState<string[]>([]);
   const [isRunningComparison, setIsRunningComparison] = useState(false);
-  const [comparisonResults, setComparisonResults] = useState<any[]>([]);
+  const [comparisonResults, setComparisonResults] = useState<Array<{
+    scenario: Scenario;
+    projection: ProjectionResult;
+    metrics: {
+      finalNetWorth: number;
+      totalGrowth: number;
+      cagr: number;
+      avgSavingsRate: number;
+    };
+  }>>([]);
 
   // Form state for scenario creation/editing
   const [formData, setFormData] = useState<Partial<Scenario>>({
@@ -389,7 +396,7 @@ const ScenariosPage: React.FC = () => {
                         Inflation
                       </Typography>
                       <Typography variant="body1" fontWeight={500}>
-                        {(scenario.inflationPct * 100).toFixed(1)}%
+                        {((scenario.inflationPct || 0) * 100).toFixed(1)}%
                       </Typography>
                     </Grid>
                     <Grid item xs={6}>
@@ -397,7 +404,7 @@ const ScenariosPage: React.FC = () => {
                         Salary Growth
                       </Typography>
                       <Typography variant="body1" fontWeight={500}>
-                        {(scenario.salaryGrowthPct * 100).toFixed(1)}%
+                        {((scenario.salaryGrowthPct || 0) * 100).toFixed(1)}%
                       </Typography>
                     </Grid>
                   </Grid>
@@ -464,7 +471,7 @@ const ScenariosPage: React.FC = () => {
           <>
             {/* Summary Cards */}
             <Grid container spacing={3} sx={{ mb: 4 }}>
-              {comparisonResults.map((result, index) => (
+              {comparisonResults.map((result) => (
                 <Grid item xs={12} md={6} lg={4} key={result.scenario.id}>
                   <Card>
                     <CardContent>
