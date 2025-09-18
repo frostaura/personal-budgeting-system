@@ -5,6 +5,7 @@ import {
   AccountBalanceOutlined,
   SavingsOutlined,
   PieChartOutlined,
+  PaymentOutlined,
 } from '@mui/icons-material';
 import { 
   LineChart, 
@@ -105,6 +106,17 @@ const DashboardPage: React.FC = () => {
       .filter(acc => acc.kind === 'liability' && acc.openingBalanceCents)
       .reduce((sum, acc) => sum + Math.abs(acc.openingBalanceCents || 0), 0);
 
+    // Calculate monthly interest payments on liability accounts
+    const monthlyInterestPayments = accounts
+      .filter(acc => acc.kind === 'liability' && acc.openingBalanceCents && acc.annualInterestRate)
+      .reduce((sum, acc) => {
+        const balance = Math.abs(acc.openingBalanceCents || 0);
+        const annualRate = acc.annualInterestRate || 0;
+        const monthlyRate = annualRate / 12;
+        const monthlyInterest = balance * monthlyRate;
+        return sum + monthlyInterest;
+      }, 0);
+
     const netWorth = assets - liabilities;
 
     // Calculate monthly income and expenses from cash flows
@@ -131,6 +143,7 @@ const DashboardPage: React.FC = () => {
       monthlyExpenses,
       monthlySavings,
       savingsRate,
+      monthlyInterestPayments,
     };
   }, [accounts, cashflows]);
 
@@ -314,7 +327,7 @@ const DashboardPage: React.FC = () => {
         </Card>
 
         <Grid container spacing={3} sx={{ mb: 4 }}>
-          <Grid item xs={12} sm={6} lg={3}>
+          <Grid item xs={12} sm={6} md={4}>
             <div data-onboarding="net-worth-card">
               <StatCard
                 title="Net Worth"
@@ -326,7 +339,7 @@ const DashboardPage: React.FC = () => {
             </div>
           </Grid>
 
-          <Grid item xs={12} sm={6} lg={3}>
+          <Grid item xs={12} sm={6} md={4}>
             <StatCard
               title="Total Assets"
               value={formatCurrency(financialMetrics.totalAssets)}
@@ -336,7 +349,17 @@ const DashboardPage: React.FC = () => {
             />
           </Grid>
 
-          <Grid item xs={12} sm={6} lg={3}>
+          <Grid item xs={12} sm={6} md={4}>
+            <StatCard
+              title="Interest Payments"
+              value={formatCurrency(financialMetrics.monthlyInterestPayments)}
+              icon={<PaymentOutlined sx={{ color: 'inherit' }} />}
+              trend={-0.012}
+              color="error"
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={6}>
             <StatCard
               title="Monthly Savings"
               value={formatCurrency(financialMetrics.monthlySavings)}
@@ -346,7 +369,7 @@ const DashboardPage: React.FC = () => {
             />
           </Grid>
 
-          <Grid item xs={12} sm={6} lg={3}>
+          <Grid item xs={12} sm={6} md={6}>
             <div data-onboarding="savings-rate-card">
               <StatCard
                 title="Savings Rate"
