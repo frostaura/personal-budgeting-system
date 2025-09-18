@@ -1,6 +1,6 @@
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
-import { BrowserRouter } from 'react-router-dom';
+import { HashRouter } from 'react-router-dom';
 import { ThemeProvider, CssBaseline } from '@mui/material';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -19,7 +19,7 @@ function App() {
         <PersistGate loading={<LoadingScreen />} persistor={persistor}>
           <ThemeProvider theme={theme}>
             <CssBaseline />
-            <BrowserRouter basename="/personal-budgeting-system">
+            <HashRouter>
               <AppRouter />
               <DisclaimerDialog />
               <ToastContainer
@@ -34,7 +34,7 @@ function App() {
                 pauseOnHover
                 theme="colored"
               />
-            </BrowserRouter>
+            </HashRouter>
           </ThemeProvider>
         </PersistGate>
       </Provider>

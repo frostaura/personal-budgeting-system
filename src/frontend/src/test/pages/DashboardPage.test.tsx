@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { Provider } from 'react-redux';
-import { BrowserRouter } from 'react-router-dom';
+import { HashRouter } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material';
 import { store } from '@/store';
 import { theme } from '@/theme';
@@ -13,7 +13,7 @@ const TestWrapper = ({ children }: { children: ReactNode }) => {
   return (
     <Provider store={store}>
       <ThemeProvider theme={theme}>
-        <BrowserRouter>{children}</BrowserRouter>
+        <HashRouter>{children}</HashRouter>
       </ThemeProvider>
     </Provider>
   );
