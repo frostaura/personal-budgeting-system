@@ -23,6 +23,9 @@ import {
   CartesianGrid,
   Tooltip as RechartsTooltip,
   ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
 } from 'recharts';
 import { formatCurrency, sumCents } from '@/utils/currency';
 import { useAppSelector } from '@/store/hooks';
@@ -189,6 +192,73 @@ const DashboardPage: React.FC = () => {
       savingsRate,
       monthlyInterestPayments,
     };
+  }, [accounts, cashflows]);
+
+  // Calculate financial allocation for pie chart
+  const financialAllocation = useMemo(() => {
+    // Calculate total expenses (excluding tax and investment-related expenses)
+    const regularExpenses = cashflows
+      .filter(cf => {
+        const account = accounts.find(acc => acc.id === cf.accountId);
+        return (
+          account &&
+          account.kind !== 'income' &&
+          cf.recurrence.frequency === 'monthly' &&
+          !cf.description.toLowerCase().includes('tax') &&
+          !cf.description.toLowerCase().includes('investment')
+        );
+      })
+      .reduce((sum, cf) => sum + cf.amountCents, 0);
+
+    // Calculate tax-related expenses
+    const taxExpenses = cashflows
+      .filter(cf => {
+        const account = accounts.find(acc => acc.id === cf.accountId);
+        return (
+          account &&
+          account.kind !== 'income' &&
+          cf.recurrence.frequency === 'monthly' &&
+          cf.description.toLowerCase().includes('tax')
+        );
+      })
+      .reduce((sum, cf) => sum + cf.amountCents, 0);
+
+    // Calculate investments (accounts with positive balance and interest rate)
+    const investments = accounts
+      .filter(account => 
+        account.kind === 'asset' && 
+        account.balanceCents > 0 && 
+        account.interestRate && 
+        account.interestRate > 0
+      )
+      .reduce((sum, account) => sum + account.balanceCents, 0);
+
+    const total = regularExpenses + taxExpenses + investments;
+    
+    if (total === 0) {
+      return [];
+    }
+
+    return [
+      {
+        name: 'Regular Expenses',
+        value: regularExpenses,
+        percentage: (regularExpenses / total) * 100,
+        color: '#f44336', // red
+      },
+      {
+        name: 'Tax Expenses',
+        value: taxExpenses,
+        percentage: (taxExpenses / total) * 100,
+        color: '#ff9800', // orange
+      },
+      {
+        name: 'Investments',
+        value: investments,
+        percentage: (investments / total) * 100,
+        color: '#4caf50', // green
+      },
+    ].filter(item => item.value > 0);
   }, [accounts, cashflows]);
 
   // Generate wealth projection data
@@ -460,6 +530,78 @@ const DashboardPage: React.FC = () => {
             </div>
           </Grid>
         </Grid>
+
+        {/* Financial Allocation Pie Chart */}
+        {financialAllocation.length > 0 && (
+          <Card sx={{ mb: 4 }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Financial Allocation
+              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
+                <Box sx={{ width: { xs: '100%', sm: 300 }, height: 200 }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={financialAllocation}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={40}
+                        outerRadius={80}
+                        paddingAngle={5}
+                        dataKey="value"
+                      >
+                        {financialAllocation.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <RechartsTooltip
+                        formatter={(value: number) => [
+                          formatCurrency(value),
+                          'Amount'
+                        ]}
+                        labelFormatter={(label) => `${label}`}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </Box>
+                <Box sx={{ ml: { xs: 0, sm: 3 }, mt: { xs: 2, sm: 0 }, flexGrow: 1 }}>
+                  {financialAllocation.map((item, index) => (
+                    <Box
+                      key={index}
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        mb: 1,
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: 16,
+                          height: 16,
+                          backgroundColor: item.color,
+                          borderRadius: '50%',
+                          mr: 2,
+                        }}
+                      />
+                      <Box sx={{ flexGrow: 1 }}>
+                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                          {item.name}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {formatCurrency(item.value)} ({item.percentage.toFixed(1)}%)
+                        </Typography>
+                      </Box>
+                    </Box>
+                  ))}
+                </Box>
+              </Box>
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 2, display: 'block' }}>
+                * Investments include accounts with positive balance and interest rate
+              </Typography>
+            </CardContent>
+          </Card>
+        )}
 
         <Grid container spacing={3}>
           <Grid item xs={12} md={6}>
