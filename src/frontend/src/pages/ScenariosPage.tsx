@@ -413,14 +413,15 @@ const ScenariosPage: React.FC = () => {
   );
 
   return (
-    <Box>
-      <Typography variant="h4" gutterBottom sx={{ fontWeight: 600 }}>
-        Financial Scenarios
-      </Typography>
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <Box sx={{ p: 3, flexGrow: 1 }}>
+        <Typography variant="h4" gutterBottom sx={{ fontWeight: 600 }}>
+          Financial Scenarios
+        </Typography>
 
-      <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-        Create and compare different what-if scenarios for your financial future
-      </Typography>
+        <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+          Create and compare different what-if scenarios for your financial future
+        </Typography>
 
       {accounts.length === 0 || cashflows.length === 0 ? (
         <Alert severity="warning" sx={{ mb: 4 }}>
@@ -781,6 +782,7 @@ const ScenariosPage: React.FC = () => {
           </Card>
         )}
       </TabPanel>
+      </Box>
 
       {scenarioFormDialog}
     </Box>

@@ -106,13 +106,14 @@ const SettingsPage: React.FC = () => {
   };
 
   return (
-    <Box>
-      <Typography variant="h4" gutterBottom sx={{ fontWeight: 600 }}>
-        Settings
-      </Typography>
-      <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-        Configure your preferences and application settings
-      </Typography>
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <Box sx={{ p: 3, flexGrow: 1 }}>
+        <Typography variant="h4" gutterBottom sx={{ fontWeight: 600 }}>
+          Settings
+        </Typography>
+        <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+          Configure your preferences and application settings
+        </Typography>
 
       {exportMessage && (
         <Alert severity={exportMessage.includes('Failed') ? 'error' : 'success'} sx={{ mb: 3 }}>
@@ -424,6 +425,7 @@ const SettingsPage: React.FC = () => {
           </Card>
         </Grid>
       </Grid>
+      </Box>
     </Box>
   );
 };

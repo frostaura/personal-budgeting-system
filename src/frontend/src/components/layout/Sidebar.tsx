@@ -150,7 +150,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   }}
                   secondaryTypographyProps={{
                     variant: 'caption',
-                    sx: { mt: 0.5 },
+                    sx: { 
+                      mt: 0.5,
+                      color: isActive ? 'inherit' : 'text.secondary',
+                    },
                   }}
                 />
               </ListItemButton>

@@ -173,168 +173,170 @@ const DashboardPage: React.FC = () => {
   );
 
   return (
-    <Box>
-      <Typography 
-        variant="h4" 
-        gutterBottom 
-        sx={{ fontWeight: 600 }}
-        data-onboarding="dashboard-title"
-      >
-        Financial Dashboard
-      </Typography>
-
-      <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-        Overview of your current financial position and recent trends
-      </Typography>
-
-      <Alert severity="info" sx={{ mb: 4 }}>
-        <Typography variant="body2">
-          <strong>Remember:</strong> All values shown are projections and
-          estimates only. This is not financial advice. Please consult with
-          qualified professionals for important financial decisions.
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <Box sx={{ p: 3, flexGrow: 1 }}>
+        <Typography 
+          variant="h4" 
+          gutterBottom 
+          sx={{ fontWeight: 600 }}
+          data-onboarding="dashboard-title"
+        >
+          Financial Dashboard
         </Typography>
-      </Alert>
 
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} lg={3}>
-          <div data-onboarding="net-worth-card">
+        <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+          Overview of your current financial position and recent trends
+        </Typography>
+
+        <Alert severity="info" sx={{ mb: 4 }}>
+          <Typography variant="body2">
+            <strong>Remember:</strong> All values shown are projections and
+            estimates only. This is not financial advice. Please consult with
+            qualified professionals for important financial decisions.
+          </Typography>
+        </Alert>
+
+        <Grid container spacing={3} sx={{ mb: 4 }}>
+          <Grid item xs={12} sm={6} lg={3}>
+            <div data-onboarding="net-worth-card">
+              <StatCard
+                title="Net Worth"
+                value={formatCurrency(financialMetrics.netWorth)}
+                icon={<TrendingUpOutlined color="primary" />}
+                trend={0.047}
+                color="primary"
+              />
+            </div>
+          </Grid>
+
+          <Grid item xs={12} sm={6} lg={3}>
             <StatCard
-              title="Net Worth"
-              value={formatCurrency(financialMetrics.netWorth)}
-              icon={<TrendingUpOutlined color="primary" />}
-              trend={0.047}
-              color="primary"
+              title="Total Assets"
+              value={formatCurrency(financialMetrics.totalAssets)}
+              icon={<AccountBalanceOutlined color="success" />}
+              trend={0.023}
+              color="success"
             />
-          </div>
-        </Grid>
+          </Grid>
 
-        <Grid item xs={12} sm={6} lg={3}>
-          <StatCard
-            title="Total Assets"
-            value={formatCurrency(financialMetrics.totalAssets)}
-            icon={<AccountBalanceOutlined color="success" />}
-            trend={0.023}
-            color="success"
-          />
-        </Grid>
-
-        <Grid item xs={12} sm={6} lg={3}>
-          <StatCard
-            title="Monthly Savings"
-            value={formatCurrency(financialMetrics.monthlySavings)}
-            icon={<SavingsOutlined color="info" />}
-            trend={0.089}
-            color="warning"
-          />
-        </Grid>
-
-        <Grid item xs={12} sm={6} lg={3}>
-          <div data-onboarding="savings-rate-card">
+          <Grid item xs={12} sm={6} lg={3}>
             <StatCard
-              title="Savings Rate"
-              value={`${(financialMetrics.savingsRate * 100).toFixed(1)}%`}
-              icon={<PieChartOutlined color="warning" />}
-              trend={0.034}
+              title="Monthly Savings"
+              value={formatCurrency(financialMetrics.monthlySavings)}
+              icon={<SavingsOutlined color="info" />}
+              trend={0.089}
               color="warning"
             />
-          </div>
-        </Grid>
-      </Grid>
+          </Grid>
 
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
-          <Card data-onboarding="account-summary">
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Account Summary
-              </Typography>
-              <Box>
-                {accounts.length === 0 ? (
-                  <Typography variant="body2" color="text.secondary">
-                    No accounts found. Add some accounts to see your portfolio.
-                  </Typography>
-                ) : (
-                  <Box>
-                    <Grid container spacing={2}>
-                      <Grid item xs={6}>
-                        <Typography variant="body2" color="text.secondary">
-                          Total Assets
-                        </Typography>
-                        <Typography variant="h6" color="success.main">
-                          {formatCurrency(financialMetrics.totalAssets)}
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={6}>
-                        <Typography variant="body2" color="text.secondary">
-                          Total Liabilities
-                        </Typography>
-                        <Typography variant="h6" color="error.main">
-                          {formatCurrency(financialMetrics.totalLiabilities)}
-                        </Typography>
-                      </Grid>
-                    </Grid>
-                    <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-                      Based on {accounts.length} account{accounts.length !== 1 ? 's' : ''}
+          <Grid item xs={12} sm={6} lg={3}>
+            <div data-onboarding="savings-rate-card">
+              <StatCard
+                title="Savings Rate"
+                value={`${(financialMetrics.savingsRate * 100).toFixed(1)}%`}
+                icon={<PieChartOutlined color="warning" />}
+                trend={0.034}
+                color="warning"
+              />
+            </div>
+          </Grid>
+        </Grid>
+
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={6}>
+            <Card data-onboarding="account-summary">
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Account Summary
+                </Typography>
+                <Box>
+                  {accounts.length === 0 ? (
+                    <Typography variant="body2" color="text.secondary">
+                      No accounts found. Add some accounts to see your portfolio.
                     </Typography>
-                  </Box>
-                )}
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} md={6}>
-          <Card data-onboarding="cashflow-summary">
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Cash Flow Summary
-              </Typography>
-              <Box>
-                {cashflows.length === 0 ? (
-                  <Typography variant="body2" color="text.secondary">
-                    No cash flows found. Add income and expense flows to see your monthly budget.
-                  </Typography>
-                ) : (
-                  <Box>
-                    <Grid container spacing={2}>
-                      <Grid item xs={6}>
-                        <Typography variant="body2" color="text.secondary">
-                          Monthly Income
-                        </Typography>
-                        <Typography variant="h6" color="success.main">
-                          {formatCurrency(financialMetrics.monthlyIncome)}
-                        </Typography>
+                  ) : (
+                    <Box>
+                      <Grid container spacing={2}>
+                        <Grid item xs={6}>
+                          <Typography variant="body2" color="text.secondary">
+                            Total Assets
+                          </Typography>
+                          <Typography variant="h6" color="success.main">
+                            {formatCurrency(financialMetrics.totalAssets)}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Typography variant="body2" color="text.secondary">
+                            Total Liabilities
+                          </Typography>
+                          <Typography variant="h6" color="error.main">
+                            {formatCurrency(financialMetrics.totalLiabilities)}
+                          </Typography>
+                        </Grid>
                       </Grid>
-                      <Grid item xs={6}>
-                        <Typography variant="body2" color="text.secondary">
-                          Monthly Expenses
-                        </Typography>
-                        <Typography variant="h6" color="error.main">
-                          {formatCurrency(financialMetrics.monthlyExpenses)}
-                        </Typography>
-                      </Grid>
-                    </Grid>
-                    <Box sx={{ mt: 2, p: 2, backgroundColor: 'action.hover', borderRadius: 1 }}>
-                      <Typography variant="body2" color="text.secondary">
-                        Net Cash Flow
-                      </Typography>
-                      <Typography 
-                        variant="h6" 
-                        color={financialMetrics.monthlySavings >= 0 ? 'success.main' : 'error.main'}
-                      >
-                        {formatCurrency(financialMetrics.monthlySavings)}
+                      <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+                        Based on {accounts.length} account{accounts.length !== 1 ? 's' : ''}
                       </Typography>
                     </Box>
-                    <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-                      Based on {cashflows.length} cash flow{cashflows.length !== 1 ? 's' : ''}
+                  )}
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <Card data-onboarding="cashflow-summary">
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Cash Flow Summary
+                </Typography>
+                <Box>
+                  {cashflows.length === 0 ? (
+                    <Typography variant="body2" color="text.secondary">
+                      No cash flows found. Add income and expense flows to see your monthly budget.
                     </Typography>
-                  </Box>
-                )}
-              </Box>
-            </CardContent>
-          </Card>
+                  ) : (
+                    <Box>
+                      <Grid container spacing={2}>
+                        <Grid item xs={6}>
+                          <Typography variant="body2" color="text.secondary">
+                            Monthly Income
+                          </Typography>
+                          <Typography variant="h6" color="success.main">
+                            {formatCurrency(financialMetrics.monthlyIncome)}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Typography variant="body2" color="text.secondary">
+                            Monthly Expenses
+                          </Typography>
+                          <Typography variant="h6" color="error.main">
+                            {formatCurrency(financialMetrics.monthlyExpenses)}
+                          </Typography>
+                        </Grid>
+                      </Grid>
+                      <Box sx={{ mt: 2, p: 2, backgroundColor: 'action.hover', borderRadius: 1 }}>
+                        <Typography variant="body2" color="text.secondary">
+                          Net Cash Flow
+                        </Typography>
+                        <Typography 
+                          variant="h6" 
+                          color={financialMetrics.monthlySavings >= 0 ? 'success.main' : 'error.main'}
+                        >
+                          {formatCurrency(financialMetrics.monthlySavings)}
+                        </Typography>
+                      </Box>
+                      <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+                        Based on {cashflows.length} cash flow{cashflows.length !== 1 ? 's' : ''}
+                      </Typography>
+                    </Box>
+                  )}
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
         </Grid>
-      </Grid>
+      </Box>
 
       {/* Onboarding System */}
       <OnboardingTooltip

@@ -204,6 +204,17 @@ const CashflowsPage: React.FC = () => {
     return FREQUENCY_OPTIONS.find(opt => opt.value === frequency)?.label || frequency;
   };
 
+  const getCashflowDescription = (direction: string): string => {
+    switch (direction) {
+      case 'income':
+        return 'Regular income sources like salary, dividends, and other earnings';
+      case 'expense':
+        return 'Regular expenses like rent, utilities, and recurring payments';
+      default:
+        return 'Financial cash flows and transactions';
+    }
+  };
+
   const groupedCashflows = cashflows.reduce((groups, cashflow) => {
     const direction = getCashflowDirection(cashflow);
     if (!groups[direction]) {
@@ -222,51 +233,61 @@ const CashflowsPage: React.FC = () => {
   }
 
   return (
-    <Box>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <div>
-          <Typography variant="h4" gutterBottom sx={{ fontWeight: 600 }}>
-            Cash Flows
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            Track your recurring income and expenses
-          </Typography>
-        </div>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => handleOpenDialog()}
-          size="large"
-        >
-          Add Cash Flow
-        </Button>
-      </Box>
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <Box sx={{ p: 3, flexGrow: 1 }}>
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+          <div>
+            <Typography variant="h4" gutterBottom sx={{ fontWeight: 600 }}>
+              Cash Flows
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              Track your recurring income and expenses
+            </Typography>
+          </div>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => handleOpenDialog()}
+            size="large"
+          >
+            Add Cash Flow
+          </Button>
+        </Box>
 
-      {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
-          {error}
-        </Alert>
-      )}
+        {error && (
+          <Alert severity="error" sx={{ mb: 3 }}>
+            {error}
+          </Alert>
+        )}
 
-      <Grid container spacing={3}>
-        {Object.entries(groupedCashflows).map(([direction, directionCashflows]) => (
-          <Grid item xs={12} md={6} key={direction}>
-            <Card>
-              <CardContent>
-                <Box display="flex" alignItems="center" mb={2}>
-                  {getCashflowIcon(direction)}
-                  <Typography variant="h6" sx={{ ml: 1, textTransform: 'capitalize' }}>
-                    {direction} Flows
+        <Grid container spacing={3}>
+          {Object.entries(groupedCashflows).map(([direction, directionCashflows]) => (
+            <Grid item xs={12} md={6} key={direction}>
+              <Card>
+                <CardContent>
+                  <Box display="flex" alignItems="center" mb={1}>
+                    {getCashflowIcon(direction)}
+                    <Typography variant="h6" sx={{ ml: 1, textTransform: 'capitalize' }}>
+                      {direction} Flows
+                    </Typography>
+                    <Chip
+                      label={directionCashflows.length}
+                      color={direction === 'income' ? 'success' : 'error'}
+                      size="small"
+                      sx={{ ml: 'auto' }}
+                    />
+                  </Box>
+
+                  {/* Add subtitle/description */}
+                  <Typography 
+                    variant="body2" 
+                    color="text.secondary" 
+                    sx={{ mb: 2, fontSize: '0.875rem' }}
+                  >
+                    {getCashflowDescription(direction)}
                   </Typography>
-                  <Chip
-                    label={directionCashflows.length}
-                    color={direction === 'income' ? 'success' : 'error'}
-                    size="small"
-                    sx={{ ml: 'auto' }}
-                  />
-                </Box>
 
-                <List dense>
+                  <List dense>
                   {directionCashflows.map(cashflow => (
                     <ListItem
                       key={cashflow.id}
@@ -352,6 +373,7 @@ const CashflowsPage: React.FC = () => {
           </Grid>
         ))}
       </Grid>
+      </Box>
 
       {/* Add/Edit Cashflow Dialog */}
       <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="md" fullWidth>

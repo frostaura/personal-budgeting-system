@@ -202,6 +202,19 @@ const AccountsPage: React.FC = () => {
     }
   };
 
+  const getAccountKindDescription = (kind: AccountKind): string => {
+    switch (kind) {
+      case 'income':
+        return 'Checking accounts, savings accounts, and other sources of income';
+      case 'investment':
+        return 'Investment accounts, retirement funds, and appreciating assets';
+      case 'liability':
+        return 'Credit cards, loans, mortgages, and other debts';
+      default:
+        return 'Financial accounts and holdings';
+    }
+  };
+
   const groupedAccounts = accounts.reduce((groups, account) => {
     const kind = account.kind;
     if (!groups[kind]) {
@@ -220,51 +233,61 @@ const AccountsPage: React.FC = () => {
   }
 
   return (
-    <Box>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <div>
-          <Typography variant="h4" gutterBottom sx={{ fontWeight: 600 }}>
-            Financial Accounts
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            Manage your bank accounts, investments, and other financial accounts
-          </Typography>
-        </div>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => handleOpenDialog()}
-          size="large"
-        >
-          Add Account
-        </Button>
-      </Box>
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <Box sx={{ p: 3, flexGrow: 1 }}>
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+          <div>
+            <Typography variant="h4" gutterBottom sx={{ fontWeight: 600 }}>
+              Financial Accounts
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              Manage your bank accounts, investments, and other financial accounts
+            </Typography>
+          </div>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => handleOpenDialog()}
+            size="large"
+          >
+            Add Account
+          </Button>
+        </Box>
 
-      {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
-          {error}
-        </Alert>
-      )}
+        {error && (
+          <Alert severity="error" sx={{ mb: 3 }}>
+            {error}
+          </Alert>
+        )}
 
-      <Grid container spacing={3}>
-        {Object.entries(groupedAccounts).map(([kind, kindAccounts]) => (
-          <Grid item xs={12} md={6} lg={4} key={kind}>
-            <Card>
-              <CardContent>
-                <Box display="flex" alignItems="center" mb={2}>
-                  {getAccountIcon(kind as AccountKind)}
-                  <Typography variant="h6" sx={{ ml: 1, textTransform: 'capitalize' }}>
-                    {kind} Accounts
+        <Grid container spacing={3}>
+          {Object.entries(groupedAccounts).map(([kind, kindAccounts]) => (
+            <Grid item xs={12} md={6} lg={4} key={kind}>
+              <Card>
+                <CardContent>
+                  <Box display="flex" alignItems="center" mb={1}>
+                    {getAccountIcon(kind as AccountKind)}
+                    <Typography variant="h6" sx={{ ml: 1, textTransform: 'capitalize' }}>
+                      {kind} Accounts
+                    </Typography>
+                    <Chip
+                      label={kindAccounts.length}
+                      color={getAccountKindColor(kind as AccountKind)}
+                      size="small"
+                      sx={{ ml: 'auto' }}
+                    />
+                  </Box>
+                  
+                  {/* Add subtitle/description */}
+                  <Typography 
+                    variant="body2" 
+                    color="text.secondary" 
+                    sx={{ mb: 2, fontSize: '0.875rem' }}
+                  >
+                    {getAccountKindDescription(kind as AccountKind)}
                   </Typography>
-                  <Chip
-                    label={kindAccounts.length}
-                    color={getAccountKindColor(kind as AccountKind)}
-                    size="small"
-                    sx={{ ml: 'auto' }}
-                  />
-                </Box>
 
-                <List dense>
+                  <List dense>
                   {kindAccounts.map(account => (
                     <ListItem
                       key={account.id}
@@ -337,6 +360,7 @@ const AccountsPage: React.FC = () => {
           </Grid>
         ))}
       </Grid>
+      </Box>
 
       {/* Add/Edit Account Dialog */}
       <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="md" fullWidth>
