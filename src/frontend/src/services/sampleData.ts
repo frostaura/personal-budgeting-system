@@ -80,6 +80,17 @@ export const SAMPLE_ACCOUNTS: Account[] = [
     annualInterestRate: 0.205, // 20.5%
     compoundsPerYear: 12,
   },
+  {
+    id: 'acc-tax',
+    name: 'Tax Withholdings',
+    kind: 'tax',
+    category: 'Tax',
+    color: '#607D8B',
+    icon: '🧾',
+    notes: 'Income tax and other statutory deductions',
+    openingBalanceCents: 0,
+    currentBalanceAsOf: '2024-01-01',
+  },
 ];
 
 export const SAMPLE_CASHFLOWS: Cashflow[] = [
@@ -94,6 +105,19 @@ export const SAMPLE_CASHFLOWS: Cashflow[] = [
       anchor: { dayOfMonth: 25 },
       startDate: '2024-01-01',
       annualIndexationPct: 0.065, // 6.5% annual increase
+    },
+  },
+  {
+    id: 'cf-salary-tax',
+    accountId: 'acc-tax',
+    amountCents: 765000, // R7,650 monthly tax withholding (17% effective rate)
+    description: 'Income Tax (PAYE)',
+    icon: '🧾',
+    recurrence: {
+      frequency: 'monthly',
+      anchor: { dayOfMonth: 25 },
+      startDate: '2024-01-01',
+      annualIndexationPct: 0.065, // 6.5% increase with salary
     },
   },
   {

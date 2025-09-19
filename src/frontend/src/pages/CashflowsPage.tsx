@@ -16,11 +16,6 @@ import {
   Alert,
   Tooltip,
   Avatar,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
-  ListItemSecondaryAction,
   Switch,
   FormControlLabel,
   useTheme,
@@ -253,7 +248,7 @@ const CashflowsPage: React.FC = () => {
 
   return (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <Box sx={{ p: 3, flexGrow: 1 }}>
+      <Box sx={{ p: 3, flexGrow: 1, maxWidth: '1400px', mx: 'auto', width: '100%' }}>
         <Box
           display="flex"
           justifyContent="space-between"
@@ -289,12 +284,12 @@ const CashflowsPage: React.FC = () => {
           </Alert>
         )}
 
-        <Grid container spacing={3}>
+        <Grid container spacing={4}>
           {Object.entries(groupedCashflows).map(
             ([direction, directionCashflows]) => (
-              <Grid item xs={12} md={6} key={direction}>
-                <Card>
-                  <CardContent>
+              <Grid item xs={12} key={direction}>
+                <Card sx={{ mb: 3 }}>
+                  <CardContent sx={{ p: 3 }}>
                     <Box display="flex" alignItems="center" mb={1}>
                       {getCashflowIcon(direction)}
                       <Typography
@@ -320,94 +315,124 @@ const CashflowsPage: React.FC = () => {
                       {getCashflowDescription(direction)}
                     </Typography>
 
-                    <List dense>
+                    <Grid container spacing={2}>
                       {directionCashflows.map(cashflow => (
-                        <ListItem
-                          key={cashflow.id}
-                          sx={{
-                            cursor: 'pointer',
-                            borderRadius: 1,
-                            '&:hover': { backgroundColor: 'action.hover' },
-                            backgroundColor:
-                              selectedCashflowId === cashflow.id
-                                ? 'action.selected'
-                                : 'transparent',
-                          }}
-                          onClick={() => dispatch(selectCashflow(cashflow.id))}
-                        >
-                          <ListItemAvatar>
-                            <Avatar
-                              sx={{
-                                backgroundColor: getCashflowColor(direction),
-                                fontSize: '1.2rem',
-                              }}
-                            >
-                              {cashflow.icon ||
-                                (direction === 'income' ? '💰' : '💸')}
-                            </Avatar>
-                          </ListItemAvatar>
-                          <ListItemText
-                            primary={
-                              cashflow.description || 'Unnamed Cash Flow'
-                            }
-                            secondary={
-                              <Box>
-                                <Typography
-                                  variant="body2"
-                                  color="text.secondary"
+                        <Grid item xs={12} sm={6} lg={4} key={cashflow.id}>
+                          <Card
+                            variant="outlined"
+                            sx={{
+                              cursor: 'pointer',
+                              transition: 'all 0.2s',
+                              '&:hover': { 
+                                backgroundColor: 'action.hover',
+                                boxShadow: 2
+                              },
+                              backgroundColor:
+                                selectedCashflowId === cashflow.id
+                                  ? 'action.selected'
+                                  : 'transparent',
+                            }}
+                            onClick={() => dispatch(selectCashflow(cashflow.id))}
+                          >
+                            <CardContent sx={{ p: 2 }}>
+                              <Box display="flex" alignItems="center" mb={1}>
+                                <Avatar
+                                  sx={{
+                                    backgroundColor: getCashflowColor(direction),
+                                    fontSize: '1.2rem',
+                                    width: 32,
+                                    height: 32,
+                                    mr: 1.5,
+                                  }}
                                 >
-                                  {getAccountName(cashflow.accountId)}
-                                </Typography>
-                                <Box display="flex" alignItems="center" gap={1}>
+                                  {cashflow.icon ||
+                                    (direction === 'income' ? '💰' : '💸')}
+                                </Avatar>
+                                <Box sx={{ flexGrow: 1, minWidth: 0 }}>
                                   <Typography
-                                    variant="body2"
-                                    sx={{ fontWeight: 600 }}
+                                    variant="subtitle2"
+                                    sx={{ 
+                                      fontWeight: 600,
+                                      textAlign: 'left',
+                                      overflow: 'hidden',
+                                      textOverflow: 'ellipsis',
+                                      whiteSpace: 'nowrap'
+                                    }}
                                   >
-                                    {formatCurrency(cashflow.amountCents)}
+                                    {cashflow.description || 'Unnamed Cash Flow'}
                                   </Typography>
-                                  <Chip
-                                    label={getFrequencyDisplayText(
-                                      cashflow.recurrence.frequency
-                                    )}
-                                    size="small"
-                                    variant="outlined"
-                                    icon={<RepeatIcon />}
-                                  />
+                                </Box>
+                                <Box sx={{ display: 'flex', gap: 0.5 }}>
+                                  <Tooltip title="Edit Cash Flow">
+                                    <IconButton
+                                      size="small"
+                                      onClick={e => {
+                                        e.stopPropagation();
+                                        handleOpenDialog(cashflow);
+                                      }}
+                                    >
+                                      <EditIcon fontSize="small" />
+                                    </IconButton>
+                                  </Tooltip>
+                                  <Tooltip title="Delete Cash Flow">
+                                    <IconButton
+                                      size="small"
+                                      color="error"
+                                      onClick={e => {
+                                        e.stopPropagation();
+                                        setCashflowToDelete(cashflow.id);
+                                        setDeleteDialogOpen(true);
+                                      }}
+                                    >
+                                      <DeleteIcon fontSize="small" />
+                                    </IconButton>
+                                  </Tooltip>
                                 </Box>
                               </Box>
-                            }
-                          />
-                          <ListItemSecondaryAction>
-                            <Tooltip title="Edit Cash Flow">
-                              <IconButton
-                                edge="end"
-                                onClick={e => {
-                                  e.stopPropagation();
-                                  handleOpenDialog(cashflow);
+                              
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                                sx={{ 
+                                  textAlign: 'left',
+                                  mb: 1,
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                  whiteSpace: 'nowrap'
                                 }}
-                                size="small"
                               >
-                                <EditIcon />
-                              </IconButton>
-                            </Tooltip>
-                            <Tooltip title="Delete Cash Flow">
-                              <IconButton
-                                edge="end"
-                                onClick={e => {
-                                  e.stopPropagation();
-                                  setCashflowToDelete(cashflow.id);
-                                  setDeleteDialogOpen(true);
-                                }}
-                                size="small"
-                                color="error"
+                                {getAccountName(cashflow.accountId)}
+                              </Typography>
+                              
+                              <Box 
+                                display="flex" 
+                                alignItems="center" 
+                                justifyContent="space-between"
+                                sx={{ mt: 1 }}
                               >
-                                <DeleteIcon />
-                              </IconButton>
-                            </Tooltip>
-                          </ListItemSecondaryAction>
-                        </ListItem>
+                                <Typography
+                                  variant="h6"
+                                  sx={{ 
+                                    fontWeight: 600,
+                                    color: direction === 'income' ? 'success.main' : 'error.main'
+                                  }}
+                                >
+                                  {formatCurrency(cashflow.amountCents)}
+                                </Typography>
+                                <Chip
+                                  label={getFrequencyDisplayText(
+                                    cashflow.recurrence.frequency
+                                  )}
+                                  size="small"
+                                  variant="outlined"
+                                  icon={<RepeatIcon />}
+                                />
+                              </Box>
+                            </CardContent>
+                          </Card>
+                        </Grid>
                       ))}
-                    </List>
+                    </Grid>
 
                     {directionCashflows.length === 0 && (
                       <Typography
@@ -496,6 +521,7 @@ const CashflowsPage: React.FC = () => {
                   <MenuItem value="🛒">🛒 Shopping</MenuItem>
                   <MenuItem value="🎪">🎪 Subscriptions</MenuItem>
                   <MenuItem value="🏦">🏦 Banking</MenuItem>
+                  <MenuItem value="🧾">🧾 Tax</MenuItem>
                 </Select>
               </FormControl>
             </Grid>

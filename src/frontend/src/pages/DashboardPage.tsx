@@ -209,6 +209,7 @@ const DashboardPage: React.FC = () => {
         return (
           account &&
           account.kind !== 'income' &&
+          account.kind !== 'tax' &&
           cf.recurrence.frequency === 'monthly' &&
           cf.description &&
           !cf.description.toLowerCase().includes('tax') &&
@@ -217,16 +218,21 @@ const DashboardPage: React.FC = () => {
       })
       .reduce((sum, cf) => sum + cf.amountCents, 0);
 
-    // Calculate tax-related expenses
+    // Calculate tax-related expenses (including tax withholdings and tax expenses)
     const taxExpenses = cashflows
       .filter(cf => {
         const account = accounts.find(acc => acc.id === cf.accountId);
         return (
           account &&
-          account.kind !== 'income' &&
           cf.recurrence.frequency === 'monthly' &&
-          cf.description &&
-          cf.description.toLowerCase().includes('tax')
+          (
+            // Tax account type (e.g., salary tax withholdings)
+            account.kind === 'tax' ||
+            // Non-income accounts with "tax" in description (e.g., municipal rates & taxes)
+            (account.kind !== 'income' && 
+             cf.description && 
+             cf.description.toLowerCase().includes('tax'))
+          )
         );
       })
       .reduce((sum, cf) => sum + cf.amountCents, 0);
@@ -249,13 +255,13 @@ const DashboardPage: React.FC = () => {
 
     return [
       {
-        name: 'Regular Expenses',
+        name: 'Expenses',
         value: regularExpenses,
         percentage: (regularExpenses / total) * 100,
         color: '#f44336', // red
       },
       {
-        name: 'Tax Expenses',
+        name: 'Tax',
         value: taxExpenses,
         percentage: (taxExpenses / total) * 100,
         color: '#ff9800', // orange
@@ -369,7 +375,7 @@ const DashboardPage: React.FC = () => {
 
   return (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <Box sx={{ p: 3, flexGrow: 1 }}>
+      <Box sx={{ p: 3, flexGrow: 1, maxWidth: '1400px', mx: 'auto', width: '100%' }}>
         <Typography
           variant="h4"
           gutterBottom
