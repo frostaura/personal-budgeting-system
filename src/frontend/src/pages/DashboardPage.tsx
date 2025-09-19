@@ -35,6 +35,7 @@ import {
 } from '@/components/common/OnboardingTooltip';
 import { useOnboarding } from '@/hooks/useOnboarding';
 import { useResponsiveCharts } from '@/hooks/useResponsiveCharts';
+import { projectionEngine } from '@/services/projectionEngine';
 
 const DashboardPage: React.FC = () => {
   const { accounts } = useAppSelector(state => state.accounts);
@@ -284,46 +285,57 @@ const DashboardPage: React.FC = () => {
     ].filter(item => item.value > 0);
   }, [accounts, cashflows, financialMetrics.monthlyInterestPayments]);
 
-  // Generate wealth projection data
+  // Generate wealth projection data using ProjectionEngine for accurate interest calculations
   const wealthProjectionData = useMemo(() => {
-    const data = [];
-    const startingNetWorth = financialMetrics.netWorth;
-    const monthlyContribution = financialMetrics.monthlySavings;
-    const annualReturn = 0.07; // 7% annual return assumption
-    const monthlyReturn = annualReturn / 12;
-
-    for (let year = 0; year <= projectionYears; year++) {
-      const months = year * 12;
-
-      // Calculate future value with monthly contributions
-      let futureValue = startingNetWorth;
-      if (monthlyReturn > 0) {
-        // Present value growth
-        futureValue = startingNetWorth * Math.pow(1 + monthlyReturn, months);
-
-        // Future value of annuity (monthly contributions)
-        if (monthlyContribution > 0 && monthlyReturn > 0) {
-          futureValue +=
-            monthlyContribution *
-            ((Math.pow(1 + monthlyReturn, months) - 1) / monthlyReturn);
-        }
-      } else {
-        // Simple case if no return
-        futureValue = startingNetWorth + monthlyContribution * months;
-      }
-
-      data.push({
-        year: year,
-        netWorth: Math.round(futureValue),
-        netWorthFormatted: formatCurrency(Math.round(futureValue)),
-      });
+    if (accounts.length === 0) {
+      return [];
     }
 
-    return data;
+    try {
+      const monthsToProject = projectionYears * 12;
+      const projectionResults = projectionEngine.projectFinances(
+        accounts,
+        cashflows,
+        monthsToProject
+      );
+
+      // Extract data points for each year
+      const data = [];
+      for (let year = 0; year <= projectionYears; year++) {
+        const monthIndex = year * 12;
+        const monthData = projectionResults.months[monthIndex];
+        
+        if (monthData) {
+          data.push({
+            year: year,
+            netWorth: monthData.totalNetWorth,
+            netWorthFormatted: formatCurrency(monthData.totalNetWorth),
+          });
+        } else if (year === 0) {
+          // For year 0, use current net worth
+          data.push({
+            year: 0,
+            netWorth: financialMetrics.netWorth,
+            netWorthFormatted: formatCurrency(financialMetrics.netWorth),
+          });
+        }
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Error calculating wealth projection:', error);
+      // Fallback to current net worth if projection fails
+      return [{
+        year: 0,
+        netWorth: financialMetrics.netWorth,
+        netWorthFormatted: formatCurrency(financialMetrics.netWorth),
+      }];
+    }
   }, [
-    financialMetrics.netWorth,
-    financialMetrics.monthlySavings,
+    accounts,
+    cashflows,
     projectionYears,
+    financialMetrics.netWorth,
   ]);
 
   const StatCard: React.FC<{
@@ -497,7 +509,7 @@ const DashboardPage: React.FC = () => {
               color="text.secondary"
               sx={{ mt: 2, display: 'block' }}
             >
-              Projection assumes 7% annual investment return and current monthly
+              Projection uses account-specific interest rates and current monthly
               savings rate of {formatCurrency(financialMetrics.monthlySavings)}
             </Typography>
           </CardContent>
