@@ -25,6 +25,8 @@ import {
   ListItemAvatar,
   ListItemText,
   ListItemSecondaryAction,
+  useTheme,
+  useMediaQuery,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -50,6 +52,8 @@ const AccountsPage: React.FC = () => {
   const { accounts, loading, error, selectedAccountId } = useAppSelector(
     state => state.accounts
   );
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingAccount, setEditingAccount] = useState<Account | null>(null);
@@ -263,11 +267,16 @@ const AccountsPage: React.FC = () => {
           </div>
           <Button
             variant="contained"
-            startIcon={<AddIcon />}
+            startIcon={!isMobile ? <AddIcon /> : undefined}
             onClick={() => handleOpenDialog()}
             size="large"
+            aria-label="Add Account"
+            sx={{
+              minWidth: isMobile ? 'auto' : undefined,
+              px: isMobile ? 2 : undefined,
+            }}
           >
-            Add Account
+            {isMobile ? <AddIcon /> : 'Add Account'}
           </Button>
         </Box>
 

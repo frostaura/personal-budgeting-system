@@ -31,6 +31,8 @@ import {
   Tab,
   LinearProgress,
   Divider,
+  useTheme,
+  useMediaQuery,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -79,6 +81,8 @@ const ScenariosPage: React.FC = () => {
   );
   const { accounts } = useAppSelector(state => state.accounts);
   const { cashflows } = useAppSelector(state => state.cashflows);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingScenario, setEditingScenario] = useState<Scenario | null>(null);
@@ -527,10 +531,15 @@ const ScenariosPage: React.FC = () => {
             </Typography>
             <Button
               variant="contained"
-              startIcon={<AddIcon />}
+              startIcon={!isMobile ? <AddIcon /> : undefined}
               onClick={() => setIsCreateDialogOpen(true)}
+              aria-label="Create Scenario"
+              sx={{
+                minWidth: isMobile ? 'auto' : undefined,
+                px: isMobile ? 2 : undefined,
+              }}
             >
-              Create Scenario
+              {isMobile ? <AddIcon /> : 'Create Scenario'}
             </Button>
           </Box>
 
@@ -912,13 +921,18 @@ const ScenariosPage: React.FC = () => {
                 {scenarios.length < 2 ? (
                   <Button
                     variant="outlined"
-                    startIcon={<AddIcon />}
+                    startIcon={!isMobile ? <AddIcon /> : undefined}
                     onClick={() => {
                       setSelectedTab(0);
                       setTimeout(() => setIsCreateDialogOpen(true), 100);
                     }}
+                    aria-label="Create Your First Scenario"
+                    sx={{
+                      minWidth: isMobile ? 'auto' : undefined,
+                      px: isMobile ? 2 : undefined,
+                    }}
                   >
-                    Create Your First Scenario
+                    {isMobile ? <AddIcon /> : 'Create Your First Scenario'}
                   </Button>
                 ) : (
                   <Button
