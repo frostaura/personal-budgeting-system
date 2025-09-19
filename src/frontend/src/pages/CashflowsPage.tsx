@@ -496,6 +496,7 @@ const CashflowsPage: React.FC = () => {
                   <MenuItem value="🛒">🛒 Shopping</MenuItem>
                   <MenuItem value="🎪">🎪 Subscriptions</MenuItem>
                   <MenuItem value="🏦">🏦 Banking</MenuItem>
+                  <MenuItem value="🧾">🧾 Tax</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
