@@ -117,6 +117,30 @@ export class ProjectionEngine {
   }
 
   /**
+   * Calculate effective cash flow amount including percentage-based calculations
+   */
+  private getEffectiveCashflowAmount(
+    cashflow: Cashflow,
+    allCashflows: Cashflow[],
+    monthsFromStart: number
+  ): Cents {
+    // If percentage-based, calculate amount from source cash flow
+    if (cashflow.percentageOf) {
+      const sourceCashflow = allCashflows.find(
+        cf => cf.id === cashflow.percentageOf!.sourceCashflowId
+      );
+      
+      if (sourceCashflow) {
+        const sourceAmount = this.getIndexedCashflowAmount(sourceCashflow, monthsFromStart);
+        return Math.round(sourceAmount * cashflow.percentageOf.percentage);
+      }
+    }
+
+    // Regular indexed amount calculation
+    return this.getIndexedCashflowAmount(cashflow, monthsFromStart);
+  }
+
+  /**
    * Apply annual indexation to cashflow amounts
    */
   private getIndexedCashflowAmount(
@@ -273,17 +297,18 @@ export class ProjectionEngine {
             new Date(cf.recurrence.startDate),
             projectionDate
           );
-          const indexedAmount = this.getIndexedCashflowAmount(
+          const effectiveAmount = this.getEffectiveCashflowAmount(
             cf,
+            adjustedCashflows,
             monthsFromStart
           );
 
           if (account.kind === 'income') {
-            netCashflow += indexedAmount;
-            totalIncome += indexedAmount;
+            netCashflow += effectiveAmount;
+            totalIncome += effectiveAmount;
           } else {
-            netCashflow -= indexedAmount;
-            totalExpenses += indexedAmount;
+            netCashflow -= effectiveAmount;
+            totalExpenses += effectiveAmount;
           }
         }
 

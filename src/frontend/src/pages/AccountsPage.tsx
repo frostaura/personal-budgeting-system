@@ -434,7 +434,6 @@ const AccountsPage: React.FC = () => {
                   <MenuItem value="investment">Investment Account</MenuItem>
                   <MenuItem value="liability">Liability Account</MenuItem>
                   <MenuItem value="expense">Expense Account</MenuItem>
-                  <MenuItem value="tax">Tax Account</MenuItem>
                   <MenuItem value="reserve">Reserve Account</MenuItem>
                   <MenuItem value="transfer">Transfer Account</MenuItem>
                 </Select>
