@@ -104,4 +104,42 @@ describe('OnboardingTooltip Error Handling', () => {
     // The component should render even with localStorage errors
     expect(console.debug).toHaveBeenCalled();
   });
+
+  it('should handle onboarding close without crashing due to scope issues', () => {
+    const mockOnComplete = vi.fn();
+    const mockOnSkip = vi.fn();
+
+    // Create a mock target element
+    const mockTarget = document.createElement('div');
+    mockTarget.setAttribute('data-testid', 'test-target');
+    document.body.appendChild(mockTarget);
+
+    const { rerender } = render(
+      <OnboardingTooltip
+        steps={mockSteps}
+        isOpen={true}
+        onComplete={mockOnComplete}
+        onSkip={mockOnSkip}
+        storageKey="test-onboarding"
+      />
+    );
+
+    // Close the onboarding (this should trigger the cleanup)
+    rerender(
+      <OnboardingTooltip
+        steps={mockSteps}
+        isOpen={false}
+        onComplete={mockOnComplete}
+        onSkip={mockOnSkip}
+        storageKey="test-onboarding"
+      />
+    );
+
+    // Cleanup
+    document.body.removeChild(mockTarget);
+
+    // The component should handle the close without throwing an error
+    expect(mockOnComplete).not.toHaveBeenCalled();
+    expect(mockOnSkip).not.toHaveBeenCalled();
+  });
 });

@@ -6,7 +6,6 @@ import {
   Button,
   Box,
   IconButton,
-  Backdrop,
   Fade,
   useTheme,
 } from '@mui/material';
@@ -53,20 +52,9 @@ export const OnboardingTooltip: React.FC<OnboardingTooltipProps> = ({
   const isLastStep = currentStep === steps.length - 1;
   const isFirstStep = currentStep === 0;
 
-  // Cleanup function to remove all onboarding-related elements and styles
+  // Cleanup function to remove onboarding-related styles
   const cleanupOnboarding = () => {
     try {
-      // Remove any remaining onboarding backdrops
-      const backdrops = document.querySelectorAll('.onboarding-backdrop');
-      backdrops.forEach(backdrop => {
-        try {
-          backdrop.remove();
-        } catch (error) {
-          // Silently ignore if element is already removed
-          console.debug('Backdrop already removed:', error);
-        }
-      });
-
       // Remove highlight styles from all elements
       const highlightedElements = document.querySelectorAll('.onboarding-highlight');
       highlightedElements.forEach(element => {
@@ -96,8 +84,10 @@ export const OnboardingTooltip: React.FC<OnboardingTooltipProps> = ({
       return;
     }
 
+    let target: HTMLElement | null = null;
+
     try {
-      const target = document.querySelector(step.target) as HTMLElement;
+      target = document.querySelector(step.target) as HTMLElement;
       if (target) {
         setAnchorEl(target);
 
@@ -125,24 +115,23 @@ export const OnboardingTooltip: React.FC<OnboardingTooltipProps> = ({
         console.debug('Target element not found:', step.target);
         setAnchorEl(null);
       }
-
-      return () => {
-        if (target) {
-          try {
-            target.classList.remove('onboarding-highlight');
-            target.style.position = '';
-            target.style.zIndex = '';
-            target.style.pointerEvents = '';
-          } catch (cleanupError) {
-            console.debug('Error cleaning up target element:', cleanupError);
-          }
-        }
-      };
     } catch (error) {
       console.debug('Error in onboarding step effect:', error);
       setAnchorEl(null);
-      return () => {}; // Return empty cleanup function
     }
+
+    return () => {
+      if (target) {
+        try {
+          target.classList.remove('onboarding-highlight');
+          target.style.position = '';
+          target.style.zIndex = '';
+          target.style.pointerEvents = '';
+        } catch (cleanupError) {
+          console.debug('Error cleaning up target element:', cleanupError);
+        }
+      }
+    };
   }, [step, isOpen, currentStep]);
 
   // Cleanup on component unmount to prevent lingering overlays
@@ -210,7 +199,7 @@ export const OnboardingTooltip: React.FC<OnboardingTooltipProps> = ({
 
   return (
     <>
-      {/* Global styles for highlight effect */}
+      {/* Global styles for highlight effect and backdrop */}
       <style>{`
         .onboarding-highlight {
           box-shadow: 0 0 0 4px ${theme.palette.primary.main}40, 
@@ -231,26 +220,10 @@ export const OnboardingTooltip: React.FC<OnboardingTooltipProps> = ({
         }
       `}</style>
 
-      {/* Backdrop to dim other elements - allow pointer events to pass through */}
-      <Backdrop
-        open={isOpen}
-        className="onboarding-backdrop"
-        sx={{
-          zIndex: 1300,
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.7)',
-          pointerEvents: 'none', // Allow clicks to pass through
-          '& .MuiBackdrop-root': {
-            position: 'fixed',
-            backgroundColor: 'rgba(0, 0, 0, 0.7)',
-            pointerEvents: 'none', // Allow clicks to pass through
-          },
-        }}
-      />
+      {/* CSS-only backdrop to dim other elements */}
+      {isOpen && (
+        <div className="onboarding-backdrop" />
+      )}
 
       {/* Tooltip */}
       <Popper
