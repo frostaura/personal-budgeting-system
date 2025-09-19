@@ -11,7 +11,6 @@ export type CurrencySettings = {
 
 export type AccountKind =
   | 'income'
-  | 'tax'
   | 'expense'
   | 'investment'
   | 'liability'
@@ -76,6 +75,11 @@ export type Cashflow = {
   icon?: string; // emoji or icon name for display
   recurrence: Recurrence;
   effectiveFrom?: string; // future-dated changes
+  // For percentage-based calculation from income flows
+  percentageOf?: {
+    sourceCashflowId: string; // ID of the income cashflow to calculate percentage from
+    percentage: number; // e.g., 0.17 for 17%
+  };
 };
 
 export type Scenario = {

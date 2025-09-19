@@ -203,37 +203,30 @@ const DashboardPage: React.FC = () => {
 
   // Calculate financial allocation for pie chart
   const financialAllocation = useMemo(() => {
-    // Calculate total expenses (excluding tax and investment-related expenses)
+    // Calculate total expenses (excluding investment-related expenses)
     const regularExpenses = cashflows
       .filter(cf => {
         const account = accounts.find(acc => acc.id === cf.accountId);
         return (
           account &&
           account.kind !== 'income' &&
-          account.kind !== 'tax' &&
           cf.recurrence.frequency === 'monthly' &&
           cf.description &&
-          !cf.description.toLowerCase().includes('tax') &&
           !cf.description.toLowerCase().includes('investment')
         );
       })
       .reduce((sum, cf) => sum + cf.amountCents, 0);
 
-    // Calculate tax-related expenses (including tax withholdings and tax expenses)
+    // Calculate tax-related expenses (non-income accounts with "tax" in description)
     const taxExpenses = cashflows
       .filter(cf => {
         const account = accounts.find(acc => acc.id === cf.accountId);
         return (
           account &&
           cf.recurrence.frequency === 'monthly' &&
-          (
-            // Tax account type (e.g., salary tax withholdings)
-            account.kind === 'tax' ||
-            // Non-income accounts with "tax" in description (e.g., municipal rates & taxes)
-            (account.kind !== 'income' && 
-             cf.description && 
-             cf.description.toLowerCase().includes('tax'))
-          )
+          account.kind !== 'income' && 
+          cf.description && 
+          cf.description.toLowerCase().includes('tax')
         );
       })
       .reduce((sum, cf) => sum + cf.amountCents, 0);
