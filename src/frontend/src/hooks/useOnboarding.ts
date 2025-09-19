@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useAppSelector } from '@/store/hooks';
 
 export interface UseOnboardingOptions {
   storageKey: string;
@@ -13,12 +14,16 @@ export const useOnboarding = ({
 }: UseOnboardingOptions) => {
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
+  const disclaimerAccepted = useAppSelector(
+    state => state.settings.disclaimerAccepted
+  );
 
   useEffect(() => {
     const completed = localStorage.getItem(storageKey) === 'true';
     setHasCompletedOnboarding(completed);
 
-    if (!completed && autoStart) {
+    // Only start onboarding if disclaimer is accepted and onboarding hasn't been completed
+    if (!completed && autoStart && disclaimerAccepted) {
       // Delay the start to ensure all elements are rendered
       const timer = setTimeout(() => {
         setIsOnboardingOpen(true);
@@ -29,7 +34,7 @@ export const useOnboarding = ({
 
     // Return empty cleanup function when no timer is set
     return () => {};
-  }, [storageKey, autoStart, delay]);
+  }, [storageKey, autoStart, delay, disclaimerAccepted]);
 
   const startOnboarding = () => {
     setIsOnboardingOpen(true);
