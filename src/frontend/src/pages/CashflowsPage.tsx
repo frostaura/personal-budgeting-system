@@ -27,6 +27,8 @@ import {
   ListItemSecondaryAction,
   Switch,
   FormControlLabel,
+  useTheme,
+  useMediaQuery,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -63,6 +65,8 @@ const CashflowsPage: React.FC = () => {
     state => state.cashflows
   );
   const { accounts } = useAppSelector(state => state.accounts);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingCashflow, setEditingCashflow] = useState<Cashflow | null>(null);
@@ -269,11 +273,16 @@ const CashflowsPage: React.FC = () => {
           </div>
           <Button
             variant="contained"
-            startIcon={<AddIcon />}
+            startIcon={!isMobile ? <AddIcon /> : undefined}
             onClick={() => handleOpenDialog()}
             size="large"
+            aria-label="Add Cash Flow"
+            sx={{
+              minWidth: isMobile ? 'auto' : undefined,
+              px: isMobile ? 2 : undefined,
+            }}
           >
-            Add Cash Flow
+            {isMobile ? <AddIcon /> : 'Add Cash Flow'}
           </Button>
         </Box>
 
