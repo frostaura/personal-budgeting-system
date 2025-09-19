@@ -10,74 +10,87 @@ export const SAMPLE_ACCOUNTS: Account[] = [
     color: '#4CAF50',
     icon: '💳',
     notes: 'Main bank account for daily transactions',
-    openingBalanceCents: 8500000, // R85,000
+    openingBalanceCents: 4631000, // R46,310 (after deductions amount from spreadsheet)
     currentBalanceAsOf: '2024-01-01',
     annualInterestRate: 0.025, // 2.5%
     compoundsPerYear: 12,
   },
   {
-    id: 'acc-savings',
-    name: 'High-Yield Savings',
+    id: 'acc-emergency-savings',
+    name: 'Emergency Savings',
     kind: 'investment',
     category: 'Savings',
     color: '#2196F3',
     icon: '🏦',
-    notes: 'Emergency fund and short-term savings',
-    openingBalanceCents: 45000000, // R450,000
+    notes: 'Emergency fund savings account',
+    openingBalanceCents: 30305706, // R303,057.06
     currentBalanceAsOf: '2024-01-01',
-    annualInterestRate: 0.068, // 6.8%
+    annualInterestRate: 0.0655, // 6.55%
     compoundsPerYear: 12,
   },
   {
-    id: 'acc-investment',
-    name: 'Investment Portfolio',
+    id: 'acc-securities',
+    name: 'Securities',
     kind: 'investment',
     category: 'Investments',
     color: '#FF9800',
     icon: '📈',
-    notes: 'Diversified portfolio with ETFs and unit trusts',
-    openingBalanceCents: 125000000, // R1,250,000
+    notes: 'Investment securities portfolio',
+    openingBalanceCents: 30305706, // R303,057.06
     currentBalanceAsOf: '2024-01-01',
-    annualInterestRate: 0.095, // 9.5% expected return
+    annualInterestRate: 0.15, // 15% expected return
     compoundsPerYear: 12,
   },
   {
-    id: 'acc-property',
-    name: 'Primary Residence',
+    id: 'acc-retirement-fund',
+    name: 'Retirement Fund',
     kind: 'investment',
-    category: 'Property',
+    category: 'Retirement',
     color: '#9C27B0',
-    icon: '🏠',
-    notes: 'Family home in Johannesburg',
-    openingBalanceCents: 280000000, // R2,800,000
+    icon: '🏆',
+    notes: 'Retirement fund investment account',
+    openingBalanceCents: 92487603, // R924,876.03
     currentBalanceAsOf: '2024-01-01',
-    isProperty: true,
-    propertyAppreciationRate: 0.065, // 6.5% annual appreciation
-  },
-  {
-    id: 'acc-bond',
-    name: 'Home Loan',
-    kind: 'liability',
-    category: 'Debt',
-    color: '#F44336',
-    icon: '🏠',
-    notes: 'Home loan at prime rate',
-    openingBalanceCents: -145000000, // -R1,450,000 (liability)
-    currentBalanceAsOf: '2024-01-01',
-    annualInterestRate: 0.115, // 11.5%
+    annualInterestRate: 0.10, // 10% expected return
     compoundsPerYear: 12,
   },
   {
-    id: 'acc-credit-card',
-    name: 'Credit Card',
+    id: 'acc-fnb-credit',
+    name: 'FNB Private Client Credit',
     kind: 'liability',
     category: 'Credit',
-    color: '#795548',
+    color: '#F44336',
     icon: '💳',
-    notes: 'Primary credit card for monthly expenses',
-    openingBalanceCents: -1250000, // -R12,500 (liability)
+    notes: 'FNB Private Client Credit Card',
+    openingBalanceCents: -25079300, // -R250,793.00 (liability)
     currentBalanceAsOf: '2024-01-01',
     annualInterestRate: 0.205, // 20.5%
+    compoundsPerYear: 12,
+  },
+  {
+    id: 'acc-mfc-vehicle',
+    name: 'MFC Vehicle Finance',
+    kind: 'liability',
+    category: 'Debt',
+    color: '#795548',
+    icon: '🚗',
+    notes: 'MFC Vehicle financing loan',
+    openingBalanceCents: -39876538, // -R398,765.38 (liability)
+    currentBalanceAsOf: '2024-01-01',
+    annualInterestRate: 0.1145, // 11.45%
+    compoundsPerYear: 12,
+  },
+  {
+    id: 'acc-sahl',
+    name: 'SAHL',
+    kind: 'liability',
+    category: 'Debt',
+    color: '#E91E63',
+    icon: '🏠',
+    notes: 'SA Home Loan',
+    openingBalanceCents: -171374771, // -R1,713,747.71 (liability)
+    currentBalanceAsOf: '2024-01-01',
+    annualInterestRate: 0.117, // 11.70%
     compoundsPerYear: 12,
   },
 ];
@@ -85,10 +98,10 @@ export const SAMPLE_ACCOUNTS: Account[] = [
 export const SAMPLE_CASHFLOWS: Cashflow[] = [
   // Income
   {
-    id: 'cf-salary',
+    id: 'cf-base-salary',
     accountId: 'acc-checking',
-    amountCents: 4500000, // R45,000 gross salary
-    description: 'Monthly Salary',
+    amountCents: 5501500, // R55,015.00 base salary
+    description: 'Base Salary',
     recurrence: {
       frequency: 'monthly',
       anchor: { dayOfMonth: 25 },
@@ -97,194 +110,389 @@ export const SAMPLE_CASHFLOWS: Cashflow[] = [
     },
   },
   {
-    id: 'cf-salary-tax',
-    accountId: 'acc-checking', // Changed from acc-tax to expense account
-    amountCents: 765000, // R7,650 monthly tax withholding (17% effective rate)
-    description: 'Income Tax (PAYE)',
-    icon: '🧾',
+    id: 'cf-performance-bonus',
+    accountId: 'acc-checking',
+    amountCents: 1320000, // R13,200.00 performance bonus
+    description: 'Performance Bonus',
     recurrence: {
       frequency: 'monthly',
       anchor: { dayOfMonth: 25 },
       startDate: '2024-01-01',
-      annualIndexationPct: 0.065, // 6.5% increase with salary
-    },
-    percentageOf: {
-      sourceCashflowId: 'cf-salary',
-      percentage: 0.17, // 17% of salary
+      annualIndexationPct: 0.065,
     },
   },
   {
-    id: 'cf-bonus',
+    id: 'cf-productivity-allowance',
     accountId: 'acc-checking',
-    amountCents: 9000000, // R90,000 annual bonus
-    description: 'Annual Performance Bonus',
+    amountCents: 230500, // R2,305.00 productivity allowance
+    description: 'Productivity Allowance',
     recurrence: {
-      frequency: 'annually',
-      anchor: { dayOfMonth: 15 },
-      startDate: '2024-12-01',
+      frequency: 'monthly',
+      anchor: { dayOfMonth: 25 },
+      startDate: '2024-01-01',
+      annualIndexationPct: 0.065,
+    },
+  },
+  {
+    id: 'cf-cellphone-reimbursement',
+    accountId: 'acc-checking',
+    amountCents: 35000, // R350.00 cellphone reimbursement
+    description: 'Cellphone Re-imbursement',
+    recurrence: {
+      frequency: 'monthly',
+      anchor: { dayOfMonth: 25 },
+      startDate: '2024-01-01',
+      annualIndexationPct: 0.05,
+    },
+  },
+  {
+    id: 'cf-medical-aid-subsidy',
+    accountId: 'acc-checking',
+    amountCents: 200000, // R2,000.00 medical aid subsidy
+    description: 'Medical Aid Subsidy',
+    recurrence: {
+      frequency: 'monthly',
+      anchor: { dayOfMonth: 25 },
+      startDate: '2024-01-01',
+      annualIndexationPct: 0.065,
     },
   },
 
-  // Housing expenses
+  // Deductions/Expenses
   {
-    id: 'cf-bond-payment',
-    accountId: 'acc-bond',
-    amountCents: 1380000, // R13,800 monthly bond payment
-    description: 'Home Loan Repayment',
+    id: 'cf-diesel-tax',
+    accountId: 'acc-checking',
+    amountCents: 517069, // R5,170.69 diesel tax
+    description: 'Diesel Tax',
+    recurrence: {
+      frequency: 'monthly',
+      anchor: { dayOfMonth: 25 },
+      startDate: '2024-01-01',
+      annualIndexationPct: 0.06,
+    },
+  },
+  {
+    id: 'cf-uif',
+    accountId: 'acc-checking',
+    amountCents: 20000, // R200.00 UIF
+    description: 'UIF',
+    recurrence: {
+      frequency: 'monthly',
+      anchor: { dayOfMonth: 25 },
+      startDate: '2024-01-01',
+      annualIndexationPct: 0.05,
+    },
+  },
+  {
+    id: 'cf-car-gap-insurance',
+    accountId: 'acc-checking',
+    amountCents: 55000, // R550.00 car gap insurance
+    description: 'Car Gap Insurance',
     recurrence: {
       frequency: 'monthly',
       anchor: { dayOfMonth: 1 },
       startDate: '2024-01-01',
+      annualIndexationPct: 0.08,
     },
   },
   {
-    id: 'cf-rates-taxes',
+    id: 'cf-canteen-expenses',
     accountId: 'acc-checking',
-    amountCents: 185000, // R1,850 monthly rates and taxes
-    description: 'Municipal Rates & Taxes',
-    recurrence: {
-      frequency: 'monthly',
-      anchor: { dayOfMonth: 15 },
-      startDate: '2024-01-01',
-      annualIndexationPct: 0.075, // 7.5% annual increase
-    },
-  },
-  {
-    id: 'cf-insurance-home',
-    accountId: 'acc-checking',
-    amountCents: 125000, // R1,250 monthly home insurance
-    description: 'Home & Contents Insurance',
-    recurrence: {
-      frequency: 'monthly',
-      anchor: { dayOfMonth: 5 },
-      startDate: '2024-01-01',
-      annualIndexationPct: 0.08, // 8% annual increase
-    },
-  },
-
-  // Living expenses
-  {
-    id: 'cf-groceries',
-    accountId: 'acc-credit-card',
-    amountCents: 480000, // R4,800 monthly groceries
-    description: 'Groceries & Household Items',
+    amountCents: 33000, // R330.00 canteen expenses
+    description: 'Canteen Expenses',
     recurrence: {
       frequency: 'monthly',
       anchor: { dayOfMonth: 1 },
       startDate: '2024-01-01',
-      annualIndexationPct: 0.055, // 5.5% food inflation
+      annualIndexationPct: 0.055,
     },
   },
-  {
-    id: 'cf-utilities',
-    accountId: 'acc-checking',
-    amountCents: 320000, // R3,200 monthly utilities
-    description: 'Electricity, Water, Gas',
-    recurrence: {
-      frequency: 'monthly',
-      anchor: { dayOfMonth: 20 },
-      startDate: '2024-01-01',
-      annualIndexationPct: 0.12, // 12% utility inflation
-    },
-  },
-  {
-    id: 'cf-cell-internet',
-    accountId: 'acc-checking',
-    amountCents: 185000, // R1,850 monthly telecommunications
-    description: 'Cell Phone & Internet',
-    recurrence: {
-      frequency: 'monthly',
-      anchor: { dayOfMonth: 10 },
-      startDate: '2024-01-01',
-      annualIndexationPct: 0.05, // 5% annual increase
-    },
-  },
-  {
-    id: 'cf-fuel',
-    accountId: 'acc-credit-card',
-    amountCents: 290000, // R2,900 monthly fuel
-    description: 'Vehicle Fuel',
-    recurrence: {
-      frequency: 'monthly',
-      anchor: { dayOfMonth: 1 },
-      startDate: '2024-01-01',
-      annualIndexationPct: 0.085, // 8.5% fuel inflation
-    },
-  },
-
-  // Insurance & Medical
   {
     id: 'cf-medical-aid',
     accountId: 'acc-checking',
-    amountCents: 285000, // R2,850 monthly medical aid
-    description: 'Medical Aid Contribution',
+    amountCents: 350000, // R3,500.00 medical aid
+    description: 'Medical Aid',
     recurrence: {
       frequency: 'monthly',
       anchor: { dayOfMonth: 1 },
       startDate: '2024-01-01',
-      annualIndexationPct: 0.095, // 9.5% medical inflation
+      annualIndexationPct: 0.095,
     },
   },
   {
-    id: 'cf-life-insurance',
+    id: 'cf-milship-subscription',
     accountId: 'acc-checking',
-    amountCents: 95000, // R950 monthly life insurance
-    description: 'Life & Disability Insurance',
+    amountCents: 35000, // R350.00 milship subscription
+    description: 'Milship Subscription',
     recurrence: {
       frequency: 'monthly',
       anchor: { dayOfMonth: 1 },
       startDate: '2024-01-01',
-      annualIndexationPct: 0.07, // 7% annual increase
+      annualIndexationPct: 0.05,
     },
   },
-
-  // Savings & Investments
   {
-    id: 'cf-savings-transfer',
-    accountId: 'acc-savings',
-    amountCents: 500000, // R5,000 monthly savings
-    description: 'Monthly Savings Transfer',
+    id: 'cf-mfc-vehicle-finance-1',
+    accountId: 'acc-mfc-vehicle',
+    amountCents: 610000, // R6,100.00 MFC vehicle finance
+    description: 'MFC Vehicle Finance',
     recurrence: {
       frequency: 'monthly',
-      anchor: { dayOfMonth: 26 },
+      anchor: { dayOfMonth: 1 },
       startDate: '2024-01-01',
     },
   },
   {
-    id: 'cf-investment-transfer',
-    accountId: 'acc-investment',
-    amountCents: 350000, // R3,500 monthly investment
-    description: 'Monthly Investment Contribution',
+    id: 'cf-rates-taxes-electricity',
+    accountId: 'acc-checking',
+    amountCents: 300000, // R3,000.00 rates, taxes & electricity
+    description: 'Rates, Taxes & Electricity',
     recurrence: {
       frequency: 'monthly',
-      anchor: { dayOfMonth: 26 },
+      anchor: { dayOfMonth: 15 },
+      startDate: '2024-01-01',
+      annualIndexationPct: 0.12,
+    },
+  },
+  {
+    id: 'cf-pet-supplies',
+    accountId: 'acc-checking',
+    amountCents: 150000, // R1,500.00 pet supplies
+    description: 'Pet Supplies',
+    recurrence: {
+      frequency: 'monthly',
+      anchor: { dayOfMonth: 1 },
+      startDate: '2024-01-01',
+      annualIndexationPct: 0.055,
+    },
+  },
+  {
+    id: 'cf-mfc-vehicle-finance-2',
+    accountId: 'acc-mfc-vehicle',
+    amountCents: 1110000, // R11,100.00 additional MFC vehicle finance
+    description: 'MFC Vehicle Finance (Additional)',
+    recurrence: {
+      frequency: 'monthly',
+      anchor: { dayOfMonth: 1 },
       startDate: '2024-01-01',
     },
   },
-
-  // Discretionary spending
+  {
+    id: 'cf-bank-account-charges',
+    accountId: 'acc-checking',
+    amountCents: 65000, // R650.00 bank account charges
+    description: 'Bank Account Charges',
+    recurrence: {
+      frequency: 'monthly',
+      anchor: { dayOfMonth: 1 },
+      startDate: '2024-01-01',
+      annualIndexationPct: 0.06,
+    },
+  },
+  {
+    id: 'cf-fnb-investment-loan-interest',
+    accountId: 'acc-checking',
+    amountCents: 495735, // R4,957.35 FNB investment loan interest
+    description: 'FNB Investment Loan Interest',
+    recurrence: {
+      frequency: 'monthly',
+      anchor: { dayOfMonth: 1 },
+      startDate: '2024-01-01',
+    },
+  },
+  {
+    id: 'cf-fnb-credit-interest',
+    accountId: 'acc-fnb-credit',
+    amountCents: 496771, // R4,967.71 FNB credit interest
+    description: 'FNB Credit Interest',
+    recurrence: {
+      frequency: 'monthly',
+      anchor: { dayOfMonth: 1 },
+      startDate: '2024-01-01',
+    },
+  },
   {
     id: 'cf-entertainment',
-    accountId: 'acc-credit-card',
-    amountCents: 180000, // R1,800 monthly entertainment
-    description: 'Entertainment & Dining',
+    accountId: 'acc-checking',
+    amountCents: 400000, // R4,000.00 entertainment
+    description: 'Entertainment',
     recurrence: {
       frequency: 'monthly',
       anchor: { dayOfMonth: 1 },
       startDate: '2024-01-01',
-      annualIndexationPct: 0.06, // 6% annual increase
+      annualIndexationPct: 0.06,
     },
   },
   {
-    id: 'cf-clothing',
-    accountId: 'acc-credit-card',
-    amountCents: 120000, // R1,200 monthly clothing
-    description: 'Clothing & Personal Items',
+    id: 'cf-youtube-premium',
+    accountId: 'acc-checking',
+    amountCents: 10000, // R100.00 YouTube Premium
+    description: 'YouTube Premium',
     recurrence: {
       frequency: 'monthly',
       anchor: { dayOfMonth: 1 },
       startDate: '2024-01-01',
-      annualIndexationPct: 0.055, // 5.5% annual increase
+      annualIndexationPct: 0.05,
+    },
+  },
+  {
+    id: 'cf-imovie-pro',
+    accountId: 'acc-checking',
+    amountCents: 5000, // R50.00 iMovie Pro
+    description: 'iMovie Pro',
+    recurrence: {
+      frequency: 'monthly',
+      anchor: { dayOfMonth: 1 },
+      startDate: '2024-01-01',
+      annualIndexationPct: 0.05,
+    },
+  },
+  {
+    id: 'cf-emergency-savings',
+    accountId: 'acc-emergency-savings',
+    amountCents: 300000, // R3,000.00 emergency savings
+    description: 'Emergency Savings',
+    recurrence: {
+      frequency: 'monthly',
+      anchor: { dayOfMonth: 26 },
+      startDate: '2024-01-01',
+    },
+  },
+  {
+    id: 'cf-old-mutual-salary',
+    accountId: 'acc-checking',
+    amountCents: 1500000, // R15,000.00 Old Mutual salary
+    description: 'Old Mutual Salary',
+    recurrence: {
+      frequency: 'monthly',
+      anchor: { dayOfMonth: 25 },
+      startDate: '2024-01-01',
+      annualIndexationPct: 0.065,
+    },
+  },
+  {
+    id: 'cf-gym-fees',
+    accountId: 'acc-checking',
+    amountCents: 90000, // R900.00 gym fees
+    description: 'Gym Fees',
+    recurrence: {
+      frequency: 'monthly',
+      anchor: { dayOfMonth: 1 },
+      startDate: '2024-01-01',
+      annualIndexationPct: 0.08,
+    },
+  },
+  {
+    id: 'cf-landscaping',
+    accountId: 'acc-checking',
+    amountCents: 100000, // R1,000.00 landscaping
+    description: 'Landscaping',
+    recurrence: {
+      frequency: 'monthly',
+      anchor: { dayOfMonth: 1 },
+      startDate: '2024-01-01',
+      annualIndexationPct: 0.06,
+    },
+  },
+
+  // Investment cash flows
+  {
+    id: 'cf-sa-home-loan',
+    accountId: 'acc-sahl',
+    amountCents: 1870000, // R18,700.00 SA home loan payment
+    description: 'SA Home Loan',
+    recurrence: {
+      frequency: 'monthly',
+      anchor: { dayOfMonth: 1 },
+      startDate: '2024-01-01',
+    },
+  },
+  {
+    id: 'cf-account-payments',
+    accountId: 'acc-checking',
+    amountCents: 2450000, // R24,500.00 account payments
+    description: 'Account Payments',
+    recurrence: {
+      frequency: 'monthly',
+      anchor: { dayOfMonth: 1 },
+      startDate: '2024-01-01',
+    },
+  },
+  {
+    id: 'cf-securities',
+    accountId: 'acc-securities',
+    amountCents: 400000, // R4,000.00 securities investment
+    description: 'Securities',
+    recurrence: {
+      frequency: 'monthly',
+      anchor: { dayOfMonth: 26 },
+      startDate: '2024-01-01',
+    },
+  },
+  {
+    id: 'cf-emergency-fund',
+    accountId: 'acc-emergency-savings',
+    amountCents: 200000, // R2,000.00 emergency fund
+    description: 'Emergency Fund',
+    recurrence: {
+      frequency: 'monthly',
+      anchor: { dayOfMonth: 26 },
+      startDate: '2024-01-01',
+    },
+  },
+  {
+    id: 'cf-short-term-savings',
+    accountId: 'acc-emergency-savings',
+    amountCents: 1030000, // R10,300.00 short term savings
+    description: 'Short Term Savings',
+    recurrence: {
+      frequency: 'monthly',
+      anchor: { dayOfMonth: 26 },
+      startDate: '2024-01-01',
+    },
+  },
+  {
+    id: 'cf-diving',
+    accountId: 'acc-checking',
+    amountCents: 200000, // R2,000.00 diving
+    description: 'Diving',
+    recurrence: {
+      frequency: 'monthly',
+      anchor: { dayOfMonth: 1 },
+      startDate: '2024-01-01',
+    },
+  },
+  {
+    id: 'cf-egypt-trip',
+    accountId: 'acc-checking',
+    amountCents: 500000, // R5,000.00 Egypt trip
+    description: 'Egypt Trip',
+    recurrence: {
+      frequency: 'monthly',
+      anchor: { dayOfMonth: 1 },
+      startDate: '2024-01-01',
+    },
+  },
+  {
+    id: 'cf-squash',
+    accountId: 'acc-checking',
+    amountCents: 250000, // R2,500.00 squash
+    description: 'Squash',
+    recurrence: {
+      frequency: 'monthly',
+      anchor: { dayOfMonth: 1 },
+      startDate: '2024-01-01',
+    },
+  },
+  {
+    id: 'cf-gravel-invoice',
+    accountId: 'acc-checking',
+    amountCents: 80000, // R800.00 gravel invoice
+    description: 'Gravel Invoice',
+    recurrence: {
+      frequency: 'monthly',
+      anchor: { dayOfMonth: 1 },
+      startDate: '2024-01-01',
     },
   },
 ];
@@ -299,9 +507,9 @@ export const SAMPLE_SCENARIOS: Scenario[] = [
     salaryGrowthPct: 0.065, // 6.5% salary growth
   },
   {
-    id: 'scenario-aggressive-saving',
-    name: 'Aggressive Savings',
-    spendAdjustmentPct: -0.25, // 25% reduction in all expenses
+    id: 'scenario-debt-focus',
+    name: 'Debt Reduction Focus',
+    spendAdjustmentPct: -0.20, // 20% reduction in all expenses
     scope: 'all',
     inflationPct: 0.055,
     salaryGrowthPct: 0.065,
@@ -315,8 +523,8 @@ export const SAMPLE_SCENARIOS: Scenario[] = [
     salaryGrowthPct: 0.055, // Lower salary growth than inflation
   },
   {
-    id: 'scenario-salary-increase',
-    name: 'Promotion & Salary Increase',
+    id: 'scenario-career-growth',
+    name: 'Career Growth & Promotion',
     spendAdjustmentPct: 0.1, // 10% lifestyle inflation
     scope: 'discretionary',
     inflationPct: 0.055,
