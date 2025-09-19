@@ -70,7 +70,7 @@ export const BottomSheetModal: React.FC<BottomSheetModalProps> = ({
           sx={{
             width: '100%',
             maxWidth: isMobile ? '100%' : maxWidth,
-            height: isMobile ? '85vh' : '70vh', // Fixed height instead of maxHeight
+            maxHeight: '50vh', // Max height as requested
             backgroundColor: 'background.paper',
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,
