@@ -101,14 +101,7 @@ export const MainLayout: React.FC = () => {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
           }),
-          ...(sidebarOpen &&
-            !isMobile && {
-              marginLeft: `${drawerWidth}px`,
-              transition: theme.transitions.create(['margin'], {
-                easing: theme.transitions.easing.easeOut,
-                duration: theme.transitions.duration.enteringScreen,
-              }),
-            }),
+
         }}
       >
         <Box sx={{ 
