@@ -375,7 +375,7 @@ const DashboardPage: React.FC = () => {
 
   return (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <Box sx={{ p: 3, flexGrow: 1 }}>
+      <Box sx={{ p: 3, flexGrow: 1, maxWidth: '1400px', mx: 'auto', width: '100%' }}>
         <Typography
           variant="h4"
           gutterBottom
