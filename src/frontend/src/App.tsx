@@ -1,24 +1,24 @@
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { HashRouter } from 'react-router-dom';
-import { ThemeProvider, CssBaseline } from '@mui/material';
+import { CssBaseline } from '@mui/material';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import { store, persistor } from '@/store';
-import { theme } from '@/theme';
 import { AppRouter } from '@/components/routing/AppRouter';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { LoadingScreen } from '@/components/common/LoadingScreen';
 import { DisclaimerDialog } from '@/components/common/DisclaimerDialog';
 import { AppInitializer } from '@/components/common/AppInitializer';
+import { DynamicThemeProvider } from '@/components/theme/DynamicThemeProvider';
 
 function App() {
   return (
     <ErrorBoundary>
       <Provider store={store}>
         <PersistGate loading={<LoadingScreen />} persistor={persistor}>
-          <ThemeProvider theme={theme}>
+          <DynamicThemeProvider>
             <CssBaseline />
             <HashRouter>
               <AppInitializer>
@@ -38,7 +38,7 @@ function App() {
                 />
               </AppInitializer>
             </HashRouter>
-          </ThemeProvider>
+          </DynamicThemeProvider>
         </PersistGate>
       </Provider>
     </ErrorBoundary>

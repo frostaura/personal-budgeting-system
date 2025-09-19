@@ -128,7 +128,13 @@ export const OnboardingTooltip: React.FC<OnboardingTooltipProps> = ({
         }
         
         .onboarding-backdrop {
+          position: fixed !important;
+          top: 0 !important;
+          left: 0 !important;
+          right: 0 !important;
+          bottom: 0 !important;
           background-color: rgba(0, 0, 0, 0.7) !important;
+          z-index: 1300 !important;
         }
       `}</style>
 
@@ -138,7 +144,14 @@ export const OnboardingTooltip: React.FC<OnboardingTooltipProps> = ({
         className="onboarding-backdrop"
         sx={{
           zIndex: 1300,
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
           '& .MuiBackdrop-root': {
+            position: 'fixed',
             backgroundColor: 'rgba(0, 0, 0, 0.7)',
           },
         }}

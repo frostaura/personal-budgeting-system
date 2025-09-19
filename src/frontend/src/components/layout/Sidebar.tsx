@@ -79,10 +79,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const navigate = useNavigate();
 
   const handleNavigation = (path: string) => {
-    navigate(path);
+    // Always close the sidebar on mobile before navigation
     if (variant === 'temporary') {
       onClose();
     }
+    
+    // Navigate after a small delay to ensure state update
+    setTimeout(() => {
+      navigate(path);
+    }, 10);
   };
 
   const handleClose = () => {
@@ -179,6 +184,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
           boxSizing: 'border-box',
           backgroundColor: 'background.paper',
           borderRight: `1px solid ${theme.palette.divider}`,
+          height: '100vh',
+          // Use dynamic viewport height for mobile devices
+          '@supports (height: 100dvh)': {
+            height: '100dvh',
+          },
         },
       }}
       ModalProps={{
