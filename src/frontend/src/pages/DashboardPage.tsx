@@ -34,10 +34,12 @@ import {
   OnboardingStep,
 } from '@/components/common/OnboardingTooltip';
 import { useOnboarding } from '@/hooks/useOnboarding';
+import { useResponsiveCharts } from '@/hooks/useResponsiveCharts';
 
 const DashboardPage: React.FC = () => {
   const { accounts } = useAppSelector(state => state.accounts);
   const { cashflows } = useAppSelector(state => state.cashflows);
+  const chartStyles = useResponsiveCharts();
   
   // Load projection years from localStorage or default to 5 years
   const [projectionYears, setProjectionYears] = useState(() => {
@@ -431,13 +433,16 @@ const DashboardPage: React.FC = () => {
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis
                     dataKey="year"
+                    tick={chartStyles.getTickStyle()}
                     label={{
                       value: 'Years',
                       position: 'insideBottom',
                       offset: -10,
+                      style: chartStyles.getAxisLabelStyle(),
                     }}
                   />
                   <YAxis
+                    tick={chartStyles.getTickStyle()}
                     tickFormatter={value =>
                       `R ${(value / 1000000).toFixed(1)}M`
                     }
@@ -445,9 +450,11 @@ const DashboardPage: React.FC = () => {
                       value: 'Net Worth',
                       angle: -90,
                       position: 'insideLeft',
+                      style: chartStyles.getAxisLabelStyle(),
                     }}
                   />
                   <RechartsTooltip
+                    contentStyle={chartStyles.getTooltipStyle()}
                     formatter={(value: number) => [
                       formatCurrency(value),
                       'Net Worth',
@@ -558,6 +565,7 @@ const DashboardPage: React.FC = () => {
                         ))}
                       </Pie>
                       <RechartsTooltip
+                        contentStyle={chartStyles.getTooltipStyle()}
                         formatter={(value: number) => [
                           formatCurrency(value),
                           'Amount'
