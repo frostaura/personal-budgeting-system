@@ -54,7 +54,8 @@ export const BottomSheetModal: React.FC<BottomSheetModalProps> = ({
         timeout: 300,
         onClick: handleBackdropClick,
         sx: {
-          backgroundColor: 'rgba(0, 0, 0, 0.6)',
+          backgroundColor: 'rgba(0, 0, 0, 0.4)',
+          zIndex: 1299, // Ensure backdrop stays below modal content
         },
       }}
       sx={{
@@ -69,7 +70,7 @@ export const BottomSheetModal: React.FC<BottomSheetModalProps> = ({
           sx={{
             width: '100%',
             maxWidth: isMobile ? '100%' : maxWidth,
-            maxHeight: '90vh',
+            height: isMobile ? '85vh' : '70vh', // Fixed height instead of maxHeight
             backgroundColor: 'background.paper',
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,
@@ -81,6 +82,7 @@ export const BottomSheetModal: React.FC<BottomSheetModalProps> = ({
             flexDirection: 'column',
             boxShadow: '0 -4px 24px rgba(0, 0, 0, 0.1)',
             margin: isMobile ? 0 : 2,
+            zIndex: 1301, // Higher z-index than backdrop
           }}
           onClick={(e) => e.stopPropagation()}
         >
