@@ -247,7 +247,10 @@ const DashboardPage: React.FC = () => {
       )
       .reduce((sum, account) => sum + (account.openingBalanceCents || 0), 0);
 
-    const total = regularExpenses + taxExpenses + investments;
+    // Get interest payments from financialMetrics
+    const interestPayments = financialMetrics.monthlyInterestPayments;
+
+    const total = regularExpenses + taxExpenses + investments + interestPayments;
     
     if (total === 0) {
       return [];
@@ -267,13 +270,19 @@ const DashboardPage: React.FC = () => {
         color: '#ff9800', // orange
       },
       {
+        name: 'Interest Payments',
+        value: interestPayments,
+        percentage: (interestPayments / total) * 100,
+        color: '#e91e63', // pink/magenta
+      },
+      {
         name: 'Investments',
         value: investments,
         percentage: (investments / total) * 100,
         color: '#4caf50', // green
       },
     ].filter(item => item.value > 0);
-  }, [accounts, cashflows]);
+  }, [accounts, cashflows, financialMetrics.monthlyInterestPayments]);
 
   // Generate wealth projection data
   const wealthProjectionData = useMemo(() => {
