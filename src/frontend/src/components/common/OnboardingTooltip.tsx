@@ -55,19 +55,38 @@ export const OnboardingTooltip: React.FC<OnboardingTooltipProps> = ({
 
   // Cleanup function to remove all onboarding-related elements and styles
   const cleanupOnboarding = () => {
-    // Remove any remaining onboarding backdrops
-    const backdrops = document.querySelectorAll('.onboarding-backdrop');
-    backdrops.forEach(backdrop => backdrop.remove());
+    try {
+      // Remove any remaining onboarding backdrops
+      const backdrops = document.querySelectorAll('.onboarding-backdrop');
+      backdrops.forEach(backdrop => {
+        try {
+          backdrop.remove();
+        } catch (error) {
+          // Silently ignore if element is already removed
+          console.debug('Backdrop already removed:', error);
+        }
+      });
 
-    // Remove highlight styles from all elements
-    const highlightedElements = document.querySelectorAll('.onboarding-highlight');
-    highlightedElements.forEach(element => {
-      element.classList.remove('onboarding-highlight');
-      const htmlElement = element as HTMLElement;
-      htmlElement.style.position = '';
-      htmlElement.style.zIndex = '';
-      htmlElement.style.pointerEvents = '';
-    });
+      // Remove highlight styles from all elements
+      const highlightedElements = document.querySelectorAll('.onboarding-highlight');
+      highlightedElements.forEach(element => {
+        try {
+          element.classList.remove('onboarding-highlight');
+          const htmlElement = element as HTMLElement;
+          if (htmlElement && htmlElement.style) {
+            htmlElement.style.position = '';
+            htmlElement.style.zIndex = '';
+            htmlElement.style.pointerEvents = '';
+          }
+        } catch (error) {
+          // Silently ignore if element is already modified or removed
+          console.debug('Element already cleaned up:', error);
+        }
+      });
+    } catch (error) {
+      // Catch any unexpected errors during cleanup
+      console.debug('Error during onboarding cleanup:', error);
+    }
   };
 
   useEffect(() => {
@@ -77,32 +96,53 @@ export const OnboardingTooltip: React.FC<OnboardingTooltipProps> = ({
       return;
     }
 
-    const target = document.querySelector(step.target) as HTMLElement;
-    if (target) {
-      setAnchorEl(target);
-
-      // Scroll to element if it's not visible
-      target.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-        inline: 'center',
-      });
-
-      // Add highlight class
-      target.classList.add('onboarding-highlight');
-      target.style.position = 'relative';
-      target.style.zIndex = '1301'; // Above backdrop (1300)
-      target.style.pointerEvents = 'auto'; // Ensure highlighted element can be clicked
-    }
-
-    return () => {
+    try {
+      const target = document.querySelector(step.target) as HTMLElement;
       if (target) {
-        target.classList.remove('onboarding-highlight');
-        target.style.position = '';
-        target.style.zIndex = '';
-        target.style.pointerEvents = '';
+        setAnchorEl(target);
+
+        // Scroll to element if it's not visible
+        try {
+          target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+            inline: 'center',
+          });
+        } catch (scrollError) {
+          console.debug('Error scrolling to target:', scrollError);
+        }
+
+        // Add highlight class
+        try {
+          target.classList.add('onboarding-highlight');
+          target.style.position = 'relative';
+          target.style.zIndex = '1301'; // Above backdrop (1300)
+          target.style.pointerEvents = 'auto'; // Ensure highlighted element can be clicked
+        } catch (styleError) {
+          console.debug('Error styling target element:', styleError);
+        }
+      } else {
+        console.debug('Target element not found:', step.target);
+        setAnchorEl(null);
       }
-    };
+
+      return () => {
+        if (target) {
+          try {
+            target.classList.remove('onboarding-highlight');
+            target.style.position = '';
+            target.style.zIndex = '';
+            target.style.pointerEvents = '';
+          } catch (cleanupError) {
+            console.debug('Error cleaning up target element:', cleanupError);
+          }
+        }
+      };
+    } catch (error) {
+      console.debug('Error in onboarding step effect:', error);
+      setAnchorEl(null);
+      return () => {}; // Return empty cleanup function
+    }
   }, [step, isOpen, currentStep]);
 
   // Cleanup on component unmount to prevent lingering overlays
@@ -129,22 +169,42 @@ export const OnboardingTooltip: React.FC<OnboardingTooltipProps> = ({
   };
 
   const handleComplete = () => {
-    cleanupOnboarding();
-    if (storageKey) {
-      localStorage.setItem(storageKey, 'true');
+    try {
+      cleanupOnboarding();
+      if (storageKey) {
+        localStorage.setItem(storageKey, 'true');
+      }
+      onComplete();
+    } catch (error) {
+      console.error('Error completing onboarding:', error);
+      // Still try to call onComplete even if cleanup fails
+      try {
+        onComplete();
+      } catch (completeError) {
+        console.error('Error in onComplete callback:', completeError);
+      }
     }
-    onComplete();
   };
 
   const handleSkip = () => {
-    cleanupOnboarding();
-    if (storageKey) {
-      localStorage.setItem(storageKey, 'true');
+    try {
+      cleanupOnboarding();
+      if (storageKey) {
+        localStorage.setItem(storageKey, 'true');
+      }
+      onSkip();
+    } catch (error) {
+      console.error('Error skipping onboarding:', error);
+      // Still try to call onSkip even if cleanup fails
+      try {
+        onSkip();
+      } catch (skipError) {
+        console.error('Error in onSkip callback:', skipError);
+      }
     }
-    onSkip();
   };
 
-  if (!isOpen || !step || !anchorEl) {
+  if (!isOpen || !step) {
     return null;
   }
 
@@ -194,7 +254,7 @@ export const OnboardingTooltip: React.FC<OnboardingTooltipProps> = ({
 
       {/* Tooltip */}
       <Popper
-        open={isOpen}
+        open={isOpen && !!anchorEl}
         anchorEl={anchorEl}
         placement={step.placement || 'bottom'}
         modifiers={[
@@ -214,7 +274,7 @@ export const OnboardingTooltip: React.FC<OnboardingTooltipProps> = ({
         ]}
         style={{ zIndex: 1400 }}
       >
-        <Fade in={isOpen} timeout={300}>
+        <Fade in={isOpen && !!anchorEl} timeout={300}>
           <Paper
             elevation={8}
             sx={{
