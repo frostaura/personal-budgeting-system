@@ -3,7 +3,6 @@ import {
   Alert,
   AlertTitle,
   Button,
-  Chip,
   Collapse,
   IconButton,
   Snackbar,
@@ -12,10 +11,7 @@ import {
 } from '@mui/material';
 import {
   Close as CloseIcon,
-  CloudOff as OfflineIcon,
-  Wifi as OnlineIcon,
   Refresh as UpdateIcon,
-  Download as DownloadIcon,
 } from '@mui/icons-material';
 import { useServiceWorkerStatus, useServiceWorkerUpdate } from '@/services/serviceWorkerManager';
 
@@ -55,36 +51,6 @@ export const OfflineIndicator: React.FC = () => {
 
   return (
     <>
-      {/* Online/Offline Status Indicator */}
-      <Stack
-        direction="row"
-        spacing={1}
-        sx={{
-          position: 'fixed',
-          top: 16,
-          right: 16,
-          zIndex: 1300,
-        }}
-      >
-        <Chip
-          icon={status.isOnline ? <OnlineIcon /> : <OfflineIcon />}
-          label={status.isOnline ? 'Online' : 'Offline'}
-          color={status.isOnline ? 'success' : 'warning'}
-          size="small"
-          variant={status.isOnline ? 'outlined' : 'filled'}
-        />
-        
-        {status.isRegistered && (
-          <Chip
-            icon={<DownloadIcon />}
-            label="Offline Ready"
-            color="info"
-            size="small"
-            variant="outlined"
-          />
-        )}
-      </Stack>
-
       {/* Offline Alert */}
       <Collapse in={showOfflineAlert}>
         <Alert
