@@ -5,10 +5,6 @@ import {
   Card,
   CardContent,
   Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   TextField,
   Select,
   MenuItem,
@@ -26,6 +22,7 @@ import {
   ListItemText,
   ListItemSecondaryAction,
 } from '@mui/material';
+import { BottomSheetModal } from '@/components/common';
 import {
   Add as AddIcon,
   Edit as EditIcon,
@@ -389,29 +386,28 @@ const AccountsPage: React.FC = () => {
         </Grid>
       </Box>
 
-      {/* Add/Edit Account Dialog */}
-      <Dialog
+      {/* Add/Edit Account Modal */}
+      <BottomSheetModal
         open={dialogOpen}
         onClose={handleCloseDialog}
-        maxWidth="md"
-        fullWidth
+        title={editingAccount ? 'Edit Account' : 'Add New Account'}
+        actionLabel={editingAccount ? 'Update' : 'Create'}
+        onAction={handleSaveAccount}
+        actionDisabled={!formData.name.trim()}
+        maxWidth={700}
       >
-        <DialogTitle>
-          {editingAccount ? 'Edit Account' : 'Add New Account'}
-        </DialogTitle>
-        <DialogContent>
-          <Grid container spacing={2} sx={{ mt: 1 }}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Account Name"
-                value={formData.name}
-                onChange={e =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
-                required
-              />
-            </Grid>
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Account Name"
+              value={formData.name}
+              onChange={e =>
+                setFormData({ ...formData, name: e.target.value })
+              }
+              required
+            />
+          </Grid>
             <Grid item xs={12} sm={6}>
               <FormControl fullWidth>
                 <InputLabel>Account Type</InputLabel>
@@ -497,42 +493,23 @@ const AccountsPage: React.FC = () => {
               />
             </Grid>
           </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog}>Cancel</Button>
-          <Button
-            onClick={handleSaveAccount}
-            variant="contained"
-            disabled={!formData.name.trim()}
-          >
-            {editingAccount ? 'Update' : 'Create'}
-          </Button>
-        </DialogActions>
-      </Dialog>
+        </BottomSheetModal>
 
-      {/* Delete Confirmation Dialog */}
-      <Dialog
+      {/* Delete Confirmation Modal */}
+      <BottomSheetModal
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
+        title="Delete Account"
+        actionLabel="Delete"
+        onAction={handleDeleteAccount}
+        actionColor="error"
+        maxWidth={500}
       >
-        <DialogTitle>Delete Account</DialogTitle>
-        <DialogContent>
-          <Typography>
-            Are you sure you want to delete this account? This action cannot be
-            undone.
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
-          <Button
-            onClick={handleDeleteAccount}
-            color="error"
-            variant="contained"
-          >
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
+        <Typography>
+          Are you sure you want to delete this account? This action cannot be
+          undone.
+        </Typography>
+      </BottomSheetModal>
     </Box>
   );
 };
