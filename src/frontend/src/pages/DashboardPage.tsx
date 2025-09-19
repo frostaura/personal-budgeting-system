@@ -39,6 +39,9 @@ import { useResponsiveCharts } from '@/hooks/useResponsiveCharts';
 const DashboardPage: React.FC = () => {
   const { accounts } = useAppSelector(state => state.accounts);
   const { cashflows } = useAppSelector(state => state.cashflows);
+  const disclaimerAccepted = useAppSelector(
+    state => state.settings.disclaimerAccepted
+  );
   const chartStyles = useResponsiveCharts();
   
   // Load projection years from localStorage or default to 5 years
@@ -59,6 +62,7 @@ const DashboardPage: React.FC = () => {
       storageKey: 'dashboard-onboarding-completed',
       autoStart: true,
       delay: 1500,
+      prerequisitesMet: disclaimerAccepted,
     });
 
   const onboardingSteps: OnboardingStep[] = [

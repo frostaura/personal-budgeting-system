@@ -4,12 +4,14 @@ export interface UseOnboardingOptions {
   storageKey: string;
   autoStart?: boolean;
   delay?: number;
+  prerequisitesMet?: boolean;
 }
 
 export const useOnboarding = ({
   storageKey,
   autoStart = true,
   delay = 1000,
+  prerequisitesMet = true,
 }: UseOnboardingOptions) => {
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
@@ -18,7 +20,7 @@ export const useOnboarding = ({
     const completed = localStorage.getItem(storageKey) === 'true';
     setHasCompletedOnboarding(completed);
 
-    if (!completed && autoStart) {
+    if (!completed && autoStart && prerequisitesMet) {
       // Delay the start to ensure all elements are rendered
       const timer = setTimeout(() => {
         setIsOnboardingOpen(true);
@@ -29,7 +31,7 @@ export const useOnboarding = ({
 
     // Return empty cleanup function when no timer is set
     return () => {};
-  }, [storageKey, autoStart, delay]);
+  }, [storageKey, autoStart, delay, prerequisitesMet]);
 
   const startOnboarding = () => {
     setIsOnboardingOpen(true);
