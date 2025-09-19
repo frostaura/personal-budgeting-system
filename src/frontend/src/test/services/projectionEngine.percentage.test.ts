@@ -41,12 +41,12 @@ describe('ProjectionEngine - Percentage-based Cash Flows', () => {
     
     expect(result.months).toHaveLength(1);
     
-    const firstMonth = result.months[0];
+    const firstMonth = result.months[0]!;
     console.log('First month accounts:', firstMonth.accounts);
     
     // Check that income account received the salary
     expect(firstMonth.accounts['acc-income']).toBeDefined();
-    expect(firstMonth.accounts['acc-income'].income).toBe(5000000);
+    expect(firstMonth.accounts['acc-income']?.income).toBe(5000000);
   });
 
   it('should calculate percentage-based cash flow amounts correctly', () => {
@@ -91,12 +91,12 @@ describe('ProjectionEngine - Percentage-based Cash Flows', () => {
 
     expect(result.months).toHaveLength(1);
     
-    const firstMonth = result.months[0];
+    const firstMonth = result.months[0]!;
     
     // Salary should remain as original amount
-    expect(firstMonth.accounts['acc-income'].income).toBe(5000000); // R50,000
+    expect(firstMonth.accounts['acc-income']?.income).toBe(5000000); // R50,000
     
     // Tax should be 17% of salary = R50,000 * 0.17 = R8,500 = 850,000 cents
-    expect(firstMonth.accounts['acc-expense'].expenses).toBe(850000);
+    expect(firstMonth.accounts['acc-expense']?.expenses).toBe(850000);
   });
 });

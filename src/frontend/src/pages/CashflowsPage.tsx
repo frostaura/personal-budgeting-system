@@ -77,6 +77,10 @@ const CashflowsPage: React.FC = () => {
     dayOfMonth: 1,
     hasEndDate: false,
     annualIndexation: '',
+    // Percentage-based calculation fields
+    isPercentageBased: false,
+    sourceCashflowId: '',
+    percentage: '',
   });
 
   useEffect(() => {
@@ -100,6 +104,12 @@ const CashflowsPage: React.FC = () => {
         annualIndexation: cashflow.recurrence.annualIndexationPct
           ? (cashflow.recurrence.annualIndexationPct * 100).toString()
           : '',
+        // Percentage-based fields
+        isPercentageBased: !!cashflow.percentageOf,
+        sourceCashflowId: cashflow.percentageOf?.sourceCashflowId || '',
+        percentage: cashflow.percentageOf?.percentage
+          ? (cashflow.percentageOf.percentage * 100).toString()
+          : '',
       });
     } else {
       setEditingCashflow(null);
@@ -108,12 +118,16 @@ const CashflowsPage: React.FC = () => {
         description: '',
         icon: '💰',
         amount: '',
-        frequency: 'monthly',
+        frequency: 'monthly' as Frequency,
         startDate: new Date().toISOString().split('T')[0],
         endDate: '',
         dayOfMonth: 1,
         hasEndDate: false,
         annualIndexation: '',
+        // Reset percentage-based fields
+        isPercentageBased: false,
+        sourceCashflowId: '',
+        percentage: '',
       });
     }
     setDialogOpen(true);
@@ -153,11 +167,21 @@ const CashflowsPage: React.FC = () => {
       const cashflow: Cashflow = {
         id: editingCashflow?.id || `cf-${Date.now()}`,
         accountId: formData.accountId,
-        amountCents: majorToCents(parseFloat(formData.amount)),
+        amountCents: formData.isPercentageBased 
+          ? 0 // Placeholder amount when using percentage calculation
+          : majorToCents(parseFloat(formData.amount)),
         description: formData.description,
         icon: formData.icon,
         recurrence: recurrenceData as Recurrence,
       };
+
+      // Add percentage-based calculation if enabled
+      if (formData.isPercentageBased && formData.sourceCashflowId && formData.percentage) {
+        cashflow.percentageOf = {
+          sourceCashflowId: formData.sourceCashflowId,
+          percentage: parseFloat(formData.percentage) / 100,
+        };
+      }
 
       if (editingCashflow) {
         await dispatch(updateCashflowThunk(cashflow));
@@ -462,7 +486,8 @@ const CashflowsPage: React.FC = () => {
         actionDisabled={
           !formData.accountId ||
           !formData.description.trim() ||
-          !formData.amount
+          (!formData.isPercentageBased && !formData.amount) ||
+          (formData.isPercentageBased && (!formData.sourceCashflowId || !formData.percentage))
         }
         maxWidth={800}
       >
@@ -534,8 +559,13 @@ const CashflowsPage: React.FC = () => {
                 onChange={e =>
                   setFormData({ ...formData, amount: e.target.value })
                 }
-                required
-                helperText="Enter positive amount (direction determined by account type)"
+                required={!formData.isPercentageBased}
+                disabled={formData.isPercentageBased}
+                helperText={
+                  formData.isPercentageBased
+                    ? "Amount will be calculated as percentage of selected income"
+                    : "Enter positive amount (direction determined by account type)"
+                }
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -617,6 +647,65 @@ const CashflowsPage: React.FC = () => {
                 />
               </Grid>
             )}
+            
+            {/* Percentage-based calculation fields */}
+            <Grid item xs={12}>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={formData.isPercentageBased}
+                    onChange={e =>
+                      setFormData({ ...formData, isPercentageBased: e.target.checked })
+                    }
+                  />
+                }
+                label="Calculate as percentage of income"
+                title="Enable this to calculate the amount as a percentage of another income cash flow"
+              />
+            </Grid>
+            
+            {formData.isPercentageBased && (
+              <>
+                <Grid item xs={12} sm={6}>
+                  <FormControl fullWidth required>
+                    <InputLabel>Source Income Cash Flow</InputLabel>
+                    <Select
+                      value={formData.sourceCashflowId}
+                      onChange={e =>
+                        setFormData({ ...formData, sourceCashflowId: e.target.value })
+                      }
+                      label="Source Income Cash Flow"
+                    >
+                      {cashflows
+                        .filter(cf => {
+                          const account = accounts.find(acc => acc.id === cf.accountId);
+                          return account && account.kind === 'income';
+                        })
+                        .map(cf => (
+                          <MenuItem key={cf.id} value={cf.id}>
+                            {cf.icon} {cf.description} ({formatCurrency(cf.amountCents)})
+                          </MenuItem>
+                        ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Percentage (%)"
+                    type="number"
+                    value={formData.percentage}
+                    onChange={e =>
+                      setFormData({ ...formData, percentage: e.target.value })
+                    }
+                    inputProps={{ min: 0, max: 100, step: 0.1 }}
+                    helperText="Percentage of the source income (e.g., 17 for 17%)"
+                    required
+                  />
+                </Grid>
+              </>
+            )}
+            
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
