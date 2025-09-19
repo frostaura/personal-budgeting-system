@@ -26,6 +26,9 @@ export const AppInitializer: React.FC<AppInitializerProps> = ({ children }) => {
         dispatch(fetchCashflows());
       } catch (error) {
         console.error('Error initializing app:', error);
+        // Continue gracefully even if initialization fails
+        // This ensures the app doesn't crash during startup
+        console.warn('App initialization encountered errors but will continue to function');
       }
     };
 

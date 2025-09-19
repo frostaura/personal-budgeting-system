@@ -33,7 +33,9 @@ export class DataService {
       localStorage.setItem(this.getStorageKey(key), JSON.stringify(value));
     } catch (error) {
       console.error(`Error writing to localStorage:`, error);
-      throw new Error('Failed to save data');
+      // Instead of throwing an error that crashes the app, 
+      // log the error and continue gracefully
+      console.warn('Data could not be saved to localStorage. The app will continue but changes may not persist.');
     }
   }
 
