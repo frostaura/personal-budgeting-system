@@ -204,6 +204,7 @@ const DashboardPage: React.FC = () => {
           account &&
           account.kind !== 'income' &&
           cf.recurrence.frequency === 'monthly' &&
+          cf.description &&
           !cf.description.toLowerCase().includes('tax') &&
           !cf.description.toLowerCase().includes('investment')
         );
@@ -218,6 +219,7 @@ const DashboardPage: React.FC = () => {
           account &&
           account.kind !== 'income' &&
           cf.recurrence.frequency === 'monthly' &&
+          cf.description &&
           cf.description.toLowerCase().includes('tax')
         );
       })
@@ -226,12 +228,12 @@ const DashboardPage: React.FC = () => {
     // Calculate investments (accounts with positive balance and interest rate)
     const investments = accounts
       .filter(account => 
-        account.kind === 'asset' && 
-        account.balanceCents > 0 && 
-        account.interestRate && 
-        account.interestRate > 0
+        account.kind === 'investment' && 
+        (account.openingBalanceCents || 0) > 0 && 
+        account.annualInterestRate && 
+        account.annualInterestRate > 0
       )
-      .reduce((sum, account) => sum + account.balanceCents, 0);
+      .reduce((sum, account) => sum + (account.openingBalanceCents || 0), 0);
 
     const total = regularExpenses + taxExpenses + investments;
     

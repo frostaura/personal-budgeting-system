@@ -36,7 +36,6 @@ export const MainLayout: React.FC = () => {
   return (
     <Box sx={{ 
       display: 'flex', 
-      minHeight: '100vh',
       // Use dynamic viewport height for mobile devices
       minHeight: ['100vh', '100dvh'], // dvh is dynamic viewport height
       '@supports (height: 100dvh)': {

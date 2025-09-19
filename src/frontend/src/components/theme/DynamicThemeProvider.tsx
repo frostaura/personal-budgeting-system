@@ -53,7 +53,6 @@ export const DynamicThemeProvider: React.FC<DynamicThemeProviderProps> = ({ chil
         ...baseThemeToUse.components,
         MuiCssBaseline: {
           styleOverrides: {
-            ...baseThemeToUse.components?.MuiCssBaseline?.styleOverrides,
             '@media (prefers-contrast: high)': {
               '*': {
                 borderColor: settings.theme.contrastMode === 'high' 
