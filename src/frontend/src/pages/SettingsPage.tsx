@@ -20,8 +20,6 @@ import {
 import {
   Settings as SettingsIcon,
   Palette as PaletteIcon,
-  Accessibility as AccessibilityIcon,
-  Notifications as NotificationsIcon,
   Security as SecurityIcon,
   GetApp as ExportIcon,
   Publish as ImportIcon,
@@ -29,8 +27,6 @@ import {
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
   updateTheme,
-  updateAccessibility,
-  updateNotifications,
   updatePrivacy,
   updateAutoSave,
 } from '@/store/slices/settingsSlice';
@@ -47,21 +43,7 @@ const SettingsPage: React.FC = () => {
     dispatch(updateTheme({ [key]: value }));
   };
 
-  const handleAccessibilityChange = (key: string, value: boolean) => {
-    dispatch(updateAccessibility({ [key]: value }));
-  };
 
-  const handleNotificationChange = (key: string, value: boolean) => {
-    if (key === 'enabled') {
-      dispatch(updateNotifications({ enabled: value }));
-    } else {
-      dispatch(
-        updateNotifications({
-          types: { ...settings.notifications.types, [key]: value },
-        })
-      );
-    }
-  };
 
   const handlePrivacyChange = (key: string, value: boolean) => {
     dispatch(updatePrivacy({ [key]: value }));
@@ -190,170 +172,9 @@ const SettingsPage: React.FC = () => {
             </Card>
           </Grid>
 
-          {/* Accessibility Settings */}
-          <Grid item xs={12} md={6}>
-            <Card>
-              <CardContent>
-                <Box display="flex" alignItems="center" mb={2}>
-                  <AccessibilityIcon sx={{ mr: 1 }} />
-                  <Typography variant="h6">Accessibility</Typography>
-                </Box>
 
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={settings.accessibility.reduceMotion}
-                      onChange={e =>
-                        handleAccessibilityChange(
-                          'reduceMotion',
-                          e.target.checked
-                        )
-                      }
-                    />
-                  }
-                  label="Reduce Motion"
-                  sx={{ mb: 1, display: 'block' }}
-                />
 
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={settings.accessibility.highContrast}
-                      onChange={e =>
-                        handleAccessibilityChange(
-                          'highContrast',
-                          e.target.checked
-                        )
-                      }
-                    />
-                  }
-                  label="High Contrast"
-                  sx={{ mb: 1, display: 'block' }}
-                />
 
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={settings.accessibility.screenReaderOptimized}
-                      onChange={e =>
-                        handleAccessibilityChange(
-                          'screenReaderOptimized',
-                          e.target.checked
-                        )
-                      }
-                    />
-                  }
-                  label="Screen Reader Optimized"
-                  sx={{ mb: 1, display: 'block' }}
-                />
-
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={settings.accessibility.keyboardNavigation}
-                      onChange={e =>
-                        handleAccessibilityChange(
-                          'keyboardNavigation',
-                          e.target.checked
-                        )
-                      }
-                    />
-                  }
-                  label="Enhanced Keyboard Navigation"
-                  sx={{ display: 'block' }}
-                />
-              </CardContent>
-            </Card>
-          </Grid>
-
-          {/* Notification Settings */}
-          <Grid item xs={12} md={6}>
-            <Card>
-              <CardContent>
-                <Box display="flex" alignItems="center" mb={2}>
-                  <NotificationsIcon sx={{ mr: 1 }} />
-                  <Typography variant="h6">Notifications</Typography>
-                </Box>
-
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={settings.notifications.enabled}
-                      onChange={e =>
-                        handleNotificationChange('enabled', e.target.checked)
-                      }
-                    />
-                  }
-                  label="Enable Notifications"
-                  sx={{ mb: 2, display: 'block' }}
-                />
-
-                <Divider sx={{ my: 2 }} />
-                <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                  Notification Types
-                </Typography>
-
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={settings.notifications.types.projectionUpdates}
-                      onChange={e =>
-                        handleNotificationChange(
-                          'projectionUpdates',
-                          e.target.checked
-                        )
-                      }
-                      disabled={!settings.notifications.enabled}
-                    />
-                  }
-                  label="Projection Updates"
-                  sx={{ mb: 1, display: 'block' }}
-                />
-
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={settings.notifications.types.errors}
-                      onChange={e =>
-                        handleNotificationChange('errors', e.target.checked)
-                      }
-                      disabled={!settings.notifications.enabled}
-                    />
-                  }
-                  label="Error Messages"
-                  sx={{ mb: 1, display: 'block' }}
-                />
-
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={settings.notifications.types.warnings}
-                      onChange={e =>
-                        handleNotificationChange('warnings', e.target.checked)
-                      }
-                      disabled={!settings.notifications.enabled}
-                    />
-                  }
-                  label="Warnings"
-                  sx={{ mb: 1, display: 'block' }}
-                />
-
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={settings.notifications.types.milestones}
-                      onChange={e =>
-                        handleNotificationChange('milestones', e.target.checked)
-                      }
-                      disabled={!settings.notifications.enabled}
-                    />
-                  }
-                  label="Financial Milestones"
-                  sx={{ display: 'block' }}
-                />
-              </CardContent>
-            </Card>
-          </Grid>
 
           {/* Privacy & Data Settings */}
           <Grid item xs={12} md={6}>

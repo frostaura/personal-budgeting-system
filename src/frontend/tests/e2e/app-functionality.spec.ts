@@ -152,8 +152,6 @@ test.describe('Personal Finance Planner E2E', () => {
 
     // Should show settings sections
     await expect(page.getByText('Appearance')).toBeVisible();
-    await expect(page.getByText('Accessibility')).toBeVisible();
-    await expect(page.getByText('Notifications')).toBeVisible();
     await expect(page.getByText('Privacy & Data')).toBeVisible();
 
     // Test toggle a setting
