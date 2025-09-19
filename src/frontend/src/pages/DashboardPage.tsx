@@ -29,20 +29,12 @@ import {
 } from 'recharts';
 import { formatCurrency, sumCents } from '@/utils/currency';
 import { useAppSelector } from '@/store/hooks';
-import {
-  OnboardingTooltip,
-  OnboardingStep,
-} from '@/components/common/OnboardingTooltip';
-import { useOnboarding } from '@/hooks/useOnboarding';
 import { useResponsiveCharts } from '@/hooks/useResponsiveCharts';
 import { projectionEngine } from '@/services/projectionEngine';
 
 const DashboardPage: React.FC = () => {
   const { accounts } = useAppSelector(state => state.accounts);
   const { cashflows } = useAppSelector(state => state.cashflows);
-  const disclaimerAccepted = useAppSelector(
-    state => state.settings.disclaimerAccepted
-  );
   const chartStyles = useResponsiveCharts();
   
   // Load projection years from localStorage or default to 5 years
@@ -56,80 +48,6 @@ const DashboardPage: React.FC = () => {
     setProjectionYears(value);
     localStorage.setItem('dashboardProjectionYears', value.toString());
   };
-
-  // Onboarding setup
-  const { isOnboardingOpen, completeOnboarding, skipOnboarding } =
-    useOnboarding({
-      storageKey: 'dashboard-onboarding-completed',
-      autoStart: true,
-      delay: 1500,
-      prerequisitesMet: disclaimerAccepted,
-    });
-
-  const onboardingSteps: OnboardingStep[] = [
-    {
-      id: 'welcome',
-      target: '[data-onboarding="dashboard-title"]',
-      title: 'Welcome to Your Financial Dashboard! 🎉',
-      description:
-        'This is your financial command center. Here you can see a complete overview of your financial health including net worth, savings, and cash flow.',
-      placement: 'bottom',
-    },
-    {
-      id: 'wealth-projection',
-      target: '[data-onboarding="wealth-projection"]',
-      title: 'Wealth Projection Chart',
-      description:
-        'This chart shows your projected net worth over time based on your current savings rate and growth assumptions. Use the slider to adjust the time horizon.',
-      placement: 'bottom',
-    },
-    {
-      id: 'net-worth',
-      target: '[data-onboarding="net-worth-card"]',
-      title: 'Your Net Worth',
-      description:
-        "This shows your total assets minus liabilities. It's the most important number for tracking your overall financial progress over time.",
-      placement: 'bottom',
-    },
-    {
-      id: 'savings-rate',
-      target: '[data-onboarding="savings-rate-card"]',
-      title: 'Savings Rate',
-      description:
-        'Your savings rate is the percentage of income you save each month. Aim for 10-20% for good financial health!',
-      placement: 'bottom',
-    },
-    {
-      id: 'account-summary',
-      target: '[data-onboarding="account-summary"]',
-      title: 'Account Summary',
-      description:
-        'Track your assets and liabilities here. Add accounts through the "Accounts" page to see your complete financial picture.',
-      placement: 'top',
-    },
-    {
-      id: 'cashflow-summary',
-      target: '[data-onboarding="cashflow-summary"]',
-      title: 'Cash Flow Analysis',
-      description:
-        "See your monthly income vs expenses. Positive cash flow means you're saving money each month!",
-      placement: 'top',
-    },
-    {
-      id: 'navigation',
-      target: '[data-onboarding="sidebar-accounts"]',
-      title: 'Ready to Get Started?',
-      description:
-        'Click on "Accounts" in the sidebar to add your bank accounts, investments, and loans. Then add your income and expenses in "Cash Flows".',
-      placement: 'right',
-      action: {
-        label: 'Go to Accounts',
-        onClick: () => {
-          window.location.hash = '/accounts';
-        },
-      },
-    },
-  ];
 
   // Calculate real financial metrics
   const financialMetrics = useMemo(() => {
@@ -394,7 +312,6 @@ const DashboardPage: React.FC = () => {
           variant="h4"
           gutterBottom
           sx={{ fontWeight: 600 }}
-          data-onboarding="dashboard-title"
         >
           Financial Dashboard
         </Typography>
@@ -412,7 +329,7 @@ const DashboardPage: React.FC = () => {
         </Alert>
 
         {/* Wealth Projection Chart */}
-        <Card sx={{ mb: 4 }} data-onboarding="wealth-projection">
+        <Card sx={{ mb: 4 }}>
           <CardContent>
             <Box
               sx={{
@@ -510,15 +427,13 @@ const DashboardPage: React.FC = () => {
 
         <Grid container spacing={3} sx={{ mb: 4 }}>
           <Grid item xs={12} sm={6} md={4}>
-            <div data-onboarding="net-worth-card">
-              <StatCard
-                title="Net Worth"
-                value={formatCurrency(financialMetrics.netWorth)}
-                icon={<TrendingUpOutlined sx={{ color: 'inherit' }} />}
-                trend={0.047}
+            <StatCard
+              title="Net Worth"
+              value={formatCurrency(financialMetrics.netWorth)}
+              icon={<TrendingUpOutlined sx={{ color: 'inherit' }} />}
+              trend={0.047}
                 color="primary"
               />
-            </div>
           </Grid>
 
           <Grid item xs={12} sm={6} md={4}>
@@ -552,15 +467,13 @@ const DashboardPage: React.FC = () => {
           </Grid>
 
           <Grid item xs={12} sm={6} md={6}>
-            <div data-onboarding="savings-rate-card">
-              <StatCard
-                title="Savings Rate"
-                value={`${(financialMetrics.savingsRate * 100).toFixed(1)}%`}
-                icon={<PieChartOutlined sx={{ color: 'inherit' }} />}
-                trend={0.034}
-                color="warning"
-              />
-            </div>
+            <StatCard
+              title="Savings Rate"
+              value={`${(financialMetrics.savingsRate * 100).toFixed(1)}%`}
+              icon={<PieChartOutlined sx={{ color: 'inherit' }} />}
+              trend={0.034}
+              color="warning"
+            />
           </Grid>
         </Grid>
 
@@ -639,7 +552,7 @@ const DashboardPage: React.FC = () => {
 
         <Grid container spacing={3}>
           <Grid item xs={12} md={6}>
-            <Card data-onboarding="account-summary">
+            <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
                   Account Summary
@@ -686,7 +599,7 @@ const DashboardPage: React.FC = () => {
           </Grid>
 
           <Grid item xs={12} md={6}>
-            <Card data-onboarding="cashflow-summary">
+            <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
                   Cash Flow Summary
@@ -755,15 +668,6 @@ const DashboardPage: React.FC = () => {
           </Grid>
         </Grid>
       </Box>
-
-      {/* Onboarding System */}
-      <OnboardingTooltip
-        steps={onboardingSteps}
-        isOpen={isOnboardingOpen}
-        onComplete={completeOnboarding}
-        onSkip={skipOnboarding}
-        storageKey="dashboard-onboarding-completed"
-      />
     </Box>
   );
 };
