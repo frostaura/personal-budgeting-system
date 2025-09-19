@@ -6,10 +6,6 @@ import {
   CardContent,
   Grid,
   Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   TextField,
   Select,
   MenuItem,
@@ -34,6 +30,7 @@ import {
   useTheme,
   useMediaQuery,
 } from '@mui/material';
+import { BottomSheetModal } from '@/components/common';
 import {
   Add as AddIcon,
   Edit as EditIcon,
@@ -215,21 +212,22 @@ const ScenariosPage: React.FC = () => {
   };
 
   const scenarioFormDialog = (
-    <Dialog
+    <BottomSheetModal
       open={isCreateDialogOpen || editingScenario !== null}
       onClose={() => {
         setIsCreateDialogOpen(false);
         setEditingScenario(null);
         resetForm();
       }}
-      maxWidth="md"
-      fullWidth
+      title={editingScenario ? 'Edit Scenario' : 'Create New Scenario'}
+      actionLabel={editingScenario ? 'Update' : 'Create'}
+      onAction={
+        editingScenario ? handleUpdateScenario : handleCreateScenario
+      }
+      actionDisabled={!formData.name}
+      maxWidth={800}
     >
-      <DialogTitle>
-        {editingScenario ? 'Edit Scenario' : 'Create New Scenario'}
-      </DialogTitle>
-      <DialogContent>
-        <Grid container spacing={3} sx={{ mt: 1 }}>
+      <Grid container spacing={3}>
           {/* Quick Start Templates */}
           {scenarios.length === 1 && !editingScenario && (
             <Grid item xs={12}>
@@ -445,28 +443,7 @@ const ScenariosPage: React.FC = () => {
             />
           </Grid>
         </Grid>
-      </DialogContent>
-      <DialogActions>
-        <Button
-          onClick={() => {
-            setIsCreateDialogOpen(false);
-            setEditingScenario(null);
-            resetForm();
-          }}
-        >
-          Cancel
-        </Button>
-        <Button
-          variant="contained"
-          onClick={
-            editingScenario ? handleUpdateScenario : handleCreateScenario
-          }
-          disabled={!formData.name}
-        >
-          {editingScenario ? 'Update' : 'Create'} Scenario
-        </Button>
-      </DialogActions>
-    </Dialog>
+      </BottomSheetModal>
   );
 
   return (

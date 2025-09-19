@@ -5,10 +5,6 @@ import {
   Card,
   CardContent,
   Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   TextField,
   Select,
   MenuItem,
@@ -30,6 +26,7 @@ import {
   useTheme,
   useMediaQuery,
 } from '@mui/material';
+import { BottomSheetModal } from '@/components/common';
 import {
   Add as AddIcon,
   Edit as EditIcon,
@@ -430,18 +427,21 @@ const CashflowsPage: React.FC = () => {
         </Grid>
       </Box>
 
-      {/* Add/Edit Cashflow Dialog */}
-      <Dialog
+      {/* Add/Edit Cashflow Modal */}
+      <BottomSheetModal
         open={dialogOpen}
         onClose={handleCloseDialog}
-        maxWidth="md"
-        fullWidth
+        title={editingCashflow ? 'Edit Cash Flow' : 'Add New Cash Flow'}
+        actionLabel={editingCashflow ? 'Update' : 'Create'}
+        onAction={handleSaveCashflow}
+        actionDisabled={
+          !formData.accountId ||
+          !formData.description.trim() ||
+          !formData.amount
+        }
+        maxWidth={800}
       >
-        <DialogTitle>
-          {editingCashflow ? 'Edit Cash Flow' : 'Add New Cash Flow'}
-        </DialogTitle>
-        <DialogContent>
-          <Grid container spacing={2} sx={{ mt: 1 }}>
+        <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
               <FormControl fullWidth required>
                 <InputLabel>Account</InputLabel>
@@ -605,46 +605,23 @@ const CashflowsPage: React.FC = () => {
               />
             </Grid>
           </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog}>Cancel</Button>
-          <Button
-            onClick={handleSaveCashflow}
-            variant="contained"
-            disabled={
-              !formData.accountId ||
-              !formData.description.trim() ||
-              !formData.amount
-            }
-          >
-            {editingCashflow ? 'Update' : 'Create'}
-          </Button>
-        </DialogActions>
-      </Dialog>
+        </BottomSheetModal>
 
-      {/* Delete Confirmation Dialog */}
-      <Dialog
+      {/* Delete Confirmation Modal */}
+      <BottomSheetModal
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
+        title="Delete Cash Flow"
+        actionLabel="Delete"
+        onAction={handleDeleteCashflow}
+        actionColor="error"
+        maxWidth={500}
       >
-        <DialogTitle>Delete Cash Flow</DialogTitle>
-        <DialogContent>
-          <Typography>
-            Are you sure you want to delete this cash flow? This action cannot
-            be undone.
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
-          <Button
-            onClick={handleDeleteCashflow}
-            color="error"
-            variant="contained"
-          >
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
+        <Typography>
+          Are you sure you want to delete this cash flow? This action cannot
+          be undone.
+        </Typography>
+      </BottomSheetModal>
     </Box>
   );
 };
