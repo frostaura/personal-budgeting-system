@@ -53,8 +53,29 @@ export const OnboardingTooltip: React.FC<OnboardingTooltipProps> = ({
   const isLastStep = currentStep === steps.length - 1;
   const isFirstStep = currentStep === 0;
 
+  // Cleanup function to remove all onboarding-related elements and styles
+  const cleanupOnboarding = () => {
+    // Remove any remaining onboarding backdrops
+    const backdrops = document.querySelectorAll('.onboarding-backdrop');
+    backdrops.forEach(backdrop => backdrop.remove());
+
+    // Remove highlight styles from all elements
+    const highlightedElements = document.querySelectorAll('.onboarding-highlight');
+    highlightedElements.forEach(element => {
+      element.classList.remove('onboarding-highlight');
+      const htmlElement = element as HTMLElement;
+      htmlElement.style.position = '';
+      htmlElement.style.zIndex = '';
+      htmlElement.style.pointerEvents = '';
+    });
+  };
+
   useEffect(() => {
-    if (!isOpen || !step) return;
+    if (!isOpen || !step) {
+      // Cleanup when onboarding is closed or no step
+      cleanupOnboarding();
+      return;
+    }
 
     const target = document.querySelector(step.target) as HTMLElement;
     if (target) {
@@ -84,6 +105,13 @@ export const OnboardingTooltip: React.FC<OnboardingTooltipProps> = ({
     };
   }, [step, isOpen, currentStep]);
 
+  // Cleanup on component unmount to prevent lingering overlays
+  useEffect(() => {
+    return () => {
+      cleanupOnboarding();
+    };
+  }, []);
+
   const handleNext = () => {
     if (step?.action) {
       step.action.onClick();
@@ -101,6 +129,7 @@ export const OnboardingTooltip: React.FC<OnboardingTooltipProps> = ({
   };
 
   const handleComplete = () => {
+    cleanupOnboarding();
     if (storageKey) {
       localStorage.setItem(storageKey, 'true');
     }
@@ -108,6 +137,7 @@ export const OnboardingTooltip: React.FC<OnboardingTooltipProps> = ({
   };
 
   const handleSkip = () => {
+    cleanupOnboarding();
     if (storageKey) {
       localStorage.setItem(storageKey, 'true');
     }
