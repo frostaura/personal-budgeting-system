@@ -70,7 +70,8 @@ export const OnboardingTooltip: React.FC<OnboardingTooltipProps> = ({
       // Add highlight class
       target.classList.add('onboarding-highlight');
       target.style.position = 'relative';
-      target.style.zIndex = '1301'; // Above backdrop
+      target.style.zIndex = '1301'; // Above backdrop (1300)
+      target.style.pointerEvents = 'auto'; // Ensure highlighted element can be clicked
     }
 
     return () => {
@@ -78,6 +79,7 @@ export const OnboardingTooltip: React.FC<OnboardingTooltipProps> = ({
         target.classList.remove('onboarding-highlight');
         target.style.position = '';
         target.style.zIndex = '';
+        target.style.pointerEvents = '';
       }
     };
   }, [step, isOpen, currentStep]);
@@ -135,10 +137,11 @@ export const OnboardingTooltip: React.FC<OnboardingTooltipProps> = ({
           bottom: 0 !important;
           background-color: rgba(0, 0, 0, 0.7) !important;
           z-index: 1300 !important;
+          pointer-events: none !important;
         }
       `}</style>
 
-      {/* Backdrop to dim other elements */}
+      {/* Backdrop to dim other elements - allow pointer events to pass through */}
       <Backdrop
         open={isOpen}
         className="onboarding-backdrop"
@@ -150,9 +153,11 @@ export const OnboardingTooltip: React.FC<OnboardingTooltipProps> = ({
           right: 0,
           bottom: 0,
           backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          pointerEvents: 'none', // Allow clicks to pass through
           '& .MuiBackdrop-root': {
             position: 'fixed',
             backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            pointerEvents: 'none', // Allow clicks to pass through
           },
         }}
       />
