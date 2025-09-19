@@ -320,13 +320,16 @@ const CashflowsPage: React.FC = () => {
                       {getCashflowDescription(direction)}
                     </Typography>
 
-                    <List dense>
+                    <List>
                       {directionCashflows.map(cashflow => (
                         <ListItem
                           key={cashflow.id}
                           sx={{
                             cursor: 'pointer',
                             borderRadius: 1,
+                            py: 2,
+                            px: 2,
+                            mb: 1,
                             '&:hover': { backgroundColor: 'action.hover' },
                             backgroundColor:
                               selectedCashflowId === cashflow.id
@@ -347,18 +350,33 @@ const CashflowsPage: React.FC = () => {
                             </Avatar>
                           </ListItemAvatar>
                           <ListItemText
+                            sx={{
+                              '& .MuiListItemText-primary': {
+                                textAlign: 'left',
+                                marginBottom: 0.5,
+                              },
+                              '& .MuiListItemText-secondary': {
+                                textAlign: 'left',
+                              },
+                            }}
                             primary={
                               cashflow.description || 'Unnamed Cash Flow'
                             }
                             secondary={
-                              <Box>
+                              <Box sx={{ textAlign: 'left' }}>
                                 <Typography
                                   variant="body2"
                                   color="text.secondary"
+                                  sx={{ textAlign: 'left', mb: 0.5 }}
                                 >
                                   {getAccountName(cashflow.accountId)}
                                 </Typography>
-                                <Box display="flex" alignItems="center" gap={1}>
+                                <Box 
+                                  display="flex" 
+                                  alignItems="center" 
+                                  gap={1}
+                                  sx={{ justifyContent: 'flex-start' }}
+                                >
                                   <Typography
                                     variant="body2"
                                     sx={{ fontWeight: 600 }}
