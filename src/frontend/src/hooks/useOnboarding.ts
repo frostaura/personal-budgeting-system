@@ -17,16 +17,21 @@ export const useOnboarding = ({
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
 
   useEffect(() => {
-    const completed = localStorage.getItem(storageKey) === 'true';
-    setHasCompletedOnboarding(completed);
+    try {
+      const completed = localStorage.getItem(storageKey) === 'true';
+      setHasCompletedOnboarding(completed);
 
-    if (!completed && autoStart && prerequisitesMet) {
-      // Delay the start to ensure all elements are rendered
-      const timer = setTimeout(() => {
-        setIsOnboardingOpen(true);
-      }, delay);
+      if (!completed && autoStart && prerequisitesMet) {
+        // Delay the start to ensure all elements are rendered
+        const timer = setTimeout(() => {
+          setIsOnboardingOpen(true);
+        }, delay);
 
-      return () => clearTimeout(timer);
+        return () => clearTimeout(timer);
+      }
+    } catch (error) {
+      console.error('Error initializing onboarding:', error);
+      setHasCompletedOnboarding(false);
     }
 
     // Return empty cleanup function when no timer is set
@@ -40,18 +45,31 @@ export const useOnboarding = ({
   const completeOnboarding = () => {
     setIsOnboardingOpen(false);
     setHasCompletedOnboarding(true);
-    localStorage.setItem(storageKey, 'true');
+    try {
+      localStorage.setItem(storageKey, 'true');
+    } catch (error) {
+      console.error('Error saving onboarding completion to localStorage:', error);
+    }
   };
 
   const skipOnboarding = () => {
     setIsOnboardingOpen(false);
     setHasCompletedOnboarding(true);
-    localStorage.setItem(storageKey, 'true');
+    try {
+      localStorage.setItem(storageKey, 'true');
+    } catch (error) {
+      console.error('Error saving onboarding skip to localStorage:', error);
+    }
   };
 
   const resetOnboarding = () => {
-    localStorage.removeItem(storageKey);
-    setHasCompletedOnboarding(false);
+    try {
+      localStorage.removeItem(storageKey);
+      setHasCompletedOnboarding(false);
+    } catch (error) {
+      console.error('Error removing onboarding from localStorage:', error);
+      setHasCompletedOnboarding(false);
+    }
   };
 
   return {
