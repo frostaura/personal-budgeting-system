@@ -3,15 +3,6 @@ import { test, expect } from '@playwright/test';
 test.describe('Personal Finance Planner E2E', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-
-    // Dismiss disclaimer dialog
-    await page
-      .getByRole('checkbox', { name: 'I understand that this' })
-      .click();
-    await page
-      .getByRole('checkbox', { name: 'I understand that my data is' })
-      .click();
-    await page.getByRole('button', { name: 'I Understand & Continue' }).click();
   });
 
   test('should navigate between all main pages', async ({ page }) => {

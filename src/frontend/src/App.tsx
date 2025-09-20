@@ -9,7 +9,7 @@ import { store, persistor } from '@/store';
 import { AppRouter } from '@/components/routing/AppRouter';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { LoadingScreen } from '@/components/common/LoadingScreen';
-import { DisclaimerDialog } from '@/components/common/DisclaimerDialog';
+
 import { AppInitializer } from '@/components/common/AppInitializer';
 import { DynamicThemeProvider } from '@/components/theme/DynamicThemeProvider';
 import { OfflineIndicator } from '@/components/common/OfflineIndicator';
@@ -24,7 +24,6 @@ function App() {
             <HashRouter>
               <AppInitializer>
                 <AppRouter />
-                <DisclaimerDialog />
                 <OfflineIndicator />
                 <ToastContainer
                   position="top-right"

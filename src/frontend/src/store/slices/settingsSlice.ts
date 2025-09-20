@@ -5,7 +5,6 @@ import { DEFAULT_CURRENCY_SETTINGS } from '@/utils/currency';
 interface SettingsState {
   currency: CurrencySettings;
   taxSettings: TaxPresetZA | null;
-  disclaimerAccepted: boolean;
   autoSave: boolean;
   saveInterval: number; // minutes
   theme: {
@@ -59,7 +58,6 @@ const initialState: SettingsState = {
       additionalDependents: 24700, // R247
     },
   },
-  disclaimerAccepted: false,
   autoSave: true,
   saveInterval: 5, // 5 minutes
   theme: {
@@ -104,9 +102,6 @@ const settingsSlice = createSlice({
     updateTaxSettings: (state, action: PayloadAction<TaxPresetZA>) => {
       state.taxSettings = action.payload;
     },
-    acceptDisclaimer: state => {
-      state.disclaimerAccepted = true;
-    },
     updateAutoSave: (
       state,
       action: PayloadAction<{ enabled: boolean; interval?: number }>
@@ -147,7 +142,6 @@ const settingsSlice = createSlice({
 export const {
   updateCurrencySettings,
   updateTaxSettings,
-  acceptDisclaimer,
   updateAutoSave,
   updateTheme,
   updateAccessibility,
