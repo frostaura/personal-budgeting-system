@@ -81,6 +81,8 @@ export type Cashflow = {
     sourceId: string; // ID of the cashflow or account to calculate percentage from
     percentage: number; // e.g., 0.17 for 17%
   };
+  // For transfers between accounts (e.g., debt payments, account-to-account transfers)
+  targetAccountId?: string; // When specified, this cashflow moves money from accountId to targetAccountId
 };
 
 export type Scenario = {
@@ -128,6 +130,23 @@ export type MonthlyProjection = {
   totalIncome: Cents;
   totalExpenses: Cents;
   savingsRate: number; // percentage
+  // Track accounts that were paid off this month
+  accountsPayoffEvents?: Array<{
+    accountId: string;
+    accountName: string;
+    finalBalance: Cents; // Should be close to 0
+  }>;
+};
+
+// Payoff projection for liability accounts
+export type PayoffProjection = {
+  accountId: string;
+  accountName: string;
+  currentBalance: Cents; // negative for liabilities
+  projectedPayoffMonth: string; // ISO YYYY-MM
+  monthsToPayoff: number;
+  totalInterestToPay: Cents;
+  totalPayments: Cents;
 };
 
 export type ProjectionResult = {
@@ -139,6 +158,8 @@ export type ProjectionResult = {
     averageSavingsRate: number;
     projectionDate: string; // ISO timestamp
   };
+  // Payoff projections for liability accounts
+  payoffProjections?: PayoffProjection[];
 };
 
 // Audit trail for deterministic projections

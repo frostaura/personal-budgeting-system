@@ -81,10 +81,11 @@ const CashflowsPage: React.FC = () => {
     hasEndDate: false,
     annualIndexation: '',
     // Calculation type and related fields
-    calculationType: 'fixed' as 'fixed' | 'percentage-income' | 'percentage-account',
+    calculationType: 'fixed' as 'fixed' | 'percentage-income' | 'percentage-account' | 'transfer',
     sourceCashflowId: '',
     sourceAccountId: '',
     percentage: '',
+    targetAccountId: '',
   });
 
   useEffect(() => {
@@ -109,14 +110,17 @@ const CashflowsPage: React.FC = () => {
           ? (cashflow.recurrence.annualIndexationPct * 100).toString()
           : '',
         // Calculation type fields
-        calculationType: cashflow.percentageOf 
-          ? (cashflow.percentageOf.sourceType === 'cashflow' ? 'percentage-income' : 'percentage-account')
-          : 'fixed',
+        calculationType: cashflow.targetAccountId 
+          ? 'transfer'
+          : cashflow.percentageOf 
+            ? (cashflow.percentageOf.sourceType === 'cashflow' ? 'percentage-income' : 'percentage-account')
+            : 'fixed',
         sourceCashflowId: cashflow.percentageOf?.sourceType === 'cashflow' ? cashflow.percentageOf.sourceId : '',
         sourceAccountId: cashflow.percentageOf?.sourceType === 'account' ? cashflow.percentageOf.sourceId : '',
         percentage: cashflow.percentageOf?.percentage
           ? (cashflow.percentageOf.percentage * 100).toString()
           : '',
+        targetAccountId: cashflow.targetAccountId || '',
       });
     } else {
       setEditingCashflow(null);
@@ -132,10 +136,11 @@ const CashflowsPage: React.FC = () => {
         hasEndDate: false,
         annualIndexation: '',
         // Reset calculation fields
-        calculationType: 'fixed' as 'fixed' | 'percentage-income' | 'percentage-account',
+        calculationType: 'fixed' as 'fixed' | 'percentage-income' | 'percentage-account' | 'transfer',
         sourceCashflowId: '',
         sourceAccountId: '',
         percentage: '',
+        targetAccountId: '',
       });
     }
     setDialogOpen(true);
@@ -196,6 +201,26 @@ const CashflowsPage: React.FC = () => {
           sourceId: formData.sourceAccountId,
           percentage: parseFloat(formData.percentage) / 100,
         };
+      } else if (formData.calculationType === 'transfer' && formData.percentage) {
+        // Transfer with percentage calculation
+        if (formData.sourceCashflowId) {
+          cashflow.percentageOf = {
+            sourceType: 'cashflow',
+            sourceId: formData.sourceCashflowId,
+            percentage: parseFloat(formData.percentage) / 100,
+          };
+        } else if (formData.sourceAccountId) {
+          cashflow.percentageOf = {
+            sourceType: 'account',
+            sourceId: formData.sourceAccountId,
+            percentage: parseFloat(formData.percentage) / 100,
+          };
+        }
+      }
+
+      // Add transfer target if enabled
+      if (formData.calculationType === 'transfer' && formData.targetAccountId) {
+        cashflow.targetAccountId = formData.targetAccountId;
       }
 
       if (editingCashflow) {
@@ -503,7 +528,12 @@ const CashflowsPage: React.FC = () => {
           !formData.description.trim() ||
           (formData.calculationType === 'fixed' && !formData.amount) ||
           (formData.calculationType === 'percentage-income' && (!formData.sourceCashflowId || !formData.percentage)) ||
-          (formData.calculationType === 'percentage-account' && (!formData.sourceAccountId || !formData.percentage))
+          (formData.calculationType === 'percentage-account' && (!formData.sourceAccountId || !formData.percentage)) ||
+          (formData.calculationType === 'transfer' && (
+            !formData.targetAccountId || 
+            ((!formData.amount && !formData.percentage) || 
+             (!!formData.percentage && !formData.sourceAccountId && !formData.sourceCashflowId))
+          ))
         }
         maxWidth={800}
       >
@@ -573,7 +603,7 @@ const CashflowsPage: React.FC = () => {
                 <RadioGroup
                   value={formData.calculationType}
                   onChange={e =>
-                    setFormData({ ...formData, calculationType: e.target.value as 'fixed' | 'percentage-income' | 'percentage-account' })
+                    setFormData({ ...formData, calculationType: e.target.value as 'fixed' | 'percentage-income' | 'percentage-account' | 'transfer' })
                   }
                   row
                 >
@@ -591,6 +621,11 @@ const CashflowsPage: React.FC = () => {
                     value="percentage-account" 
                     control={<Radio />} 
                     label="% of Account Balance" 
+                  />
+                  <FormControlLabel 
+                    value="transfer" 
+                    control={<Radio />} 
+                    label="Transfer to Account" 
                   />
                 </RadioGroup>
               </FormControl>
@@ -693,6 +728,155 @@ const CashflowsPage: React.FC = () => {
                     required
                   />
                 </Grid>
+              </>
+            )}
+            
+            {/* Transfer Fields */}
+            {formData.calculationType === 'transfer' && (
+              <>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Transfer Amount"
+                    type="number"
+                    value={formData.amount}
+                    onChange={e =>
+                      setFormData({ ...formData, amount: e.target.value })
+                    }
+                    required
+                    helperText="Amount to transfer from source to target account"
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <FormControl fullWidth required>
+                    <InputLabel>Target Account</InputLabel>
+                    <Select
+                      value={formData.targetAccountId}
+                      onChange={e =>
+                        setFormData({ ...formData, targetAccountId: e.target.value })
+                      }
+                      label="Target Account"
+                    >
+                      {accounts
+                        .filter(acc => acc.id !== formData.accountId)
+                        .map(account => (
+                          <MenuItem key={account.id} value={account.id}>
+                            {account.icon} {account.name} ({account.kind})
+                          </MenuItem>
+                        ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                
+                <Grid item xs={12}>
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={!!formData.sourceAccountId || !!formData.sourceCashflowId}
+                        onChange={e => {
+                          if (!e.target.checked) {
+                            setFormData({ 
+                              ...formData, 
+                              sourceAccountId: '', 
+                              sourceCashflowId: '', 
+                              percentage: '' 
+                            });
+                          }
+                        }}
+                      />
+                    }
+                    label="Calculate amount as percentage of account balance or income"
+                  />
+                </Grid>
+                
+                {/* Percentage fields for transfers */}
+                {(formData.sourceAccountId || formData.sourceCashflowId) && (
+                  <>
+                    <Grid item xs={12} sm={6}>
+                      <FormControl fullWidth>
+                        <InputLabel>Percentage Source</InputLabel>
+                        <Select
+                          value={formData.sourceAccountId ? 'account' : 'income'}
+                          onChange={e => {
+                            if (e.target.value === 'account') {
+                              setFormData({ ...formData, sourceCashflowId: '' });
+                            } else {
+                              setFormData({ ...formData, sourceAccountId: '' });
+                            }
+                          }}
+                          label="Percentage Source"
+                        >
+                          <MenuItem value="account">Account Balance</MenuItem>
+                          <MenuItem value="income">Income Cashflow</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    
+                    {formData.sourceAccountId === '' && (
+                      <Grid item xs={12} sm={6}>
+                        <FormControl fullWidth>
+                          <InputLabel>Source Income Cash Flow</InputLabel>
+                          <Select
+                            value={formData.sourceCashflowId}
+                            onChange={e =>
+                              setFormData({ ...formData, sourceCashflowId: e.target.value })
+                            }
+                            label="Source Income Cash Flow"
+                          >
+                            {cashflows
+                              .filter(cf => {
+                                const account = accounts.find(acc => acc.id === cf.accountId);
+                                return account && account.kind === 'income';
+                              })
+                              .map(cf => (
+                                <MenuItem key={cf.id} value={cf.id}>
+                                  {cf.icon} {cf.description} ({formatCurrency(cf.amountCents)})
+                                </MenuItem>
+                              ))}
+                          </Select>
+                        </FormControl>
+                      </Grid>
+                    )}
+                    
+                    {formData.sourceCashflowId === '' && (
+                      <Grid item xs={12} sm={6}>
+                        <FormControl fullWidth>
+                          <InputLabel>Source Account</InputLabel>
+                          <Select
+                            value={formData.sourceAccountId}
+                            onChange={e =>
+                              setFormData({ ...formData, sourceAccountId: e.target.value })
+                            }
+                            label="Source Account"
+                          >
+                            {accounts
+                              .filter(acc => acc.kind === 'liability' || acc.kind === 'investment' || acc.kind === 'reserve')
+                              .map(account => (
+                                <MenuItem key={account.id} value={account.id}>
+                                  {account.icon} {account.name} ({account.kind})
+                                </MenuItem>
+                              ))}
+                          </Select>
+                        </FormControl>
+                      </Grid>
+                    )}
+                    
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        fullWidth
+                        label="Percentage (%)"
+                        type="number"
+                        value={formData.percentage}
+                        onChange={e =>
+                          setFormData({ ...formData, percentage: e.target.value })
+                        }
+                        inputProps={{ min: 0, max: 100, step: 0.1 }}
+                        helperText="Percentage to transfer (e.g., 10 for 10%)"
+                        required
+                      />
+                    </Grid>
+                  </>
+                )}
               </>
             )}
             <Grid item xs={12} sm={6}>

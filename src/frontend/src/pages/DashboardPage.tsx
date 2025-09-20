@@ -249,6 +249,31 @@ const DashboardPage: React.FC = () => {
     financialMetrics.netWorth,
   ]);
 
+  // Calculate payoff projections for liability accounts
+  const payoffProjectionsData = useMemo(() => {
+    if (accounts.length === 0 || cashflows.length === 0) {
+      return [];
+    }
+
+    try {
+      const monthsToProject = projectionYears * 12;
+      const projectionResults = projectionEngine.projectFinances(
+        accounts,
+        cashflows,
+        monthsToProject
+      );
+
+      return projectionResults.payoffProjections || [];
+    } catch (error) {
+      console.error('Error calculating payoff projections:', error);
+      return [];
+    }
+  }, [
+    accounts,
+    cashflows,
+    projectionYears,
+  ]);
+
   const StatCard: React.FC<{
     title: string;
     value: string;
@@ -666,6 +691,164 @@ const DashboardPage: React.FC = () => {
               </CardContent>
             </Card>
           </Grid>
+
+          {/* Liability Payoff Projections */}
+          {payoffProjectionsData.length > 0 && (
+            <Grid item xs={12}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>
+                    Debt Payoff Projections
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                    Projected payoff dates for your liability accounts based on current payment schedules
+                  </Typography>
+                  
+                  <Box sx={{ overflowX: 'auto' }}>
+                    <Box component="table" sx={{ width: '100%', borderCollapse: 'collapse' }}>
+                      <Box component="thead">
+                        <Box component="tr">
+                          <Box 
+                            component="th" 
+                            sx={{ 
+                              textAlign: 'left', 
+                              p: 2, 
+                              borderBottom: 1, 
+                              borderColor: 'divider',
+                              fontWeight: 600 
+                            }}
+                          >
+                            Account
+                          </Box>
+                          <Box 
+                            component="th" 
+                            sx={{ 
+                              textAlign: 'right', 
+                              p: 2, 
+                              borderBottom: 1, 
+                              borderColor: 'divider',
+                              fontWeight: 600 
+                            }}
+                          >
+                            Current Balance
+                          </Box>
+                          <Box 
+                            component="th" 
+                            sx={{ 
+                              textAlign: 'center', 
+                              p: 2, 
+                              borderBottom: 1, 
+                              borderColor: 'divider',
+                              fontWeight: 600 
+                            }}
+                          >
+                            Payoff Date
+                          </Box>
+                          <Box 
+                            component="th" 
+                            sx={{ 
+                              textAlign: 'center', 
+                              p: 2, 
+                              borderBottom: 1, 
+                              borderColor: 'divider',
+                              fontWeight: 600 
+                            }}
+                          >
+                            Months to Payoff
+                          </Box>
+                          <Box 
+                            component="th" 
+                            sx={{ 
+                              textAlign: 'right', 
+                              p: 2, 
+                              borderBottom: 1, 
+                              borderColor: 'divider',
+                              fontWeight: 600 
+                            }}
+                          >
+                            Total Interest
+                          </Box>
+                        </Box>
+                      </Box>
+                      <Box component="tbody">
+                        {payoffProjectionsData.map((projection) => (
+                          <Box component="tr" key={projection.accountId}>
+                            <Box 
+                              component="td" 
+                              sx={{ 
+                                p: 2, 
+                                borderBottom: 1, 
+                                borderColor: 'divider' 
+                              }}
+                            >
+                              <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                                {projection.accountName}
+                              </Typography>
+                            </Box>
+                            <Box 
+                              component="td" 
+                              sx={{ 
+                                p: 2, 
+                                borderBottom: 1, 
+                                borderColor: 'divider',
+                                textAlign: 'right' 
+                              }}
+                            >
+                              <Typography variant="body2" color="error.main">
+                                {formatCurrency(projection.currentBalance)}
+                              </Typography>
+                            </Box>
+                            <Box 
+                              component="td" 
+                              sx={{ 
+                                p: 2, 
+                                borderBottom: 1, 
+                                borderColor: 'divider',
+                                textAlign: 'center' 
+                              }}
+                            >
+                              <Typography variant="body2">
+                                {new Date(projection.projectedPayoffMonth + '-01').toLocaleDateString('en-US', { 
+                                  year: 'numeric', 
+                                  month: 'short' 
+                                })}
+                              </Typography>
+                            </Box>
+                            <Box 
+                              component="td" 
+                              sx={{ 
+                                p: 2, 
+                                borderBottom: 1, 
+                                borderColor: 'divider',
+                                textAlign: 'center' 
+                              }}
+                            >
+                              <Typography variant="body2">
+                                {projection.monthsToPayoff}
+                              </Typography>
+                            </Box>
+                            <Box 
+                              component="td" 
+                              sx={{ 
+                                p: 2, 
+                                borderBottom: 1, 
+                                borderColor: 'divider',
+                                textAlign: 'right' 
+                              }}
+                            >
+                              <Typography variant="body2" color="warning.main">
+                                {formatCurrency(projection.totalInterestToPay)}
+                              </Typography>
+                            </Box>
+                          </Box>
+                        ))}
+                      </Box>
+                    </Box>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          )}
         </Grid>
       </Box>
     </Box>

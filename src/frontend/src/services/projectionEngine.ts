@@ -4,6 +4,7 @@ import {
   Scenario,
   MonthlyProjection,
   ProjectionResult,
+  PayoffProjection,
   Cents,
 } from '@/types/money';
 
@@ -331,6 +332,33 @@ export class ProjectionEngine {
           }
         }
 
+        // Process transfer cashflows where this account is the target
+        const transfersToAccount = adjustedCashflows.filter(
+          cf => cf.targetAccountId === account.id
+        );
+        const monthTransfersTo = this.getCashflowsForMonth(
+          transfersToAccount,
+          projectionDate,
+          startDate
+        );
+        
+        for (const cf of monthTransfersTo) {
+          const monthsFromStart = this.getMonthsDifference(
+            new Date(cf.recurrence.startDate),
+            projectionDate
+          );
+          const effectiveAmount = this.getEffectiveCashflowAmount(
+            cf,
+            adjustedCashflows,
+            adjustedAccounts,
+            currentAccountBalances,
+            monthsFromStart
+          );
+          
+          // Transfers to this account increase the balance
+          netCashflow += effectiveAmount;
+        }
+
         // Calculate interest earned (for assets) or charged (for liabilities)
         let interestEarned = 0;
         if (account.annualInterestRate) {
@@ -371,6 +399,29 @@ export class ProjectionEngine {
         };
       }
 
+      // Track liability accounts that got paid off this month
+      const payoffEvents: Array<{
+        accountId: string;
+        accountName: string;
+        finalBalance: Cents;
+      }> = [];
+
+      for (const account of adjustedAccounts) {
+        if (account.kind === 'liability') {
+          const openingBalance = monthlyAccountData[account.id]?.openingBalance || 0;
+          const closingBalance = monthlyAccountData[account.id]?.closingBalance || 0;
+          
+          // Check if liability was paid off (went from negative to zero or positive)
+          if (openingBalance < 0 && closingBalance >= -1000) { // Allow small rounding errors
+            payoffEvents.push({
+              accountId: account.id,
+              accountName: account.name,
+              finalBalance: closingBalance,
+            });
+          }
+        }
+      }
+
       // Calculate month totals
       const totalNetWorth = this.calculateNetWorth(
         currentAccountBalances,
@@ -379,14 +430,21 @@ export class ProjectionEngine {
       const savingsRate =
         totalIncome > 0 ? (totalIncome - totalExpenses) / totalIncome : 0;
 
-      projectionMonths.push({
+      const monthProjection: MonthlyProjection = {
         month: projectionDate.toISOString().slice(0, 7), // YYYY-MM format
         accounts: monthlyAccountData,
         totalNetWorth,
         totalIncome,
         totalExpenses,
         savingsRate,
-      });
+      };
+
+      // Add payoff events if any occurred
+      if (payoffEvents.length > 0) {
+        monthProjection.accountsPayoffEvents = payoffEvents;
+      }
+
+      projectionMonths.push(monthProjection);
     }
 
     const endNetWorth =
@@ -397,6 +455,13 @@ export class ProjectionEngine {
       projectionMonths.reduce((sum, month) => sum + month.savingsRate, 0) /
       projectionMonths.length;
 
+    // Calculate payoff projections for liability accounts
+    const payoffProjections = this.calculatePayoffProjections(
+      adjustedAccounts,
+      adjustedCashflows,
+      projectionMonths
+    );
+
     return {
       months: projectionMonths,
       summary: {
@@ -406,6 +471,7 @@ export class ProjectionEngine {
         averageSavingsRate,
         projectionDate: new Date().toISOString(),
       },
+      payoffProjections,
     };
   }
 
@@ -429,6 +495,68 @@ export class ProjectionEngine {
     }
 
     return netWorth;
+  }
+
+  /**
+   * Calculate payoff projections for liability accounts
+   */
+  private calculatePayoffProjections(
+    accounts: Account[],
+    _cashflows: Cashflow[],
+    projectionMonths: MonthlyProjection[]
+  ): PayoffProjection[] {
+    const payoffProjections: PayoffProjection[] = [];
+
+    // Find liability accounts with negative balances
+    const liabilityAccounts = accounts.filter(
+      acc => acc.kind === 'liability' && (acc.openingBalanceCents || 0) < 0
+    );
+
+    for (const account of liabilityAccounts) {
+      const currentBalance = account.openingBalanceCents || 0;
+      
+      // Find when this account gets paid off in the projections
+      const payoffMonth = projectionMonths.find(month => {
+        const accountData = month.accounts[account.id];
+        return accountData && accountData.closingBalance >= -1000; // Allow small rounding errors
+      });
+
+      if (payoffMonth) {
+        // Calculate months to payoff
+        const startDate = new Date();
+        const payoffDate = new Date(payoffMonth.month + '-01');
+        const monthsToPayoff = this.getMonthsDifference(startDate, payoffDate);
+
+        // Calculate total interest and payments
+        let totalInterestToPay = 0;
+        let totalPayments = 0;
+
+        for (const month of projectionMonths) {
+          const accountData = month.accounts[account.id];
+          if (accountData) {
+            totalInterestToPay += accountData.interestEarned || 0;
+            totalPayments += Math.abs(accountData.netCashflow);
+            
+            // Stop calculating once account is paid off
+            if (accountData.closingBalance >= -1000) {
+              break;
+            }
+          }
+        }
+
+        payoffProjections.push({
+          accountId: account.id,
+          accountName: account.name,
+          currentBalance,
+          projectedPayoffMonth: payoffMonth.month,
+          monthsToPayoff,
+          totalInterestToPay,
+          totalPayments,
+        });
+      }
+    }
+
+    return payoffProjections;
   }
 }
 
