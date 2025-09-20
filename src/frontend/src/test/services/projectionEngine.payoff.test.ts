@@ -182,11 +182,12 @@ describe('ProjectionEngine - Account Payoff', () => {
 
     // Should have payoff event in first month
     const firstMonth = result.months[0];
-    expect(firstMonth.accountsPayoffEvents).toBeDefined();
-    expect(firstMonth.accountsPayoffEvents!.length).toBeGreaterThan(0);
+    expect(firstMonth).toBeDefined();
+    expect(firstMonth?.accountsPayoffEvents).toBeDefined();
+    expect(firstMonth?.accountsPayoffEvents?.length).toBeGreaterThan(0);
     
-    const payoffEvent = firstMonth.accountsPayoffEvents!.find(e => e.accountId === 'acc-credit-card');
+    const payoffEvent = firstMonth?.accountsPayoffEvents?.find(e => e.accountId === 'acc-credit-card');
     expect(payoffEvent).toBeDefined();
-    expect(payoffEvent!.accountName).toBe('Credit Card');
+    expect(payoffEvent?.accountName).toBe('Credit Card');
   });
 });
