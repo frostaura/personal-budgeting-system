@@ -109,7 +109,8 @@ export const SAMPLE_CASHFLOWS: Cashflow[] = [
       annualIndexationPct: 0.065, // 6.5% increase with salary
     },
     percentageOf: {
-      sourceCashflowId: 'cf-salary',
+      sourceType: 'cashflow',
+      sourceId: 'cf-salary',
       percentage: 0.17, // 17% of salary
     },
   },
