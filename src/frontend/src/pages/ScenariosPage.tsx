@@ -49,6 +49,7 @@ import {
 import { projectionEngine } from '@/services/projectionEngine';
 import { formatCurrency } from '@/utils/currency';
 import { Scenario, ProjectionResult } from '@/types/money';
+import { chartColors } from '@/utils/chartColors';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -366,13 +367,20 @@ const ScenariosPage: React.FC = () => {
               min={-0.5}
               max={0.5}
               step={0.05}
-              marks={[
-                { value: -0.5, label: '-50%' },
-                { value: 0, label: '0%' },
-                { value: 0.5, label: '+50%' },
-              ]}
               valueLabelDisplay="auto"
               valueLabelFormat={value => `${(value * 100).toFixed(1)}%`}
+              sx={{
+                '& .MuiSlider-thumb': {
+                  backgroundColor: chartColors.warning.main,
+                },
+                '& .MuiSlider-track': {
+                  backgroundColor: chartColors.warning.main,
+                },
+                '& .MuiSlider-rail': {
+                  backgroundColor: chartColors.warning.light,
+                  opacity: 0.3,
+                },
+              }}
             />
           </Grid>
 
@@ -410,13 +418,20 @@ const ScenariosPage: React.FC = () => {
               min={0}
               max={0.15}
               step={0.005}
-              marks={[
-                { value: 0.03, label: '3%' },
-                { value: 0.06, label: '6%' },
-                { value: 0.1, label: '10%' },
-              ]}
               valueLabelDisplay="auto"
               valueLabelFormat={value => `${(value * 100).toFixed(1)}%`}
+              sx={{
+                '& .MuiSlider-thumb': {
+                  backgroundColor: chartColors.error.main,
+                },
+                '& .MuiSlider-track': {
+                  backgroundColor: chartColors.error.main,
+                },
+                '& .MuiSlider-rail': {
+                  backgroundColor: chartColors.error.light,
+                  opacity: 0.3,
+                },
+              }}
             />
           </Grid>
 
@@ -433,13 +448,20 @@ const ScenariosPage: React.FC = () => {
               min={0}
               max={0.2}
               step={0.005}
-              marks={[
-                { value: 0.03, label: '3%' },
-                { value: 0.07, label: '7%' },
-                { value: 0.15, label: '15%' },
-              ]}
               valueLabelDisplay="auto"
               valueLabelFormat={value => `${(value * 100).toFixed(1)}%`}
+              sx={{
+                '& .MuiSlider-thumb': {
+                  backgroundColor: chartColors.success.main,
+                },
+                '& .MuiSlider-track': {
+                  backgroundColor: chartColors.success.main,
+                },
+                '& .MuiSlider-rail': {
+                  backgroundColor: chartColors.success.light,
+                  opacity: 0.3,
+                },
+              }}
             />
           </Grid>
         </Grid>
