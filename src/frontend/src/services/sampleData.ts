@@ -112,7 +112,7 @@ export const SAMPLE_CASHFLOWS: Cashflow[] = [
   {
     id: 'cf-performance-bonus',
     accountId: 'acc-checking',
-    amountCents: 1320000, // R13,200.00 performance bonus
+    amountCents: 1320000, // R13,200.00 performance bonus - fixed amount from spreadsheet
     description: 'Performance Bonus',
     recurrence: {
       frequency: 'monthly',
@@ -158,7 +158,27 @@ export const SAMPLE_CASHFLOWS: Cashflow[] = [
     },
   },
 
-  // Deductions/Expenses
+  // Tax Deductions
+  {
+    id: 'cf-income-tax-paye',
+    accountId: 'acc-checking',
+    amountCents: 0, // Calculated as percentage of base salary
+    description: 'Income Tax (PAYE)',
+    icon: '🧾',
+    recurrence: {
+      frequency: 'monthly',
+      anchor: { dayOfMonth: 25 },
+      startDate: '2024-01-01',
+      annualIndexationPct: 0.065, // 6.5% increase with salary
+    },
+    percentageOf: {
+      sourceType: 'cashflow',
+      sourceId: 'cf-base-salary',
+      percentage: 0.17, // 17% of salary
+    },
+  },
+
+  // Other Deductions/Expenses
   {
     id: 'cf-diesel-tax',
     accountId: 'acc-checking',
