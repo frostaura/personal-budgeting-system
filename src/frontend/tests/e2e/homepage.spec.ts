@@ -12,17 +12,7 @@ test.describe('Personal Finance Planner', () => {
       page.getByRole('button', { name: 'toggle navigation menu' })
     ).toBeVisible();
 
-    // Check for the disclaimer dialog
-    await expect(page.getByText('Important Legal Disclaimer')).toBeVisible();
-
-    // Accept the disclaimer
-    await page
-      .getByText('I understand that this application provides estimates only')
-      .click();
-    await page.getByText('I understand that my data is stored locally').click();
-    await page.getByRole('button', { name: 'I Understand & Continue' }).click();
-
-    // Check if we're redirected to dashboard
+    // Check if we're on the dashboard (should be the default page)
     await expect(page.getByText('Financial Dashboard')).toBeVisible();
 
     // Check for key dashboard elements
@@ -34,13 +24,6 @@ test.describe('Personal Finance Planner', () => {
 
   test('navigation works correctly', async ({ page }) => {
     await page.goto('/');
-
-    // Accept disclaimer first
-    await page
-      .getByText('I understand that this application provides estimates only')
-      .click();
-    await page.getByText('I understand that my data is stored locally').click();
-    await page.getByRole('button', { name: 'I Understand & Continue' }).click();
 
     // Test navigation to different pages
     await page.getByRole('menuitem', { name: 'Navigate to Accounts' }).click();
@@ -67,13 +50,6 @@ test.describe('Personal Finance Planner', () => {
     // Set mobile viewport
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto('/');
-
-    // Accept disclaimer
-    await page
-      .getByText('I understand that this application provides estimates only')
-      .click();
-    await page.getByText('I understand that my data is stored locally').click();
-    await page.getByRole('button', { name: 'I Understand & Continue' }).click();
 
     // Check that sidebar is closed on mobile
     await expect(page.getByRole('navigation')).not.toBeVisible();
