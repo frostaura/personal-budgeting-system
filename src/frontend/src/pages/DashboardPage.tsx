@@ -33,6 +33,8 @@ import { useResponsiveCharts } from '@/hooks/useResponsiveCharts';
 import { projectionEngine } from '@/services/projectionEngine';
 import { fetchAccounts } from '@/store/slices/accountsSlice';
 import { fetchCashflows } from '@/store/slices/cashflowsSlice';
+import { chartColors, financialAllocationColors, chartStyleEnhancements } from '@/utils/chartColors';
+import { generateSliderLabel } from '@/utils/sliderLabels';
 
 const DashboardPage: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -182,25 +184,25 @@ const DashboardPage: React.FC = () => {
         name: 'Expenses',
         value: regularExpenses,
         percentage: (regularExpenses / total) * 100,
-        color: '#f44336', // red
+        color: financialAllocationColors.expenses,
       },
       {
         name: 'Tax',
         value: taxExpenses,
         percentage: (taxExpenses / total) * 100,
-        color: '#ff9800', // orange
+        color: financialAllocationColors.tax,
       },
       {
         name: 'Interest Payments',
         value: interestPayments,
         percentage: (interestPayments / total) * 100,
-        color: '#e91e63', // pink/magenta
+        color: financialAllocationColors.interestPayments,
       },
       {
         name: 'Investments',
         value: investments,
         percentage: (investments / total) * 100,
-        color: '#4caf50', // green
+        color: financialAllocationColors.investments,
       },
     ].filter(item => item.value > 0);
   }, [accounts, cashflows, financialMetrics.monthlyInterestPayments]);
@@ -353,8 +355,7 @@ const DashboardPage: React.FC = () => {
               </Typography>
               <Box sx={{ minWidth: 200 }}>
                 <Typography variant="body2" gutterBottom>
-                  Time Horizon: {projectionYears} year
-                  {projectionYears !== 1 ? 's' : ''}
+                  {generateSliderLabel(projectionYears)}
                 </Typography>
                 <Slider
                   value={projectionYears}
@@ -362,17 +363,20 @@ const DashboardPage: React.FC = () => {
                   min={1}
                   max={50}
                   step={1}
-                  marks={[
-                    { value: 1, label: '1y' },
-                    { value: 5, label: '5y' },
-                    { value: 10, label: '10y' },
-                    { value: 20, label: '20y' },
-                    { value: 30, label: '30y' },
-                    { value: 40, label: '40y' },
-                    { value: 50, label: '50y' },
-                  ]}
                   valueLabelDisplay="auto"
-                  sx={{ width: 180 }}
+                  sx={{ 
+                    width: 180,
+                    '& .MuiSlider-thumb': {
+                      backgroundColor: chartColors.primary.main,
+                    },
+                    '& .MuiSlider-track': {
+                      backgroundColor: chartColors.primary.main,
+                    },
+                    '& .MuiSlider-rail': {
+                      backgroundColor: chartColors.primary.light,
+                      opacity: 0.3,
+                    },
+                  }}
                 />
               </Box>
             </Box>
@@ -380,7 +384,11 @@ const DashboardPage: React.FC = () => {
             <Box sx={{ height: 300 }}>
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={wealthProjectionData}>
-                  <CartesianGrid strokeDasharray="3 3" />
+                  <CartesianGrid 
+                    strokeDasharray={chartStyleEnhancements.grid.strokeDasharray}
+                    stroke={chartStyleEnhancements.grid.stroke}
+                    strokeOpacity={chartStyleEnhancements.grid.strokeOpacity}
+                  />
                   <XAxis
                     dataKey="year"
                     tick={chartStyles.getTickStyle()}
@@ -404,7 +412,10 @@ const DashboardPage: React.FC = () => {
                     }}
                   />
                   <RechartsTooltip
-                    contentStyle={chartStyles.getTooltipStyle()}
+                    contentStyle={{
+                      ...chartStyles.getTooltipStyle(),
+                      ...chartStyleEnhancements.tooltip,
+                    }}
                     formatter={(value: number) => [
                       formatCurrency(value),
                       'Net Worth',
@@ -414,10 +425,16 @@ const DashboardPage: React.FC = () => {
                   <Line
                     type="monotone"
                     dataKey="netWorth"
-                    stroke="#1976d2"
-                    strokeWidth={3}
-                    dot={{ fill: '#1976d2', strokeWidth: 2, r: 4 }}
-                    activeDot={{ r: 6 }}
+                    stroke={chartColors.primary.main}
+                    strokeWidth={chartStyleEnhancements.lineChart.strokeWidth}
+                    dot={{
+                      ...chartStyleEnhancements.lineChart.dot,
+                      fill: chartColors.primary.main,
+                    }}
+                    activeDot={{
+                      ...chartStyleEnhancements.lineChart.activeDot,
+                      fill: chartColors.primary.main,
+                    }}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -501,17 +518,22 @@ const DashboardPage: React.FC = () => {
                         data={financialAllocation}
                         cx="50%"
                         cy="50%"
-                        innerRadius={40}
-                        outerRadius={80}
-                        paddingAngle={5}
+                        innerRadius={chartStyleEnhancements.pieChart.innerRadius}
+                        outerRadius={chartStyleEnhancements.pieChart.outerRadius}
+                        paddingAngle={chartStyleEnhancements.pieChart.paddingAngle}
                         dataKey="value"
+                        stroke={chartStyleEnhancements.pieChart.stroke}
+                        strokeWidth={chartStyleEnhancements.pieChart.strokeWidth}
                       >
                         {financialAllocation.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
                       </Pie>
                       <RechartsTooltip
-                        contentStyle={chartStyles.getTooltipStyle()}
+                        contentStyle={{
+                          ...chartStyles.getTooltipStyle(),
+                          ...chartStyleEnhancements.tooltip,
+                        }}
                         formatter={(value: number) => [
                           formatCurrency(value),
                           'Amount'

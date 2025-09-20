@@ -28,6 +28,8 @@ import {
 } from '@mui/icons-material';
 import { useAppSelector } from '@/store/hooks';
 import { projectionEngine } from '@/services/projectionEngine';
+import { chartColors } from '@/utils/chartColors';
+import { generateMonthsSliderLabel } from '@/utils/sliderLabels';
 import { formatCurrency } from '@/utils/currency';
 import { ProjectionResult } from '@/types/money';
 
@@ -146,8 +148,7 @@ const ProjectionsPage: React.FC = () => {
           <Grid container spacing={3} sx={{ mt: 1 }}>
             <Grid item xs={12} md={6}>
               <Typography variant="body2" gutterBottom>
-                Projection Period: {monthsToProject} months (
-                {(monthsToProject / 12).toFixed(1)} years)
+                {generateMonthsSliderLabel(monthsToProject)}
               </Typography>
               <Slider
                 value={monthsToProject}
@@ -155,16 +156,19 @@ const ProjectionsPage: React.FC = () => {
                 min={12}
                 max={600} // 50 years max
                 step={12}
-                marks={[
-                  { value: 12, label: '1yr' },
-                  { value: 60, label: '5yr' },
-                  { value: 120, label: '10yr' },
-                  { value: 240, label: '20yr' },
-                  { value: 360, label: '30yr' },
-                  { value: 480, label: '40yr' },
-                  { value: 600, label: '50yr' },
-                ]}
-                sx={{ mt: 2 }}
+                sx={{ 
+                  mt: 2,
+                  '& .MuiSlider-thumb': {
+                    backgroundColor: chartColors.primary.main,
+                  },
+                  '& .MuiSlider-track': {
+                    backgroundColor: chartColors.primary.main,
+                  },
+                  '& .MuiSlider-rail': {
+                    backgroundColor: chartColors.primary.light,
+                    opacity: 0.3,
+                  },
+                }}
               />
             </Grid>
 
