@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import {
   Typography,
   Grid,
@@ -28,14 +28,23 @@ import {
   Cell,
 } from 'recharts';
 import { formatCurrency, sumCents } from '@/utils/currency';
-import { useAppSelector } from '@/store/hooks';
+import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { useResponsiveCharts } from '@/hooks/useResponsiveCharts';
 import { projectionEngine } from '@/services/projectionEngine';
+import { fetchAccounts } from '@/store/slices/accountsSlice';
+import { fetchCashflows } from '@/store/slices/cashflowsSlice';
 
 const DashboardPage: React.FC = () => {
+  const dispatch = useAppDispatch();
   const { accounts } = useAppSelector(state => state.accounts);
   const { cashflows } = useAppSelector(state => state.cashflows);
   const chartStyles = useResponsiveCharts();
+  
+  // Fetch data on component mount to ensure fresh data
+  useEffect(() => {
+    dispatch(fetchAccounts());
+    dispatch(fetchCashflows());
+  }, [dispatch]);
   
   // Load projection years from localStorage or default to 5 years
   const [projectionYears, setProjectionYears] = useState(() => {
