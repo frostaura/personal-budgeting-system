@@ -122,17 +122,34 @@ export class ProjectionEngine {
   private getEffectiveCashflowAmount(
     cashflow: Cashflow,
     allCashflows: Cashflow[],
+    allAccounts: Account[],
+    accountBalances: Map<string, Cents>,
     monthsFromStart: number
   ): Cents {
-    // If percentage-based, calculate amount from source cash flow
+    // If percentage-based, calculate amount from source
     if (cashflow.percentageOf) {
-      const sourceCashflow = allCashflows.find(
-        cf => cf.id === cashflow.percentageOf!.sourceCashflowId
-      );
-      
-      if (sourceCashflow) {
-        const sourceAmount = this.getIndexedCashflowAmount(sourceCashflow, monthsFromStart);
-        return Math.round(sourceAmount * cashflow.percentageOf.percentage);
+      if (cashflow.percentageOf.sourceType === 'cashflow') {
+        // Calculate percentage of another cashflow
+        const sourceCashflow = allCashflows.find(
+          cf => cf.id === cashflow.percentageOf!.sourceId
+        );
+        
+        if (sourceCashflow) {
+          const sourceAmount = this.getIndexedCashflowAmount(sourceCashflow, monthsFromStart);
+          return Math.round(sourceAmount * cashflow.percentageOf.percentage);
+        }
+      } else if (cashflow.percentageOf.sourceType === 'account') {
+        // Calculate percentage of account balance
+        const sourceAccount = allAccounts.find(
+          acc => acc.id === cashflow.percentageOf!.sourceId
+        );
+        
+        if (sourceAccount) {
+          const accountBalance = accountBalances.get(sourceAccount.id) || 0;
+          // For liability accounts, use absolute value for percentage calculation
+          const balanceForCalculation = sourceAccount.kind === 'liability' ? Math.abs(accountBalance) : accountBalance;
+          return Math.round(balanceForCalculation * cashflow.percentageOf.percentage);
+        }
       }
     }
 
@@ -300,6 +317,8 @@ export class ProjectionEngine {
           const effectiveAmount = this.getEffectiveCashflowAmount(
             cf,
             adjustedCashflows,
+            adjustedAccounts,
+            currentAccountBalances,
             monthsFromStart
           );
 

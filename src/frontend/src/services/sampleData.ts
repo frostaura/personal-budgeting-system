@@ -118,7 +118,7 @@ export const SAMPLE_CASHFLOWS: Cashflow[] = [
       frequency: 'monthly',
       anchor: { dayOfMonth: 25 },
       startDate: '2024-01-01',
-      annualIndexationPct: 0.065,
+      annualIndexationPct: 0.065, // 6.5% annual increase
     },
   },
   {

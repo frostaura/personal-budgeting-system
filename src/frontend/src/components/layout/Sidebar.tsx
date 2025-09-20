@@ -136,9 +136,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 }}
                 aria-label={`Navigate to ${item.label}`}
                 role="menuitem"
-                {...(item.path === '/accounts' && {
-                  'data-onboarding': 'sidebar-accounts',
-                })}
               >
                 <ListItemIcon
                   sx={{

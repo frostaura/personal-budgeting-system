@@ -75,9 +75,10 @@ export type Cashflow = {
   icon?: string; // emoji or icon name for display
   recurrence: Recurrence;
   effectiveFrom?: string; // future-dated changes
-  // For percentage-based calculation from income flows
+  // For percentage-based calculation from income flows or account balances
   percentageOf?: {
-    sourceCashflowId: string; // ID of the income cashflow to calculate percentage from
+    sourceType: 'cashflow' | 'account'; // Type of source to calculate percentage from
+    sourceId: string; // ID of the cashflow or account to calculate percentage from
     percentage: number; // e.g., 0.17 for 17%
   };
 };
