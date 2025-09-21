@@ -268,9 +268,30 @@ const CashflowsPage: React.FC = () => {
 
   const getCashflowDirection = (cashflow: Cashflow) => {
     const accountType = getAccountType(cashflow.accountId);
-    // For income accounts, positive amounts are inflows
-    // For expense/liability accounts, positive amounts are outflows
-    return accountType === 'income' ? 'income' : 'expense';
+    const amount = cashflow.amountCents;
+    
+    // Determine if this cashflow increases or decreases net worth
+    // Income flows: increase net worth (positive to income accounts, positive from liability reductions)
+    // Expense flows: decrease net worth (negative from income accounts, negative to liability increases)
+    
+    if (accountType === 'income') {
+      // Income accounts: positive amounts are income, negative amounts are deductions/expenses
+      return amount >= 0 ? 'income' : 'expense';
+    } else if (accountType === 'liability' || accountType === 'expense') {
+      // Liability/expense accounts: 
+      // - Positive amounts increase the liability/expense (bad for net worth) = expense
+      // - Negative amounts decrease the liability/expense (good for net worth) = income
+      // But in our system, we store expenses as negative amounts, so we need to invert this logic
+      return amount <= 0 ? 'expense' : 'income';
+    } else if (accountType === 'investment' || accountType === 'reserve') {
+      // Investment/savings accounts:
+      // - Positive amounts increase savings/investments (good for net worth) = income  
+      // - Negative amounts decrease savings/investments (bad for net worth) = expense
+      return amount >= 0 ? 'income' : 'expense';
+    } else {
+      // Transfer and other account types - default based on amount sign
+      return amount >= 0 ? 'income' : 'expense';
+    }
   };
 
   const getCashflowIcon = (direction: string) => {
