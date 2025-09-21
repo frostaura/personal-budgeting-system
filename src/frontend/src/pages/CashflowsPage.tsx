@@ -100,7 +100,7 @@ const CashflowsPage: React.FC = () => {
         accountId: cashflow.accountId,
         description: cashflow.description || '',
         icon: cashflow.icon || '💰',
-        amount: centsToMajor(cashflow.amountCents).toString(),
+        amount: centsToMajor(Math.abs(cashflow.amountCents)).toString(),
         frequency: cashflow.recurrence.frequency,
         startDate: cashflow.recurrence.startDate,
         endDate: cashflow.recurrence.endDate || '',
@@ -177,12 +177,25 @@ const CashflowsPage: React.FC = () => {
           parseFloat(formData.annualIndexation) / 100;
       }
 
+      // Determine if this should be an expense (negative amount) based on account type
+      const account = accounts.find(acc => acc.id === formData.accountId);
+      const isExpenseFlow = account && account.kind !== 'income';
+      
+      let amountCents = 0;
+      if (formData.calculationType === 'fixed') {
+        const positiveAmount = majorToCents(parseFloat(formData.amount));
+        // For non-income accounts, make the amount negative (expenses)
+        amountCents = isExpenseFlow ? -positiveAmount : positiveAmount;
+      } else if (formData.calculationType === 'transfer' && formData.amount) {
+        const positiveAmount = majorToCents(parseFloat(formData.amount));
+        // For transfers, the amount is typically negative from the source account
+        amountCents = -positiveAmount;
+      }
+
       const cashflow: Cashflow = {
         id: editingCashflow?.id || `cf-${Date.now()}`,
         accountId: formData.accountId,
-        amountCents: formData.calculationType === 'fixed'
-          ? majorToCents(parseFloat(formData.amount))
-          : 0, // Placeholder amount when using percentage calculation
+        amountCents,
         description: formData.description,
         icon: formData.icon,
         recurrence: recurrenceData as Recurrence,
@@ -615,7 +628,7 @@ const CashflowsPage: React.FC = () => {
                   <FormControlLabel 
                     value="percentage-income" 
                     control={<Radio />} 
-                    label="% of Income" 
+                    label="% of Cash Flow" 
                   />
                   <FormControlLabel 
                     value="percentage-account" 
@@ -643,7 +656,13 @@ const CashflowsPage: React.FC = () => {
                     setFormData({ ...formData, amount: e.target.value })
                   }
                   required
-                  helperText="Enter positive amount (direction determined by account type)"
+                  helperText={(() => {
+                    const account = accounts.find(acc => acc.id === formData.accountId);
+                    const isExpenseAccount = account && account.kind !== 'income';
+                    return isExpenseAccount 
+                      ? "Enter positive amount (will be treated as an expense)"
+                      : "Enter positive amount (will be treated as income)";
+                  })()}
                 />
               </Grid>
             )}
@@ -653,19 +672,15 @@ const CashflowsPage: React.FC = () => {
               <>
                 <Grid item xs={12} sm={6}>
                   <FormControl fullWidth required>
-                    <InputLabel>Source Income Cash Flow</InputLabel>
+                    <InputLabel>Source Cash Flow</InputLabel>
                     <Select
                       value={formData.sourceCashflowId}
                       onChange={e =>
                         setFormData({ ...formData, sourceCashflowId: e.target.value })
                       }
-                      label="Source Income Cash Flow"
+                      label="Source Cash Flow"
                     >
                       {cashflows
-                        .filter(cf => {
-                          const account = accounts.find(acc => acc.id === cf.accountId);
-                          return account && account.kind === 'income';
-                        })
                         .map(cf => (
                           <MenuItem key={cf.id} value={cf.id}>
                             {cf.icon} {cf.description} ({formatCurrency(cf.amountCents)})
@@ -684,7 +699,7 @@ const CashflowsPage: React.FC = () => {
                       setFormData({ ...formData, percentage: e.target.value })
                     }
                     inputProps={{ min: 0, max: 100, step: 0.1 }}
-                    helperText="Percentage of the source income (e.g., 17 for 17%)"
+                    helperText="Percentage of the source cash flow (e.g., 17 for 17%)"
                     required
                   />
                 </Grid>
@@ -807,7 +822,7 @@ const CashflowsPage: React.FC = () => {
                           label="Percentage Source"
                         >
                           <MenuItem value="account">Account Balance</MenuItem>
-                          <MenuItem value="income">Income Cashflow</MenuItem>
+                          <MenuItem value="income">Cash Flow</MenuItem>
                         </Select>
                       </FormControl>
                     </Grid>
@@ -815,19 +830,15 @@ const CashflowsPage: React.FC = () => {
                     {formData.sourceAccountId === '' && (
                       <Grid item xs={12} sm={6}>
                         <FormControl fullWidth>
-                          <InputLabel>Source Income Cash Flow</InputLabel>
+                          <InputLabel>Source Cash Flow</InputLabel>
                           <Select
                             value={formData.sourceCashflowId}
                             onChange={e =>
                               setFormData({ ...formData, sourceCashflowId: e.target.value })
                             }
-                            label="Source Income Cash Flow"
+                            label="Source Cash Flow"
                           >
                             {cashflows
-                              .filter(cf => {
-                                const account = accounts.find(acc => acc.id === cf.accountId);
-                                return account && account.kind === 'income';
-                              })
                               .map(cf => (
                                 <MenuItem key={cf.id} value={cf.id}>
                                   {cf.icon} {cf.description} ({formatCurrency(cf.amountCents)})
