@@ -79,19 +79,37 @@ test.describe('Personal Finance Planner E2E', () => {
     await expect(page.getByText('Income Flows')).toBeVisible();
     await expect(page.getByText('Expense Flows')).toBeVisible();
 
-    // Test create cash flow
+    // Test create income cash flow
     await page.getByRole('button', { name: 'Add Cash Flow' }).click();
     await expect(page.getByRole('dialog')).toBeVisible();
 
     await page
       .getByRole('textbox', { name: 'Description' })
       .fill('Test Monthly Income');
-    await page.getByRole('textbox', { name: 'Amount (ZAR)' }).fill('5000');
+    await page.getByRole('spinbutton', { name: 'Amount' }).fill('5000');
 
-    await page.getByRole('button', { name: 'Create Cash Flow' }).click();
+    await page.getByRole('button', { name: 'Create' }).click();
 
     // Should show the new cash flow
     await expect(page.getByText('Test Monthly Income')).toBeVisible();
+    
+    // Test create expense cash flow
+    await page.getByRole('button', { name: 'Add Cash Flow' }).click();
+    
+    // Select a liability account (expense account)
+    await page.getByRole('combobox').first().click();
+    await page.getByRole('option', { name: 'FNB Private Client Credit' }).click();
+    
+    await page
+      .getByRole('textbox', { name: 'Description' })
+      .fill('Test Monthly Expense');
+    await page.getByRole('spinbutton', { name: 'Amount' }).fill('1200');
+
+    await page.getByRole('button', { name: 'Create' }).click();
+
+    // Should show the new expense flow with negative amount
+    await expect(page.getByText('Test Monthly Expense')).toBeVisible();
+    await expect(page.getByText('-R 1,200.00')).toBeVisible();
   });
 
   test('should run financial projections', async ({ page }) => {
