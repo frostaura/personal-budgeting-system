@@ -23,6 +23,8 @@ import {
   FormLabel,
   useTheme,
   useMediaQuery,
+  Collapse,
+  Paper,
 } from '@mui/material';
 import { BottomSheetModal } from '@/components/common';
 import {
@@ -32,6 +34,8 @@ import {
   TrendingUp as IncomeIcon,
   TrendingDown as ExpenseIcon,
   Repeat as RepeatIcon,
+  Info as InfoIcon,
+  HelpOutline as HelpIcon,
 } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
@@ -67,6 +71,7 @@ const CashflowsPage: React.FC = () => {
   const [editingCashflow, setEditingCashflow] = useState<Cashflow | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [cashflowToDelete, setCashflowToDelete] = useState<string | null>(null);
+  const [showHelpCard, setShowHelpCard] = useState(false);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -361,20 +366,83 @@ const CashflowsPage: React.FC = () => {
               Track your recurring income and expenses
             </Typography>
           </div>
-          <Button
-            variant="contained"
-            startIcon={!isMobile ? <AddIcon /> : undefined}
-            onClick={() => handleOpenDialog()}
-            size="large"
-            aria-label="Add Cash Flow"
-            sx={{
-              minWidth: isMobile ? 'auto' : undefined,
-              px: isMobile ? 2 : undefined,
-            }}
-          >
-            {isMobile ? <AddIcon /> : 'Add Cash Flow'}
-          </Button>
+          <Box display="flex" gap={1} alignItems="center">
+            <Tooltip title="How do cash flow types work?">
+              <IconButton
+                onClick={() => setShowHelpCard(!showHelpCard)}
+                size="small"
+                color={showHelpCard ? "primary" : "default"}
+              >
+                <HelpIcon />
+              </IconButton>
+            </Tooltip>
+            <Button
+              variant="contained"
+              startIcon={!isMobile ? <AddIcon /> : undefined}
+              onClick={() => handleOpenDialog()}
+              size="large"
+              aria-label="Add Cash Flow"
+              sx={{
+                minWidth: isMobile ? 'auto' : undefined,
+                px: isMobile ? 2 : undefined,
+              }}
+            >
+              {isMobile ? <AddIcon /> : 'Add Cash Flow'}
+            </Button>
+          </Box>
         </Box>
+
+        {/* Helpful Information Card */}
+        <Collapse in={showHelpCard}>
+          <Card sx={{ mb: 3, bgcolor: 'primary.50', border: '1px solid', borderColor: 'primary.200' }}>
+            <CardContent>
+              <Box display="flex" alignItems="flex-start" gap={2}>
+                <InfoIcon color="primary" sx={{ mt: 0.5 }} />
+                <Box>
+                  <Typography variant="h6" gutterBottom color="primary">
+                    How Cash Flow Types Work
+                  </Typography>
+                  <Typography variant="body2" paragraph>
+                    Cash flows are automatically categorized as <strong>income</strong> or <strong>expenses</strong> based on the account type you choose:
+                  </Typography>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} md={6}>
+                      <Paper elevation={0} sx={{ p: 2, bgcolor: 'success.50', border: '1px solid', borderColor: 'success.200' }}>
+                        <Box display="flex" alignItems="center" gap={1} mb={1}>
+                          <IncomeIcon color="success" fontSize="small" />
+                          <Typography variant="subtitle2" color="success.dark">Income Flows</Typography>
+                        </Box>
+                        <Typography variant="body2" color="text.secondary">
+                          • <strong>Income accounts:</strong> Salary, bonuses, dividends<br/>
+                          • <strong>Investment/Savings accounts:</strong> Contributions to savings<br/>
+                          • <strong>Liability accounts:</strong> Loan payments (reduce debt)
+                        </Typography>
+                      </Paper>
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <Paper elevation={0} sx={{ p: 2, bgcolor: 'error.50', border: '1px solid', borderColor: 'error.200' }}>
+                        <Box display="flex" alignItems="center" gap={1} mb={1}>
+                          <ExpenseIcon color="error" fontSize="small" />
+                          <Typography variant="subtitle2" color="error.dark">Expense Flows</Typography>
+                        </Box>
+                        <Typography variant="body2" color="text.secondary">
+                          • <strong>Expense accounts:</strong> Rent, utilities, groceries<br/>
+                          • <strong>Credit card accounts:</strong> Purchases and charges<br/>
+                          • <strong>Income accounts:</strong> Taxes and deductions
+                        </Typography>
+                      </Paper>
+                    </Grid>
+                  </Grid>
+                  <Alert severity="info" sx={{ mt: 2 }}>
+                    <Typography variant="body2">
+                      <strong>Simple rule:</strong> Always enter positive amounts. The system automatically determines if it's income or expense based on the account type and how it affects your net worth.
+                    </Typography>
+                  </Alert>
+                </Box>
+              </Box>
+            </CardContent>
+          </Card>
+        </Collapse>
 
         {error && (
           <Alert severity="error" sx={{ mb: 3 }}>
@@ -574,7 +642,12 @@ const CashflowsPage: React.FC = () => {
         <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
               <FormControl fullWidth required>
-                <InputLabel>Account</InputLabel>
+                <Box display="flex" alignItems="center" gap={1}>
+                  <InputLabel>Account</InputLabel>
+                  <Tooltip title="The account type determines if this cashflow will be categorized as income or expense">
+                    <InfoIcon fontSize="small" color="action" />
+                  </Tooltip>
+                </Box>
                 <Select
                   value={formData.accountId}
                   onChange={e =>
@@ -582,11 +655,27 @@ const CashflowsPage: React.FC = () => {
                   }
                   label="Account"
                 >
-                  {accounts.map(account => (
-                    <MenuItem key={account.id} value={account.id}>
-                      {account.icon} {account.name} ({account.kind})
-                    </MenuItem>
-                  ))}
+                  {accounts.map(account => {
+                    const isExpenseAccount = account.kind !== 'income';
+                    const chipColor = isExpenseAccount ? 'error' : 'success';
+                    const chipText = isExpenseAccount ? 'Expense' : 'Income';
+                    
+                    return (
+                      <MenuItem key={account.id} value={account.id}>
+                        <Box display="flex" alignItems="center" justifyContent="space-between" width="100%">
+                          <Box display="flex" alignItems="center" gap={1}>
+                            {account.icon} {account.name} ({account.kind})
+                          </Box>
+                          <Chip
+                            label={chipText}
+                            color={chipColor}
+                            size="small"
+                            variant="outlined"
+                          />
+                        </Box>
+                      </MenuItem>
+                    );
+                  })}
                 </Select>
               </FormControl>
             </Grid>
@@ -679,10 +768,21 @@ const CashflowsPage: React.FC = () => {
                   required
                   helperText={(() => {
                     const account = accounts.find(acc => acc.id === formData.accountId);
+                    if (!account) return "Select an account first";
+                    
                     const isExpenseAccount = account && account.kind !== 'income';
+                    const accountTypeText = {
+                      'income': 'income account',
+                      'liability': 'liability account', 
+                      'investment': 'investment account',
+                      'reserve': 'savings account',
+                      'expense': 'expense account',
+                      'transfer': 'transfer account'
+                    }[account.kind] || account.kind;
+                    
                     return isExpenseAccount 
-                      ? "Enter positive amount (will be treated as an expense)"
-                      : "Enter positive amount (will be treated as income)";
+                      ? `Enter positive amount (${accountTypeText} → treated as expense)`
+                      : `Enter positive amount (${accountTypeText} → treated as income)`;
                   })()}
                 />
               </Grid>
