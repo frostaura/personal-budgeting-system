@@ -112,6 +112,14 @@ export type TaxPresetZA = {
   };
 };
 
+// Calculation step detail for transparency
+export type CalculationStep = {
+  description: string;
+  formula: string;  
+  values: Record<string, number | string>;
+  result: number;
+};
+
 // Projection outputs
 export type MonthlyProjection = {
   month: string; // ISO YYYY-MM
@@ -124,6 +132,12 @@ export type MonthlyProjection = {
       netCashflow: Cents;
       interestEarned?: Cents;
       closingBalance: Cents;
+      // Calculation breakdown for transparency
+      calculationDetails?: {
+        interestCalculation?: CalculationStep;
+        cashflowCalculations?: CalculationStep[];
+        appreciationCalculation?: CalculationStep;
+      };
     }
   >;
   totalNetWorth: Cents;
@@ -136,6 +150,13 @@ export type MonthlyProjection = {
     accountName: string;
     finalBalance: Cents; // Should be close to 0
   }>;
+  // Monthly calculation breakdown
+  calculationSummary?: {
+    totalIncomeCalculation: CalculationStep;
+    totalExpensesCalculation: CalculationStep;
+    netWorthCalculation: CalculationStep;
+    savingsRateCalculation: CalculationStep;
+  };
 };
 
 // Payoff projection for liability accounts

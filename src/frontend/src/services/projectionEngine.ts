@@ -6,6 +6,7 @@ import {
   ProjectionResult,
   PayoffProjection,
   Cents,
+  CalculationStep,
 } from '@/types/money';
 
 /**
@@ -14,37 +15,104 @@ import {
  */
 export class ProjectionEngine {
   /**
-   * Calculate compound interest for a period
+   * Create a calculation step for transparency
    */
-  private calculateCompoundInterest(
+  private createCalculationStep(
+    description: string,
+    formula: string,
+    values: Record<string, number | string>, 
+    result: number
+  ): CalculationStep {
+    return {
+      description,
+      formula,
+      values,
+      result,
+    };
+  }
+
+  /**
+   * Calculate compound interest for a period with detailed explanation
+   */
+  private calculateCompoundInterestWithDetails(
     principal: Cents,
     annualRate: number,
     compoundsPerYear: number = 12,
     months: number = 1
-  ): Cents {
-    if (!annualRate || annualRate === 0) return 0;
+  ): { interest: Cents; calculation: CalculationStep } {
+    if (!annualRate || annualRate === 0) {
+      return {
+        interest: 0,
+        calculation: this.createCalculationStep(
+          'No interest calculation',
+          'Interest = 0 (no rate set)',
+          { principal, annualRate, months },
+          0
+        ),
+      };
+    }
 
     const periodicRate = annualRate / compoundsPerYear;
     const periods = (months / 12) * compoundsPerYear;
     const compoundedAmount = principal * Math.pow(1 + periodicRate, periods);
+    const interest = Math.round(compoundedAmount - principal);
 
-    return Math.round(compoundedAmount - principal);
+    const calculation = this.createCalculationStep(
+      'Compound Interest Calculation',
+      'A = P × (1 + r/n)^(n×t), Interest = A - P',
+      {
+        'Principal (P)': `R${(principal / 100).toFixed(2)}`,
+        'Annual Rate (r)': `${(annualRate * 100).toFixed(2)}%`,
+        'Compounds per year (n)': compoundsPerYear,
+        'Time in years (t)': `${(months / 12).toFixed(4)}`,
+        'Periodic Rate (r/n)': `${(periodicRate * 100).toFixed(4)}%`,
+        'Total periods (n×t)': periods.toFixed(2),
+        'Compounded Amount (A)': `R${(compoundedAmount / 100).toFixed(2)}`,
+      },
+      interest
+    );
+
+    return { interest, calculation };
   }
 
   /**
-   * Apply property appreciation to property accounts
+   * Apply property appreciation to property accounts with detailed explanation
    */
-  private calculatePropertyAppreciation(
+  private calculatePropertyAppreciationWithDetails(
     currentValue: Cents,
     annualAppreciationRate: number,
     months: number = 1
-  ): Cents {
-    if (!annualAppreciationRate || annualAppreciationRate === 0) return 0;
+  ): { appreciation: Cents; calculation: CalculationStep } {
+    if (!annualAppreciationRate || annualAppreciationRate === 0) {
+      return {
+        appreciation: 0,
+        calculation: this.createCalculationStep(
+          'No property appreciation',
+          'Appreciation = 0 (no rate set)',
+          { currentValue, annualAppreciationRate, months },
+          0
+        ),
+      };
+    }
 
     const monthlyRate = annualAppreciationRate / 12;
     const appreciatedAmount = currentValue * Math.pow(1 + monthlyRate, months);
+    const appreciation = Math.round(appreciatedAmount - currentValue);
 
-    return Math.round(appreciatedAmount - currentValue);
+    const calculation = this.createCalculationStep(
+      'Property Appreciation Calculation',
+      'A = V × (1 + r/12)^months, Appreciation = A - V',
+      {
+        'Current Value (V)': `R${(currentValue / 100).toFixed(2)}`,
+        'Annual Rate (r)': `${(annualAppreciationRate * 100).toFixed(2)}%`,
+        'Monthly Rate (r/12)': `${(monthlyRate * 100).toFixed(4)}%`,
+        'Months': months,
+        'Appreciated Value (A)': `R${(appreciatedAmount / 100).toFixed(2)}`,
+      },
+      appreciation
+    );
+
+    return { appreciation, calculation };
   }
 
   /**
@@ -118,15 +186,15 @@ export class ProjectionEngine {
   }
 
   /**
-   * Calculate effective cash flow amount including percentage-based calculations
+   * Calculate effective cash flow amount including percentage-based calculations with details
    */
-  private getEffectiveCashflowAmount(
+  private getEffectiveCashflowAmountWithDetails(
     cashflow: Cashflow,
     allCashflows: Cashflow[],
     allAccounts: Account[],
     accountBalances: Map<string, Cents>,
     monthsFromStart: number
-  ): Cents {
+  ): { amount: Cents; calculation?: CalculationStep } {
     // If percentage-based, calculate amount from source
     if (cashflow.percentageOf) {
       if (cashflow.percentageOf.sourceType === 'cashflow') {
@@ -137,7 +205,19 @@ export class ProjectionEngine {
         
         if (sourceCashflow) {
           const sourceAmount = this.getIndexedCashflowAmount(sourceCashflow, monthsFromStart);
-          return Math.round(sourceAmount * cashflow.percentageOf.percentage);
+          const result = Math.round(sourceAmount * cashflow.percentageOf.percentage);
+          
+          const calculation = this.createCalculationStep(
+            `Percentage of ${sourceCashflow.description || 'Cash Flow'}`,
+            'Amount = Source Amount × Percentage',
+            {
+              'Source Amount': `R${(sourceAmount / 100).toFixed(2)}`,
+              'Percentage': `${(cashflow.percentageOf.percentage * 100).toFixed(2)}%`,
+            },
+            result
+          );
+
+          return { amount: result, calculation };
         }
       } else if (cashflow.percentageOf.sourceType === 'account') {
         // Calculate percentage of account balance
@@ -149,13 +229,48 @@ export class ProjectionEngine {
           const accountBalance = accountBalances.get(sourceAccount.id) || 0;
           // For liability accounts, use absolute value for percentage calculation
           const balanceForCalculation = sourceAccount.kind === 'liability' ? Math.abs(accountBalance) : accountBalance;
-          return Math.round(balanceForCalculation * cashflow.percentageOf.percentage);
+          const result = Math.round(balanceForCalculation * cashflow.percentageOf.percentage);
+
+          const calculation = this.createCalculationStep(
+            `Percentage of ${sourceAccount.name} Balance`,
+            'Amount = Account Balance × Percentage',
+            {
+              'Account Balance': `R${(balanceForCalculation / 100).toFixed(2)}`,
+              'Percentage': `${(cashflow.percentageOf.percentage * 100).toFixed(2)}%`,
+              'Account Type': sourceAccount.kind,
+            },
+            result
+          );
+
+          return { amount: result, calculation };
         }
       }
     }
 
     // Regular indexed amount calculation
-    return this.getIndexedCashflowAmount(cashflow, monthsFromStart);
+    const baseAmount = this.getIndexedCashflowAmount(cashflow, monthsFromStart);
+    
+    // Show indexation calculation if applicable
+    if (cashflow.recurrence.annualIndexationPct && monthsFromStart > 0) {
+      const yearsElapsed = monthsFromStart / 12;
+      const indexationFactor = Math.pow(1 + cashflow.recurrence.annualIndexationPct, yearsElapsed);
+      
+      const calculation = this.createCalculationStep(
+        'Annual Indexation Applied',
+        'Indexed Amount = Base Amount × (1 + rate)^years',
+        {
+          'Base Amount': `R${(cashflow.amountCents / 100).toFixed(2)}`,
+          'Indexation Rate': `${(cashflow.recurrence.annualIndexationPct * 100).toFixed(2)}%`,
+          'Years Elapsed': yearsElapsed.toFixed(2),
+          'Indexation Factor': indexationFactor.toFixed(4),
+        },
+        baseAmount
+      );
+
+      return { amount: baseAmount, calculation };
+    }
+
+    return { amount: baseAmount };
   }
 
   /**
@@ -308,20 +423,27 @@ export class ProjectionEngine {
           startDate
         );
 
-        // Calculate total cashflow for this account this month
+        // Calculate total cashflow for this account this month with detailed calculations
         let netCashflow = 0;
+        const cashflowCalculations: CalculationStep[] = [];
+        
         for (const cf of monthCashflows) {
           const monthsFromStart = this.getMonthsDifference(
             new Date(cf.recurrence.startDate),
             projectionDate
           );
-          const effectiveAmount = this.getEffectiveCashflowAmount(
+          const { amount: effectiveAmount, calculation } = this.getEffectiveCashflowAmountWithDetails(
             cf,
             adjustedCashflows,
             adjustedAccounts,
             currentAccountBalances,
             monthsFromStart
           );
+
+          // Track calculation details if available
+          if (calculation) {
+            cashflowCalculations.push(calculation);
+          }
 
           if (account.kind === 'income') {
             netCashflow += effectiveAmount;
@@ -347,7 +469,7 @@ export class ProjectionEngine {
             new Date(cf.recurrence.startDate),
             projectionDate
           );
-          const effectiveAmount = this.getEffectiveCashflowAmount(
+          const { amount: effectiveAmount, calculation } = this.getEffectiveCashflowAmountWithDetails(
             cf,
             adjustedCashflows,
             adjustedAccounts,
@@ -355,30 +477,46 @@ export class ProjectionEngine {
             monthsFromStart
           );
           
+          // Track transfer calculation details
+          if (calculation) {
+            cashflowCalculations.push({
+              ...calculation,
+              description: `Transfer: ${calculation.description}`,
+            });
+          }
+          
           // Transfers to this account increase the balance
           netCashflow += effectiveAmount;
         }
 
-        // Calculate interest earned (for assets) or charged (for liabilities)
+        // Calculate interest earned (for assets) or charged (for liabilities) with details
         let interestEarned = 0;
+        let interestCalculation: CalculationStep | undefined;
+        
         if (account.annualInterestRate) {
           const balanceForInterest = openingBalance + netCashflow / 2; // Use average balance
-          interestEarned = this.calculateCompoundInterest(
+          const interestResult = this.calculateCompoundInterestWithDetails(
             balanceForInterest,
             account.annualInterestRate,
             account.compoundsPerYear || 12,
             1
           );
+          interestEarned = interestResult.interest;
+          interestCalculation = interestResult.calculation;
         }
 
-        // Calculate property appreciation if applicable
+        // Calculate property appreciation if applicable with details
         let appreciationGain = 0;
+        let appreciationCalculation: CalculationStep | undefined;
+        
         if (account.isProperty && account.propertyAppreciationRate) {
-          appreciationGain = this.calculatePropertyAppreciation(
+          const appreciationResult = this.calculatePropertyAppreciationWithDetails(
             openingBalance,
             account.propertyAppreciationRate,
             1
           );
+          appreciationGain = appreciationResult.appreciation;
+          appreciationCalculation = appreciationResult.calculation;
         }
 
         // Calculate closing balance
@@ -388,7 +526,21 @@ export class ProjectionEngine {
         // Update the running balance
         currentAccountBalances.set(account.id, closingBalance);
 
-        // Store monthly data
+        // Store monthly data with calculation details
+        const accountCalculationDetails: any = {};
+        
+        if (interestCalculation) {
+          accountCalculationDetails.interestCalculation = interestCalculation;
+        }
+        
+        if (appreciationCalculation) {
+          accountCalculationDetails.appreciationCalculation = appreciationCalculation;
+        }
+        
+        if (cashflowCalculations.length > 0) {
+          accountCalculationDetails.cashflowCalculations = cashflowCalculations;
+        }
+
         monthlyAccountData[account.id] = {
           openingBalance,
           income: account.kind === 'income' ? netCashflow : 0,
@@ -396,6 +548,10 @@ export class ProjectionEngine {
           netCashflow,
           interestEarned: interestEarned + appreciationGain,
           closingBalance,
+          // Add calculation details if any exist
+          ...(Object.keys(accountCalculationDetails).length > 0 && {
+            calculationDetails: accountCalculationDetails,
+          }),
         };
       }
 
@@ -422,13 +578,76 @@ export class ProjectionEngine {
         }
       }
 
-      // Calculate month totals
+      // Calculate month totals with calculation details
       const totalNetWorth = this.calculateNetWorth(
         currentAccountBalances,
         adjustedAccounts
       );
       const savingsRate =
         totalIncome > 0 ? (totalIncome - totalExpenses) / totalIncome : 0;
+
+      // Create calculation summaries for transparency
+      const calculationSummary = {
+        totalIncomeCalculation: this.createCalculationStep(
+          'Total Income for Month',
+          'Sum of all income account net cash flows',
+          {
+            'Income Sources': Object.entries(monthlyAccountData)
+              .filter(([accountId]) => {
+                const account = adjustedAccounts.find(acc => acc.id === accountId);
+                return account?.kind === 'income';
+              })
+              .map(([, data]) => `R${(data.income / 100).toFixed(2)}`)
+              .join(' + '),
+          },
+          totalIncome
+        ),
+        totalExpensesCalculation: this.createCalculationStep(
+          'Total Expenses for Month',
+          'Sum of all expense account net cash flows',
+          {
+            'Expense Categories': Object.entries(monthlyAccountData)
+              .filter(([accountId]) => {
+                const account = adjustedAccounts.find(acc => acc.id === accountId);
+                return account?.kind !== 'income';
+              })
+              .map(([, data]) => `R${(data.expenses / 100).toFixed(2)}`)
+              .join(' + '),
+          },
+          totalExpenses
+        ),
+        netWorthCalculation: this.createCalculationStep(
+          'Total Net Worth Calculation',
+          'Sum of assets minus liabilities',
+          {
+            'Asset Balances': Object.entries(monthlyAccountData)
+              .filter(([accountId]) => {
+                const account = adjustedAccounts.find(acc => acc.id === accountId);
+                return account?.kind !== 'liability';
+              })
+              .map(([, data]) => `R${(data.closingBalance / 100).toFixed(2)}`)
+              .join(' + '),
+            'Liability Balances': Object.entries(monthlyAccountData)
+              .filter(([accountId]) => {
+                const account = adjustedAccounts.find(acc => acc.id === accountId);
+                return account?.kind === 'liability';
+              })
+              .map(([, data]) => `R${(Math.abs(data.closingBalance) / 100).toFixed(2)}`)
+              .join(' + '),
+          },
+          totalNetWorth
+        ),
+        savingsRateCalculation: this.createCalculationStep(
+          'Savings Rate Calculation',
+          'Savings Rate = (Income - Expenses) / Income',
+          {
+            'Total Income': `R${(totalIncome / 100).toFixed(2)}`,
+            'Total Expenses': `R${(totalExpenses / 100).toFixed(2)}`,
+            'Net Savings': `R${((totalIncome - totalExpenses) / 100).toFixed(2)}`,
+          },
+          savingsRate
+        ),
+      };
 
       const monthProjection: MonthlyProjection = {
         month: projectionDate.toISOString().slice(0, 7), // YYYY-MM format
@@ -437,6 +656,7 @@ export class ProjectionEngine {
         totalIncome,
         totalExpenses,
         savingsRate,
+        calculationSummary,
       };
 
       // Add payoff events if any occurred
