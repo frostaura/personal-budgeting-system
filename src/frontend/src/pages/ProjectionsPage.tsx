@@ -20,11 +20,17 @@ import {
   Alert,
   Slider,
   FormHelperText,
+  Collapse,
+  IconButton,
+  Divider,
 } from '@mui/material';
 import {
   Calculate as CalculateIcon,
   Timeline as TimelineIcon,
   AccountBalance as AccountBalanceIcon,
+  ExpandMore as ExpandMoreIcon,
+  ExpandLess as ExpandLessIcon,
+  Functions as FunctionsIcon,
 } from '@mui/icons-material';
 import { useAppSelector } from '@/store/hooks';
 import { projectionEngine } from '@/services/projectionEngine';
@@ -32,6 +38,7 @@ import { chartColors } from '@/utils/chartColors';
 import { generateMonthsSliderLabel } from '@/utils/sliderLabels';
 import { formatCurrency } from '@/utils/currency';
 import { ProjectionResult } from '@/types/money';
+import { CalculationBreakdown } from '@/components/common';
 
 const ProjectionsPage: React.FC = () => {
   const { accounts } = useAppSelector(state => state.accounts);
@@ -48,6 +55,7 @@ const ProjectionsPage: React.FC = () => {
   const [projectionResults, setProjectionResults] =
     useState<ProjectionResult | null>(null);
   const [isCalculating, setIsCalculating] = useState(false);
+  const [expandedCalculations, setExpandedCalculations] = useState<Set<string>>(new Set());
 
   // Save projection period to localStorage when it changes
   const handleProjectionPeriodChange = (value: number) => {
@@ -56,6 +64,16 @@ const ProjectionsPage: React.FC = () => {
   };
 
   const selectedScenarioObj = scenarios.find(s => s.id === selectedScenario);
+
+  const toggleCalculationExpansion = (monthKey: string) => {
+    const newExpanded = new Set(expandedCalculations);
+    if (newExpanded.has(monthKey)) {
+      newExpanded.delete(monthKey);
+    } else {
+      newExpanded.add(monthKey);
+    }
+    setExpandedCalculations(newExpanded);
+  };
 
   // Calculate real-time projections
   const handleCalculateProjections = useCallback(async () => {
@@ -323,6 +341,9 @@ const ProjectionsPage: React.FC = () => {
                       <TableCell align="right" sx={{ minWidth: { xs: 100, sm: 120 } }}>Monthly Expenses</TableCell>
                       <TableCell align="right" sx={{ minWidth: { xs: 80, sm: 100 } }}>Savings Rate</TableCell>
                       <TableCell align="right" sx={{ minWidth: { xs: 80, sm: 100 }, display: { xs: 'none', md: 'table-cell' } }}>Growth</TableCell>
+                      <TableCell align="center" sx={{ minWidth: 50 }}>
+                        <FunctionsIcon fontSize="small" />
+                      </TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -337,79 +358,189 @@ const ProjectionsPage: React.FC = () => {
                           ? month.totalNetWorth - previousMonth.totalNetWorth
                           : 0;
 
+                        const isExpanded = expandedCalculations.has(month.month);
+
                         return (
-                          <TableRow key={month.month}>
-                            <TableCell sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
-                              {new Date(month.month + '-01').toLocaleDateString(
-                                'en-ZA',
-                                {
-                                  year: 'numeric',
-                                  month: 'short',
-                                }
-                              )}
-                            </TableCell>
-                            <TableCell align="right">
-                              <Typography
-                                sx={{
-                                  fontWeight: 'bold',
-                                  fontSize: { xs: '0.75rem', sm: '0.875rem' },
-                                  color: month.totalNetWorth >= 0 ? 'success.main' : 'error.main',
-                                }}
-                              >
-                                {formatCurrency(month.totalNetWorth)}
-                              </Typography>
-                            </TableCell>
-                            <TableCell
-                              align="right"
-                              sx={{ 
-                                color: 'success.main',
-                                fontSize: { xs: '0.75rem', sm: '0.875rem' },
-                                display: { xs: 'none', sm: 'table-cell' }
-                              }}
-                            >
-                              {formatCurrency(month.totalIncome)}
-                            </TableCell>
-                            <TableCell
-                              align="right"
-                              sx={{ 
-                                color: 'error.main',
-                                fontSize: { xs: '0.75rem', sm: '0.875rem' }
-                              }}
-                            >
-                              {formatCurrency(month.totalExpenses)}
-                            </TableCell>
-                            <TableCell align="right">
-                              <Chip
-                                label={`${(month.savingsRate * 100).toFixed(1)}%`}
-                                color={
-                                  month.savingsRate >= 0.2
-                                    ? 'success'
-                                    : month.savingsRate >= 0.1
-                                      ? 'warning'
-                                      : 'error'
-                                }
-                                size="small"
-                                sx={{ 
-                                  fontSize: { xs: '0.65rem', sm: '0.75rem' },
-                                  height: { xs: 20, sm: 24 }
-                                }}
-                              />
-                            </TableCell>
-                            <TableCell align="right" sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                              {previousMonth && (
+                          <React.Fragment key={month.month}>
+                            <TableRow>
+                              <TableCell sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
+                                {new Date(month.month + '-01').toLocaleDateString(
+                                  'en-ZA',
+                                  {
+                                    year: 'numeric',
+                                    month: 'short',
+                                  }
+                                )}
+                              </TableCell>
+                              <TableCell align="right">
                                 <Typography
-                                  variant="body2"
                                   sx={{
+                                    fontWeight: 'bold',
                                     fontSize: { xs: '0.75rem', sm: '0.875rem' },
-                                    color: monthlyGrowth >= 0 ? 'success.main' : 'error.main',
+                                    color: month.totalNetWorth >= 0 ? 'success.main' : 'error.main',
                                   }}
                                 >
-                                  {monthlyGrowth >= 0 ? '+' : ''}
-                                  {formatCurrency(monthlyGrowth)}
+                                  {formatCurrency(month.totalNetWorth)}
                                 </Typography>
-                              )}
-                            </TableCell>
-                          </TableRow>
+                              </TableCell>
+                              <TableCell
+                                align="right"
+                                sx={{ 
+                                  color: 'success.main',
+                                  fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                                  display: { xs: 'none', sm: 'table-cell' }
+                                }}
+                              >
+                                {formatCurrency(month.totalIncome)}
+                              </TableCell>
+                              <TableCell
+                                align="right"
+                                sx={{ 
+                                  color: 'error.main',
+                                  fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                                }}
+                              >
+                                {formatCurrency(month.totalExpenses)}
+                              </TableCell>
+                              <TableCell align="right">
+                                <Chip
+                                  label={`${(month.savingsRate * 100).toFixed(1)}%`}
+                                  color={
+                                    month.savingsRate >= 0.2
+                                      ? 'success'
+                                      : month.savingsRate >= 0.1
+                                        ? 'warning'
+                                        : 'error'
+                                  }
+                                  size="small"
+                                  sx={{ 
+                                    fontSize: { xs: '0.65rem', sm: '0.75rem' },
+                                    height: { xs: 20, sm: 24 }
+                                  }}
+                                />
+                              </TableCell>
+                              <TableCell align="right" sx={{ display: { xs: 'none', md: 'table-cell' } }}>
+                                {previousMonth && (
+                                  <Typography
+                                    variant="body2"
+                                    sx={{
+                                      fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                                      color: monthlyGrowth >= 0 ? 'success.main' : 'error.main',
+                                    }}
+                                  >
+                                    {monthlyGrowth >= 0 ? '+' : ''}
+                                    {formatCurrency(monthlyGrowth)}
+                                  </Typography>
+                                )}
+                              </TableCell>
+                              <TableCell align="center">
+                                <IconButton
+                                  size="small"
+                                  onClick={() => toggleCalculationExpansion(month.month)}
+                                  sx={{ color: 'primary.main' }}
+                                >
+                                  {isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                                </IconButton>
+                              </TableCell>
+                            </TableRow>
+
+                            {/* Calculation Details Row */}
+                            <TableRow>
+                              <TableCell colSpan={7} sx={{ py: 0, border: 'none' }}>
+                                <Collapse in={isExpanded} timeout="auto" unmountOnExit>
+                                  <Box sx={{ py: 2, backgroundColor: 'grey.50' }}>
+                                    <Typography
+                                      variant="subtitle2"
+                                      sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}
+                                    >
+                                      Calculation Details for {new Date(month.month + '-01').toLocaleDateString('en-ZA', { year: 'numeric', month: 'long' })}
+                                    </Typography>
+                                    
+                                    {month.calculationSummary && (
+                                      <Grid container spacing={2}>
+                                        <Grid item xs={12} md={6}>
+                                          <CalculationBreakdown
+                                            calculation={month.calculationSummary.netWorthCalculation}
+                                            variant="detailed"
+                                          />
+                                        </Grid>
+                                        <Grid item xs={12} md={6}>
+                                          <CalculationBreakdown
+                                            calculation={month.calculationSummary.savingsRateCalculation}
+                                            variant="detailed"
+                                          />
+                                        </Grid>
+                                        <Grid item xs={12} md={6}>
+                                          <CalculationBreakdown
+                                            calculation={month.calculationSummary.totalIncomeCalculation}
+                                            variant="detailed"
+                                          />
+                                        </Grid>
+                                        <Grid item xs={12} md={6}>
+                                          <CalculationBreakdown
+                                            calculation={month.calculationSummary.totalExpensesCalculation}
+                                            variant="detailed"
+                                          />
+                                        </Grid>
+                                      </Grid>
+                                    )}
+
+                                    {/* Account-specific calculation details */}
+                                    {Object.entries(month.accounts).some(([, accountData]) => accountData.calculationDetails) && (
+                                      <>
+                                        <Divider sx={{ my: 2 }} />
+                                        <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>
+                                          Account-Specific Calculations
+                                        </Typography>
+                                        <Grid container spacing={2}>
+                                          {Object.entries(month.accounts).map(([accountId, accountData]) => {
+                                            if (!accountData.calculationDetails) return null;
+                                            
+                                            const account = accounts.find(acc => acc.id === accountId);
+                                            const accountName = account?.name || accountId;
+
+                                            return (
+                                              <Grid item xs={12} key={accountId}>
+                                                <Typography variant="body2" sx={{ fontWeight: 500, mb: 1 }}>
+                                                  {account?.icon} {accountName}
+                                                </Typography>
+                                                <Grid container spacing={1}>
+                                                  {accountData.calculationDetails.interestCalculation && (
+                                                    <Grid item xs={12} sm={6}>
+                                                      <CalculationBreakdown
+                                                        calculation={accountData.calculationDetails.interestCalculation}
+                                                        variant="detailed"
+                                                      />
+                                                    </Grid>
+                                                  )}
+                                                  {accountData.calculationDetails.appreciationCalculation && (
+                                                    <Grid item xs={12} sm={6}>
+                                                      <CalculationBreakdown
+                                                        calculation={accountData.calculationDetails.appreciationCalculation}
+                                                        variant="detailed"
+                                                      />
+                                                    </Grid>
+                                                  )}
+                                                  {accountData.calculationDetails.cashflowCalculations?.map((calc, idx) => (
+                                                    <Grid item xs={12} sm={6} key={idx}>
+                                                      <CalculationBreakdown
+                                                        calculation={calc}
+                                                        variant="detailed"
+                                                      />
+                                                    </Grid>
+                                                  ))}
+                                                </Grid>
+                                              </Grid>
+                                            );
+                                          })}
+                                        </Grid>
+                                      </>
+                                    )}
+                                  </Box>
+                                </Collapse>
+                              </TableCell>
+                            </TableRow>
+                          </React.Fragment>
                         );
                       })}
                   </TableBody>
@@ -428,38 +559,88 @@ const ProjectionsPage: React.FC = () => {
             </CardContent>
           </Card>
 
-          {/* Key Assumptions */}
+          {/* Key Assumptions and Calculation Methodology */}
           <Card sx={{ mt: 3 }}>
             <CardContent>
               <Typography variant="h6" gutterBottom>
-                Projection Assumptions
+                Calculation Methodology & Assumptions
               </Typography>
-              <Grid container spacing={2}>
-                <Grid item xs={12} md={6}>
-                  <Typography variant="body2" gutterBottom>
-                    <strong>Interest & Growth:</strong>
+              
+              <Alert severity="info" sx={{ mb: 3 }}>
+                <Typography variant="body2">
+                  💡 <strong>All calculations are transparent and verifiable.</strong> 
+                  Click the <FunctionsIcon sx={{ fontSize: 16, mx: 0.5 }} /> icon in any month row above to see detailed step-by-step calculations.
+                </Typography>
+              </Alert>
+
+              <Grid container spacing={3}>
+                <Grid item xs={12} md={4}>
+                  <Typography variant="body2" gutterBottom sx={{ fontWeight: 600 }}>
+                    <CalculateIcon sx={{ fontSize: 16, mr: 0.5, verticalAlign: 'text-bottom' }} />
+                    Interest & Growth Calculations:
                   </Typography>
-                  <ul style={{ margin: 0, paddingLeft: 20 }}>
+                  <ul style={{ margin: 0, paddingLeft: 20, fontSize: '0.875rem' }}>
                     <li>
-                      Account interest rates applied monthly with compounding
+                      <strong>Compound Interest:</strong> A = P × (1 + r/n)^(n×t)
+                      <br />
+                      <Typography variant="caption" color="text.secondary">
+                        Where P=principal, r=annual rate, n=compounds per year, t=time in years
+                      </Typography>
                     </li>
                     <li>
-                      Property appreciation calculated monthly where applicable
+                      <strong>Property Appreciation:</strong> Monthly compounding based on annual rates
                     </li>
-                    <li>Investment returns based on configured annual rates</li>
+                    <li>
+                      <strong>Investment Returns:</strong> Configurable annual rates applied monthly
+                    </li>
                   </ul>
                 </Grid>
-                <Grid item xs={12} md={6}>
-                  <Typography variant="body2" gutterBottom>
-                    <strong>Cash Flows:</strong>
+                
+                <Grid item xs={12} md={4}>
+                  <Typography variant="body2" gutterBottom sx={{ fontWeight: 600 }}>
+                    💰 Cash Flow Calculations:
                   </Typography>
-                  <ul style={{ margin: 0, paddingLeft: 20 }}>
-                    <li>Recurring transactions maintain their schedules</li>
-                    <li>Annual indexation applied where configured</li>
-                    <li>Scenario adjustments applied to relevant expenses</li>
+                  <ul style={{ margin: 0, paddingLeft: 20, fontSize: '0.875rem' }}>
+                    <li>
+                      <strong>Percentage-based:</strong> Amount = Source × Percentage
+                      <br />
+                      <Typography variant="caption" color="text.secondary">
+                        e.g., Tax = Salary × 17%, Loan Payment = Balance × 1%
+                      </Typography>
+                    </li>
+                    <li>
+                      <strong>Annual Indexation:</strong> Indexed Amount = Base × (1 + rate)^years
+                    </li>
+                    <li>
+                      <strong>Scenario Adjustments:</strong> Applied to relevant expense categories
+                    </li>
+                  </ul>
+                </Grid>
+                
+                <Grid item xs={12} md={4}>
+                  <Typography variant="body2" gutterBottom sx={{ fontWeight: 600 }}>
+                    📊 Summary Calculations:
+                  </Typography>
+                  <ul style={{ margin: 0, paddingLeft: 20, fontSize: '0.875rem' }}>
+                    <li>
+                      <strong>Net Worth:</strong> Sum of Assets - Sum of Liabilities
+                    </li>
+                    <li>
+                      <strong>Savings Rate:</strong> (Income - Expenses) / Income
+                    </li>
+                    <li>
+                      <strong>Monthly Growth:</strong> Current Net Worth - Previous Net Worth
+                    </li>
                   </ul>
                 </Grid>
               </Grid>
+              
+              <Divider sx={{ my: 3 }} />
+              
+              <Typography variant="body2" color="text.secondary">
+                <strong>Note:</strong> All monetary calculations use cents (integers) to avoid floating-point precision errors. 
+                Formulas and step-by-step breakdowns are available for every calculation to ensure complete transparency.
+              </Typography>
             </CardContent>
           </Card>
         </>
