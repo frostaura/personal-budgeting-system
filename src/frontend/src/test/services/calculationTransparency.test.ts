@@ -7,7 +7,7 @@ describe('Calculation Transparency Features', () => {
     {
       id: 'savings',
       name: 'Savings Account',
-      kind: 'asset',
+      kind: 'investment',
       openingBalanceCents: 100000000, // R1,000,000
       annualInterestRate: 0.06, // 6% annual
       compoundsPerYear: 12,
@@ -187,7 +187,7 @@ describe('Calculation Transparency Features', () => {
     expect(result1.summary.endNetWorth).toBe(result2.summary.endNetWorth);
     
     // Each month should have calculation details
-    result1.months.forEach((month, index) => {
+    result1.months.forEach((month) => {
       expect(month.calculationSummary).toBeDefined();
       
       // Calculation results should match the actual totals
